@@ -1,6 +1,6 @@
 # PappiScents.shop
 
-Static one-page storefront for Pappi Suds & Scents. It uses plain HTML, CSS, and a small amount of vanilla JavaScript—no build step or external framework required.
+Static one-page storefront for Pappi Suds & Scents Shop. It uses plain HTML, CSS, and a small amount of vanilla JavaScript—no build step or external framework required.
 
 ## Publish with GitHub Pages
 
