@@ -40,7 +40,7 @@
     "telephone": "+63 905 561 3013",
     "hasMap": "https://maps.app.goo.gl/wPRMuWsfBQyrzJ5r5",
     "founder": { "@type": "Person", "name": "Verge" },
-    "foundingDate": "2024-04",
+    "foundingDate": "2025-04",
     "foundingLocation": { "@type": "Place", "name": "Cebu, Philippines" },
     "areaServed": { "@type": "Country", "name": "Philippines" },
     "sameAs": ["https://shopee.ph/bilyotoy"]
@@ -214,6 +214,23 @@
     .about-milestone strong { display: block; margin-bottom: 5px; font-family: var(--serif); font-size: 1.35rem; font-weight: 400; }
     .about-milestone span { color: var(--muted); font-size: .75rem; line-height: 1.45; }
 
+    .about-timeline { margin-top: 76px; padding-top: 64px; border-top: 1px solid var(--line); }
+    .about-timeline-head { max-width: 640px; margin-bottom: 42px; }
+    .about-timeline-head h3 { margin: 0 0 10px; font-family: var(--serif); font-size: clamp(1.7rem, 3vw, 2.3rem); font-weight: 400; }
+    .about-timeline-head p { margin: 0; color: var(--muted); font-size: .92rem; }
+    .timeline { position: relative; max-width: 780px; padding-left: 36px; }
+    .timeline::before { position: absolute; top: 6px; bottom: 6px; left: 6px; width: 1px; background: linear-gradient(180deg, var(--gold), rgba(200,155,60,.12)); content: ''; }
+    .timeline-era { margin: 0 0 22px; padding-top: 26px; border-top: 1px solid var(--line); color: #8f897f; font-size: .72rem; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; }
+    .timeline-era:first-child { padding-top: 0; border-top: 0; }
+    .timeline-entry { position: relative; padding-bottom: 28px; }
+    .timeline-entry:last-child { padding-bottom: 0; }
+    .timeline-entry::before { position: absolute; top: 3px; left: -36px; width: 11px; height: 11px; border: 2px solid var(--gold); border-radius: 50%; background: var(--paper); content: ''; }
+    .timeline-entry.is-milestone::before { background: var(--gold); }
+    .timeline-when { margin-bottom: 3px; color: #946c1f; font-family: var(--serif); font-size: .92rem; font-style: italic; }
+    .timeline-what { margin-bottom: 4px; font-size: 1rem; font-weight: 700; }
+    .timeline-detail { max-width: 620px; color: var(--muted); font-size: .86rem; line-height: 1.65; }
+    .timeline-detail strong { color: var(--ink); }
+
     .memory { position: relative; overflow: hidden; padding: 92px 0; background: var(--black); color: white; text-align: center; }
     .memory::before { position: absolute; inset: -35%; background: radial-gradient(circle, rgba(200,155,60,.14), transparent 52%); content: ""; }
     .memory-inner { position: relative; z-index: 1; }
@@ -329,6 +346,9 @@
       .about-grid { gap: 34px; }
       .about-visual { min-height: 0; aspect-ratio: 3 / 4; }
       .about-milestones { grid-template-columns: 1fr; }
+      .about-timeline { margin-top: 52px; padding-top: 44px; }
+      .timeline { padding-left: 28px; }
+      .timeline-entry::before { left: -28px; }
       .memory { padding: 72px 0; }
       .memory-quotes { grid-template-columns: 1fr; }
       .memory-quotes q { border-radius: 18px; }
@@ -451,16 +471,104 @@
         <figure class="about-visual"><img src="assets/brand/verge-pappi-story.jpg" width="941" height="1672" alt="Verge, founder of Pappi Suds and Scents Shop, holding a Pappi fragrance bottle and artisan savon bar" loading="lazy" decoding="async"></figure>
         <div class="about-copy">
           <p class="eyebrow">About Pappi · Founded by Verge</p>
-          <h2>A fragrance story carried home.</h2>
-          <p class="lede">Pappi began with Verge, a returning OFW who spent eight years living and working in Singapore before coming home to Cebu to be closer to family.</p>
-          <p>Those years abroad were shaped by responsibility: helping a younger brother finish school and establish himself, then finding a way forward after losing both parents. When the weight of those responsibilities eased, coming home became a chance to stay close to loved ones—and to build something meaningful in Cebu.</p>
-          <p>After studying perfumery and formulation in Malaysia and Singapore, Verge founded Pappi around April 2024. The first idea was simple and personal: give Filipino domestic helpers and fellow OFWs access to scents inspired by the character of luxury fragrances, at a fraction of luxury prices.</p>
-          <p>Today, that idea has come home. Pappi has become a thoughtful pasalubong and gift chosen by OFW kababayans for the people they love in the Philippines—bottling a little confidence, connection and memory in every scent.</p>
+          <h2>A partner’s obsession. A group chat. A brand.</h2>
+          <p class="lede">Pappi started with two things colliding: my partner Larry’s fascination with perfume—and the money he kept spending on it—and a TikTok chat with friends in Singapore who loved luxury fragrance but hated the price tag.</p>
+          <p>I didn’t have an answer for them at first. So I went looking for one: Sephora every other day, sniffing everything I could reach, studying mixes, watching videos, flipping through books. Eventually I enrolled in a proper perfumery course and visited manufacturing hubs and suppliers for real base ingredients, until I had over 150 oils on a shelf—ready for mixing, like alchemy in a Singapore bedroom my housemates swore smelled different every time the door opened.</p>
+          <p>Some fragrances started as personal requests—friends who wanted a luxury scent without the luxury price—so I named the bottle after them. Under a Singapore-born label called <strong>VG</strong>, that idea traveled with word of mouth into Malaysia and Singapore, and the bottles kept selling.</p>
+          <p>Retrenchment hit in May 2026. It could have ended things—instead it sent me home. As a returning OFW, I qualified for financial assistance to start a business, so I made it official. My brothers were dealing with chicken skin and wanted a natural alternative, which became <strong>Savon</strong>. And the perfume line, once VG, became <strong>Pappi</strong> the moment I landed back in the Philippines—black for the dark days it took to get here, gold for what came after.</p>
           <div class="about-milestones" aria-label="Pappi story highlights">
-            <div class="about-milestone"><strong>8 years</strong><span>Living and working in Singapore</span></div>
-            <div class="about-milestone"><strong>April 2024</strong><span>Pappi’s fragrance journey began</span></div>
-            <div class="about-milestone"><strong>Home in Cebu</strong><span>Created for kababayans and their loved ones</span></div>
+            <div class="about-milestone"><strong>150+ oils</strong><span>Gathered from suppliers and manufacturing hubs</span></div>
+            <div class="about-milestone"><strong>April 2025</strong><span>First bottles sold under VG—2,000+ since</span></div>
+            <div class="about-milestone"><strong>Home in Cebu</strong><span>Rebuilt as Pappi Suds &amp; Scents, 2026</span></div>
           </div>
+        </div>
+      </div>
+
+      <div class="wrap about-timeline">
+        <div class="about-timeline-head">
+          <h3>How Pappi came to be.</h3>
+          <p>From a partner’s perfume habit to a name with its own story—here’s the full timeline.</p>
+        </div>
+        <div class="timeline">
+
+          <p class="timeline-era">Singapore — discovery</p>
+          <div class="timeline-entry">
+            <p class="timeline-when">The spark</p>
+            <p class="timeline-what">Larry’s stash grows, and a question follows</p>
+            <p class="timeline-detail">My partner Larry’s fascination with perfume—and the money spent on it—sits alongside a TikTok chat with Singapore friends looking for a cheaper way into luxury scents.</p>
+          </div>
+          <div class="timeline-entry">
+            <p class="timeline-when">Months of learning</p>
+            <p class="timeline-what">Sephora, YouTube, and an online perfumery course</p>
+            <p class="timeline-detail">Sniffing at Sephora every other day, studying mixes, watching countless videos, flipping through books—then enrolling in a proper course and visiting manufacturing hubs and suppliers for base ingredients.</p>
+          </div>
+          <div class="timeline-entry is-milestone">
+            <p class="timeline-when">The lab</p>
+            <p class="timeline-what">150+ oils, one Singapore bedroom</p>
+            <p class="timeline-detail">A room that housemates said smelled different every time the door opened—each blend tested side-by-side against the real designer scent, like alchemy.</p>
+          </div>
+          <div class="timeline-entry">
+            <p class="timeline-when">Naming the bottles</p>
+            <p class="timeline-what">Fragrances named after the friends who requested them</p>
+            <p class="timeline-detail">Arianne, Anne, Ayani, Jo, Ms. Fe, Ms. Jane, Angelina, Maejoy, Khimmy, and more—each one a personal request from someone who wanted a luxury scent without the luxury price.</p>
+          </div>
+
+          <p class="timeline-era">April 2025 — going to market</p>
+          <div class="timeline-entry is-milestone">
+            <p class="timeline-when">April 7, 2025</p>
+            <p class="timeline-what">First bottles sold</p>
+            <p class="timeline-detail">The start of tracked sales—over 2,000 bottles (10–30ml) sold since this date, under the original “VG” label.</p>
+          </div>
+          <div class="timeline-entry">
+            <p class="timeline-when">Expanding</p>
+            <p class="timeline-what">Distribution into Malaysia and Singapore</p>
+            <p class="timeline-detail">Word spread beyond the original friend group; packaging upgraded from loose bottles to named boxes.</p>
+          </div>
+          <div class="timeline-entry">
+            <p class="timeline-when">Giving back</p>
+            <p class="timeline-what">Giveaways for Filipino community groups abroad</p>
+            <p class="timeline-detail">Plus a personalized line built specifically for gifting.</p>
+          </div>
+
+          <p class="timeline-era">May–August 2026 — the turn</p>
+          <div class="timeline-entry is-milestone">
+            <p class="timeline-when">May 2026</p>
+            <p class="timeline-what">Retrenchment</p>
+            <p class="timeline-detail">The job in Singapore ends—and unexpectedly, it paves the way for what comes next.</p>
+          </div>
+          <div class="timeline-entry">
+            <p class="timeline-when">August 10, 2026</p>
+            <p class="timeline-what">Preparing to embark on a new journey</p>
+            <p class="timeline-detail">Packing up Singapore, closing one chapter.</p>
+          </div>
+          <div class="timeline-entry is-milestone">
+            <p class="timeline-when">August 11, 2026</p>
+            <p class="timeline-what">Arrival in Cebu</p>
+            <p class="timeline-detail">Home, and the start of building something official.</p>
+          </div>
+
+          <p class="timeline-era">Cebu — rebirth</p>
+          <div class="timeline-entry">
+            <p class="timeline-when">OFW support</p>
+            <p class="timeline-what">Financial assistance becomes the seed capital</p>
+            <p class="timeline-detail">As a returning OFW, assistance to start a business made the decision easy—might as well make it official.</p>
+          </div>
+          <div class="timeline-entry">
+            <p class="timeline-when">A second line is born</p>
+            <p class="timeline-what">Savon—natural soap, for a very personal reason</p>
+            <p class="timeline-detail">My brothers were dealing with chicken skin and wanted a natural alternative—Savon exists because of them.</p>
+          </div>
+          <div class="timeline-entry is-milestone">
+            <p class="timeline-when">The rebrand</p>
+            <p class="timeline-what">Pappi Suds &amp; Scents—black for the dark days, gold for what’s next</p>
+            <p class="timeline-detail">A new name, new bottles, a new crest—built for premium, international, and a new chapter.</p>
+          </div>
+          <div class="timeline-entry">
+            <p class="timeline-when">Now</p>
+            <p class="timeline-what">Live at pappiscents.shop</p>
+            <p class="timeline-detail">Facebook: pappi.artisan · Shopee: bilyotoy</p>
+          </div>
+
         </div>
       </div>
     </section>
