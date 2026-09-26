@@ -34,7 +34,7 @@
   .row{display:grid;grid-template-columns:auto 1fr auto;gap:12px;align-items:center;padding:12px 14px;background:var(--panel);border:1px solid var(--line);border-radius:12px;text-align:left;width:100%}
   .row:hover{border-color:var(--gold)}
   .dot{width:10px;height:10px;border-radius:50%}
-  .s-new{background:var(--new)}.s-paid{background:var(--paid)}.s-packed{background:var(--packed)}.s-shipped{background:var(--shipped)}.s-completed{background:var(--done)}.s-cancelled{background:var(--cancel)}
+  .s-new{background:var(--new)}.s-awaiting_payment{background:transparent;border:2px solid var(--mute)}.s-paid{background:var(--paid)}.s-packed{background:var(--packed)}.s-shipped{background:var(--shipped)}.s-completed{background:var(--done)}.s-cancelled{background:var(--cancel)}
   .row small{display:block;color:var(--mute)}
   .amt{font-weight:700;text-align:right}
   .sheet{position:fixed;inset:0;z-index:10;background:rgba(0,0,0,.6);display:flex;justify-content:flex-end}
@@ -83,8 +83,9 @@ const app = document.getElementById("app");
 const peso = n => "₱" + Number(n || 0).toLocaleString("en-PH");
 const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;" }[c]));
 const fmtDate = d => new Date(d).toLocaleString("en-PH", { month:"short", day:"numeric", hour:"numeric", minute:"2-digit" });
-const STATUSES = ["new","paid","packed","shipped","completed","cancelled"];
-const LABEL = { new:"New", paid:"Paid", packed:"Packed", shipped:"Shipped", completed:"Completed", cancelled:"Cancelled" };
+const STATUSES = ["new","awaiting_payment","paid","packed","shipped","completed","cancelled"];
+const SITE = "https://pappiscents.shop";
+const LABEL = { new:"To check", awaiting_payment:"Unpaid", paid:"Paid", packed:"Packed", shipped:"Shipped", completed:"Completed", cancelled:"Cancelled" };
 const DELIVERY = { nationwide:"Nationwide", cebu_express:"Cebu express", pickup:"Pickup" };
 const REVENUE_STATUSES = ["paid","packed","shipped","completed"];
 
@@ -132,15 +133,15 @@ function shell(body){
 function viewOrders(){
   const counts = Object.fromEntries(STATUSES.map(s=>[s, S.orders.filter(o=>o.status===s).length]));
   const list = S.orders.filter(o => S.filter==="all" || o.status===S.filter);
-  return `<div class="filters">${["new","paid","packed","shipped","completed","cancelled","all"].map(f=>
+  return `<div class="filters">${["new","awaiting_payment","paid","packed","shipped","completed","cancelled","all"].map(f=>
       `<button class="chip" data-filter="${f}" aria-pressed="${S.filter===f}">${f==="all"?"All":LABEL[f]}<b>${f==="all"?S.orders.length:counts[f]}</b></button>`).join("")}</div>
     <div class="list">${list.length ? list.map(o=>`
       <button class="row" data-order="${o.id}">
         <span class="dot s-${o.status}" title="${LABEL[o.status]}"></span>
         <span><b>${esc(o.order_no)}</b> · ${esc(o.customers?.name)}
           <small>${o.order_items.map(i=>`${i.qty}× ${esc(i.name)} ${i.line.split(" ")[0]}`).join(", ")} · ${DELIVERY[o.delivery]} · ${fmtDate(o.created_at)}</small></span>
-        <span class="amt">${peso(o.total)}<small>${esc(o.payment_method)}</small></span>
-      </button>`).join("") : `<p class="muted">No ${S.filter==="all"?"":LABEL[S.filter].toLowerCase()+" "}orders. New website orders appear here and on Telegram.</p>`}</div>`;
+        <span class="amt">${peso(o.total)}<small>${esc(o.payment_method || "Not paid yet")}</small></span>
+      </button>`).join("") : `<p class="muted">No ${S.filter==="all"?"":LABEL[S.filter].toLowerCase()+" "}orders. Paid website orders appear under To check and on Telegram.</p>`}</div>`;
 }
 
 function viewOrder(){
@@ -160,7 +161,8 @@ function viewOrder(){
       <dt>Mobile</dt><dd><a style="color:var(--gold-hi)" href="tel:${esc(o.customers?.phone)}">${esc(o.customers?.phone)}</a> · <a style="color:var(--gold-hi)" href="sms:${esc(o.customers?.phone)}">Text</a></dd>
       <dt>Delivery</dt><dd>${DELIVERY[o.delivery]}</dd>
       ${o.address?`<dt>Address</dt><dd>${esc(o.address)}</dd>`:""}
-      <dt>Paid via</dt><dd>${esc(o.payment_method)} · expected ${peso(o.subtotal)}</dd>
+      <dt>Paid via</dt><dd>${o.payment_method ? `${esc(o.payment_method)} · expected ${peso(o.subtotal)}` : `Not paid yet · ${peso(o.subtotal)} due`}</dd>
+      <dt>Order link</dt><dd><button class="btn ghost" style="padding:6px 12px" data-copylink="${esc(SITE + "/?checkout=" + o.access_token)}">Copy link</button> <span class="muted" style="font-size:.85rem">Send it if they need to finish paying or track the order.</span></dd>
       ${o.customer_note?`<dt>Their note</dt><dd>${esc(o.customer_note)}</dd>`:""}
     </dl>
     <div class="muted">Payment screenshot</div>
@@ -272,6 +274,7 @@ app.addEventListener("click", async e => {
   const d = b.dataset;
   if (d.tab){ S.tab=d.tab; S.open=null; render(); }
   else if (d.filter){ S.filter=d.filter; render(); }
+  else if (d.copylink){ navigator.clipboard?.writeText(d.copylink); toast("Order link copied"); }
   else if (d.order){ openOrder(d.order); }
   else if ("close" in d){ S.open=null; render(); }
   else if (d.status){ await updateOrder(S.open, { status:d.status }, `Marked ${LABEL[d.status]}`); }
@@ -294,8 +297,10 @@ app.addEventListener("input", e => { if (e.target.id==="q"){ S.q=e.target.value;
 
 // New orders show up live while the dashboard is open
 function live(){
-  db.channel("orders").on("postgres_changes", { event:"INSERT", schema:"public", table:"orders" }, async () => {
-    await load(); render(); toast("New order received");
+  db.channel("orders").on("postgres_changes", { event:"*", schema:"public", table:"orders" }, async (ev) => {
+    await load(); render();
+    if (ev.eventType === "UPDATE" && ev.new?.status === "new") toast("Payment received — check it");
+    else if (ev.eventType === "INSERT") toast("New checkout started");
   }).subscribe();
 }
 
