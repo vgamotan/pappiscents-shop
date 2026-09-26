@@ -1,0 +1,311 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<meta name="theme-color" content="#0c0b09">
+<title>Pappi Orders</title>
+<style>
+  :root{--bg:#0c0b09;--panel:#16140f;--panel2:#1d1a13;--line:#2d2819;--gold:#c9a45c;--gold-hi:#e3c585;--text:#f3ede0;--mute:#a39a86;--new:#e3c585;--paid:#7fc8a9;--packed:#8fb3e8;--shipped:#b89ae8;--done:#6f6a5c;--cancel:#ff8a7a}
+  *{box-sizing:border-box}
+  html,body{margin:0;background:var(--bg);color:var(--text);font:15px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+  body{padding:env(safe-area-inset-top) 0 env(safe-area-inset-bottom)}
+  button,input,select,textarea{font:inherit;color:inherit}
+  button{cursor:pointer}
+  :focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+  header{position:sticky;top:0;z-index:5;background:var(--bg);border-bottom:1px solid var(--line)}
+  .top{display:flex;align-items:center;justify-content:space-between;max-width:1100px;margin:0 auto;padding:14px 16px}
+  .brand{font-weight:700;letter-spacing:.02em}.brand span{color:var(--gold)}
+  nav{display:flex;gap:4px;max-width:1100px;margin:0 auto;padding:0 12px 10px;overflow-x:auto}
+  nav button{border:0;background:none;padding:8px 14px;border-radius:999px;color:var(--mute);white-space:nowrap}
+  nav button[aria-current="page"]{background:var(--gold);color:#1a1409;font-weight:600}
+  main{max-width:1100px;margin:0 auto;padding:16px}
+  .muted{color:var(--mute)}
+  .btn{border:0;border-radius:999px;padding:10px 18px;background:var(--gold);color:#1a1409;font-weight:700}
+  .btn.ghost{background:transparent;border:1px solid var(--line);color:var(--text);font-weight:500}
+  .btn:disabled{opacity:.5}
+  input,select,textarea{width:100%;padding:10px 12px;border-radius:10px;border:1px solid var(--line);background:var(--panel)}
+  .filters{display:flex;gap:6px;overflow-x:auto;margin-bottom:14px}
+  .chip{border:1px solid var(--line);background:none;border-radius:999px;padding:6px 12px;white-space:nowrap;color:var(--mute)}
+  .chip[aria-pressed="true"]{border-color:var(--gold);color:var(--gold-hi)}
+  .chip b{color:var(--text);margin-left:4px}
+  .list{display:grid;gap:8px}
+  .row{display:grid;grid-template-columns:auto 1fr auto;gap:12px;align-items:center;padding:12px 14px;background:var(--panel);border:1px solid var(--line);border-radius:12px;text-align:left;width:100%}
+  .row:hover{border-color:var(--gold)}
+  .dot{width:10px;height:10px;border-radius:50%}
+  .s-new{background:var(--new)}.s-paid{background:var(--paid)}.s-packed{background:var(--packed)}.s-shipped{background:var(--shipped)}.s-completed{background:var(--done)}.s-cancelled{background:var(--cancel)}
+  .row small{display:block;color:var(--mute)}
+  .amt{font-weight:700;text-align:right}
+  .sheet{position:fixed;inset:0;z-index:10;background:rgba(0,0,0,.6);display:flex;justify-content:flex-end}
+  .sheet>div{width:min(560px,100%);height:100%;overflow:auto;background:var(--panel2);border-left:1px solid var(--line);padding:20px 18px calc(24px + env(safe-area-inset-bottom))}
+  .sheet h2{margin:0 0 2px;font-size:1.4rem}
+  .kv{display:grid;grid-template-columns:110px 1fr;gap:6px 12px;margin:16px 0}
+  .kv dt{color:var(--mute)}.kv dd{margin:0;word-break:break-word}
+  .proof{width:100%;border-radius:10px;border:1px solid var(--line);background:#000;margin-top:6px}
+  .pipeline{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin:16px 0}
+  .pipeline button{border:1px solid var(--line);background:var(--panel);border-radius:10px;padding:10px 4px;font-size:.9rem}
+  .pipeline button[aria-pressed="true"]{border-color:var(--gold);background:var(--gold);color:#1a1409;font-weight:700}
+  .items{list-style:none;margin:0;padding:0}.items li{display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--line)}
+  .field{margin-top:12px}.field label{display:block;color:var(--mute);margin-bottom:4px;font-size:.9rem}
+  .actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
+  .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:10px;margin-bottom:18px}
+  .stat{padding:14px;background:var(--panel);border:1px solid var(--line);border-radius:12px}
+  .stat .v{font-size:1.6rem;font-weight:700}
+  .stat .l{color:var(--mute);font-size:.9rem}
+  .bars{display:flex;align-items:flex-end;gap:3px;height:140px;padding:12px;background:var(--panel);border:1px solid var(--line);border-radius:12px;margin-bottom:18px}
+  .bars div{flex:1;background:var(--gold);border-radius:3px 3px 0 0;min-height:2px}
+  table{width:100%;border-collapse:collapse}
+  th,td{padding:10px 8px;border-bottom:1px solid var(--line);text-align:left}
+  th{color:var(--mute);font-weight:500}
+  td.n,th.n{text-align:right}
+  .wrap{overflow-x:auto;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:4px 8px}
+  .login{max-width:360px;margin:12vh auto;padding:24px;background:var(--panel);border:1px solid var(--line);border-radius:16px}
+  .login h1{margin:0 0 4px;font-size:1.4rem}
+  .login .field{margin-top:14px}
+  .err{color:var(--cancel);min-height:1.3em;margin-top:10px}
+  .toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom));transform:translateX(-50%);background:var(--gold);color:#1a1409;padding:10px 18px;border-radius:999px;font-weight:600;z-index:20}
+  h3{margin:22px 0 10px;font-size:1.05rem}
+  @media (max-width:560px){.row{grid-template-columns:auto 1fr}.row .amt{grid-column:2;text-align:left}.kv{grid-template-columns:90px 1fr}}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
+<script>
+// ------------------------- SETTINGS (same as the order widget) -------------------------
+const SUPABASE_URL = "https://bkklvfioefrdaddbcisz.supabase.co";
+const SUPABASE_ANON_KEY = "sb_publishable_sXZa6c917YXzSkvKdhzaig_FgrdDbjQ";
+// ---------------------------------------------------------------------------------------
+
+const db = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+const app = document.getElementById("app");
+const peso = n => "₱" + Number(n || 0).toLocaleString("en-PH");
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;" }[c]));
+const fmtDate = d => new Date(d).toLocaleString("en-PH", { month:"short", day:"numeric", hour:"numeric", minute:"2-digit" });
+const STATUSES = ["new","paid","packed","shipped","completed","cancelled"];
+const LABEL = { new:"New", paid:"Paid", packed:"Packed", shipped:"Shipped", completed:"Completed", cancelled:"Cancelled" };
+const DELIVERY = { nationwide:"Nationwide", cebu_express:"Cebu express", pickup:"Pickup" };
+const REVENUE_STATUSES = ["paid","packed","shipped","completed"];
+
+const S = { tab:"orders", filter:"new", orders:[], customers:[], products:[], open:null, proofUrl:"", q:"" };
+
+function toast(msg){ const t=document.createElement("div"); t.className="toast"; t.textContent=msg; document.body.append(t); setTimeout(()=>t.remove(),2200); }
+
+// ---------------- Auth ----------------
+function viewLogin(err=""){
+  app.innerHTML = `<form class="login" id="login">
+    <h1>Pappi Orders</h1><p class="muted">Sign in to manage orders.</p>
+    <div class="field"><label for="em">Email</label><input id="em" type="email" autocomplete="username" required></div>
+    <div class="field"><label for="pw">Password</label><input id="pw" type="password" autocomplete="current-password" required></div>
+    <p class="err">${esc(err)}</p>
+    <button class="btn" style="width:100%">Sign in</button></form>`;
+  document.getElementById("login").onsubmit = async e => {
+    e.preventDefault();
+    const { error } = await db.auth.signInWithPassword({ email: em.value.trim(), password: pw.value });
+    if (error) return viewLogin("Wrong email or password.");
+    boot();
+  };
+}
+
+// ---------------- Data ----------------
+async function load(){
+  const since = new Date(Date.now() - 1000*60*60*24*365).toISOString();
+  const [o, c, p] = await Promise.all([
+    db.from("orders").select("*, customers(id,name,phone,address), order_items(name,line,qty,unit_price)").gte("created_at", since).order("created_at",{ascending:false}),
+    db.from("customers").select("*").order("created_at",{ascending:false}),
+    db.from("products").select("*").order("sort"),
+  ]);
+  if (o.error) throw o.error;
+  S.orders = o.data; S.customers = c.data || []; S.products = p.data || [];
+}
+
+// ---------------- Views ----------------
+function shell(body){
+  const tabs = [["orders","Orders"],["customers","Customers"],["sales","Sales"],["products","Products"]];
+  app.innerHTML = `<header><div class="top"><div class="brand">Pappi <span>Orders</span></div>
+      <div><button class="btn ghost" id="refresh">Refresh</button> <button class="btn ghost" id="logout">Sign out</button></div></div>
+    <nav>${tabs.map(([k,l])=>`<button data-tab="${k}" ${S.tab===k?'aria-current="page"':""}>${l}</button>`).join("")}</nav></header>
+    <main>${body}</main>${S.open ? viewOrder() : ""}`;
+}
+
+function viewOrders(){
+  const counts = Object.fromEntries(STATUSES.map(s=>[s, S.orders.filter(o=>o.status===s).length]));
+  const list = S.orders.filter(o => S.filter==="all" || o.status===S.filter);
+  return `<div class="filters">${["new","paid","packed","shipped","completed","cancelled","all"].map(f=>
+      `<button class="chip" data-filter="${f}" aria-pressed="${S.filter===f}">${f==="all"?"All":LABEL[f]}<b>${f==="all"?S.orders.length:counts[f]}</b></button>`).join("")}</div>
+    <div class="list">${list.length ? list.map(o=>`
+      <button class="row" data-order="${o.id}">
+        <span class="dot s-${o.status}" title="${LABEL[o.status]}"></span>
+        <span><b>${esc(o.order_no)}</b> · ${esc(o.customers?.name)}
+          <small>${o.order_items.map(i=>`${i.qty}× ${esc(i.name)} ${i.line.split(" ")[0]}`).join(", ")} · ${DELIVERY[o.delivery]} · ${fmtDate(o.created_at)}</small></span>
+        <span class="amt">${peso(o.total)}<small>${esc(o.payment_method)}</small></span>
+      </button>`).join("") : `<p class="muted">No ${S.filter==="all"?"":LABEL[S.filter].toLowerCase()+" "}orders. New website orders appear here and on Telegram.</p>`}</div>`;
+}
+
+function viewOrder(){
+  const o = S.orders.find(x=>x.id===S.open); if(!o) return "";
+  const pipe = ["paid","packed","shipped","completed"];
+  const repeat = S.orders.filter(x=>x.customer_id===o.customer_id).length;
+  return `<div class="sheet" data-close><div role="dialog" aria-label="Order ${esc(o.order_no)}">
+    <div style="display:flex;justify-content:space-between;align-items:start">
+      <div><h2>${esc(o.order_no)}</h2><span class="muted">${fmtDate(o.created_at)} · ${LABEL[o.status]}</span></div>
+      <button class="btn ghost" data-close>Close</button></div>
+    <div class="pipeline">${pipe.map(s=>`<button data-status="${s}" aria-pressed="${o.status===s}">${LABEL[s]}</button>`).join("")}</div>
+    <ul class="items">${o.order_items.map(i=>`<li><span>${i.qty} × ${esc(i.name)} <span class="muted">${esc(i.line)}</span></span><span>${peso(i.qty*i.unit_price)}</span></li>`).join("")}
+      <li><span>Shipping</span><span>${peso(o.shipping_fee)}</span></li>
+      <li><b>Total</b><b>${peso(o.total)}</b></li></ul>
+    <dl class="kv">
+      <dt>Customer</dt><dd>${esc(o.customers?.name)}${repeat>1?` <span style="color:var(--gold-hi)">· ${repeat} orders</span>`:""}</dd>
+      <dt>Mobile</dt><dd><a style="color:var(--gold-hi)" href="tel:${esc(o.customers?.phone)}">${esc(o.customers?.phone)}</a> · <a style="color:var(--gold-hi)" href="sms:${esc(o.customers?.phone)}">Text</a></dd>
+      <dt>Delivery</dt><dd>${DELIVERY[o.delivery]}</dd>
+      ${o.address?`<dt>Address</dt><dd>${esc(o.address)}</dd>`:""}
+      <dt>Paid via</dt><dd>${esc(o.payment_method)} · expected ${peso(o.subtotal)}</dd>
+      ${o.customer_note?`<dt>Their note</dt><dd>${esc(o.customer_note)}</dd>`:""}
+    </dl>
+    <div class="muted">Payment screenshot</div>
+    ${S.proofUrl?`<a href="${S.proofUrl}" target="_blank" rel="noopener"><img class="proof" src="${S.proofUrl}" alt="Payment screenshot for ${esc(o.order_no)}"></a>`:`<p class="muted">${o.proof_path?"Loading…":"No screenshot"}</p>`}
+    <div class="field"><label for="f-ship">Shipping fee (₱)</label><input id="f-ship" type="number" min="0" step="1" value="${Number(o.shipping_fee)}"></div>
+    <div class="field"><label for="f-track">Tracking number</label><input id="f-track" value="${esc(o.tracking_no)}"></div>
+    <div class="field"><label for="f-note">Private note</label><textarea id="f-note" rows="2">${esc(o.admin_note)}</textarea></div>
+    <div class="actions"><button class="btn" data-save>Save details</button>
+      ${o.status!=="cancelled"?`<button class="btn ghost" data-status="cancelled">Cancel order</button>`:`<button class="btn ghost" data-status="new">Reopen order</button>`}</div>
+  </div></div>`;
+}
+
+function customerStats(){
+  const by = {};
+  for (const o of S.orders){
+    if (!REVENUE_STATUSES.includes(o.status) && o.status!=="new") continue;
+    const c = by[o.customer_id] ||= { orders:0, spent:0, last:null, scents:{} };
+    c.orders++; if (REVENUE_STATUSES.includes(o.status)) c.spent += Number(o.total);
+    if (!c.last || o.created_at > c.last) c.last = o.created_at;
+    for (const i of o.order_items) c.scents[i.name] = (c.scents[i.name]||0) + i.qty;
+  }
+  return by;
+}
+
+function viewCustomers(){
+  const st = customerStats(); const q = S.q.toLowerCase();
+  const rows = S.customers.filter(c=>!q || c.name.toLowerCase().includes(q) || c.phone.includes(q))
+    .map(c=>({ ...c, ...(st[c.id]||{orders:0,spent:0,last:null,scents:{}}) }))
+    .sort((a,b)=>b.spent-a.spent);
+  const fav = s => Object.entries(s).sort((a,b)=>b[1]-a[1])[0]?.[0] || "—";
+  const repeaters = rows.filter(r=>r.orders>1).length;
+  return `<div class="stats">
+      <div class="stat"><div class="v">${S.customers.length}</div><div class="l">Customers</div></div>
+      <div class="stat"><div class="v">${repeaters}</div><div class="l">Repeat buyers</div></div>
+      <div class="stat"><div class="v">${S.customers.length?Math.round(repeaters/S.customers.length*100):0}%</div><div class="l">Repeat rate</div></div></div>
+    <input id="q" placeholder="Search name or number" value="${esc(S.q)}" style="margin-bottom:12px">
+    <div class="wrap"><table><thead><tr><th>Name</th><th>Mobile</th><th class="n">Orders</th><th class="n">Spent</th><th>Favorite</th><th>Last order</th></tr></thead>
+    <tbody>${rows.map(r=>`<tr><td>${esc(r.name)}</td><td><a style="color:var(--gold-hi)" href="sms:${esc(r.phone)}">${esc(r.phone)}</a></td>
+      <td class="n">${r.orders}</td><td class="n">${peso(r.spent)}</td><td>${esc(fav(r.scents))}</td><td>${r.last?fmtDate(r.last):"—"}</td></tr>`).join("") || `<tr><td colspan="6" class="muted">Customers are added automatically when they order.</td></tr>`}</tbody></table></div>`;
+}
+
+function viewSales(){
+  const paid = S.orders.filter(o=>REVENUE_STATUSES.includes(o.status));
+  const now = new Date(); const today = now.toDateString();
+  const ym = `${now.getFullYear()}-${now.getMonth()}`;
+  const sum = arr => arr.reduce((s,o)=>s+Number(o.subtotal),0);
+  const tOrders = paid.filter(o=>new Date(o.paid_at||o.created_at).toDateString()===today);
+  const mOrders = paid.filter(o=>{const d=new Date(o.paid_at||o.created_at);return `${d.getFullYear()}-${d.getMonth()}`===ym;});
+  const units = {}; let elixir=0, parfum=0, savon=0;
+  for (const o of mOrders) for (const i of o.order_items){
+    const k = i.name + " · " + i.line; units[k] = units[k] || { name:i.name, line:i.line, qty:0, rev:0 };
+    units[k].qty += i.qty; units[k].rev += i.qty*i.unit_price;
+    if (i.line.startsWith("Elixir")) elixir+=i.qty; else if (i.line.startsWith("Parfum")) parfum+=i.qty; else savon+=i.qty;
+  }
+  const days = [...Array(30)].map((_,k)=>{ const d=new Date(now); d.setDate(d.getDate()-29+k); return d.toDateString(); });
+  const perDay = days.map(d=>sum(paid.filter(o=>new Date(o.paid_at||o.created_at).toDateString()===d)));
+  const max = Math.max(1,...perDay);
+  const waiting = S.orders.filter(o=>o.status==="new").length;
+  const toShip = S.orders.filter(o=>o.status==="paid"||o.status==="packed").length;
+  return `<div class="stats">
+      <div class="stat"><div class="v">${peso(sum(tOrders))}</div><div class="l">Sales today · ${tOrders.length} orders</div></div>
+      <div class="stat"><div class="v">${peso(sum(mOrders))}</div><div class="l">Sales this month · ${mOrders.length} orders</div></div>
+      <div class="stat"><div class="v">${mOrders.length?peso(Math.round(sum(mOrders)/mOrders.length)):"₱0"}</div><div class="l">Average order this month</div></div>
+      <div class="stat"><div class="v">${elixir} / ${parfum}</div><div class="l">Elixir vs Parfum bottles this month</div></div>
+      <div class="stat"><div class="v">${waiting}</div><div class="l">Waiting for payment check</div></div>
+      <div class="stat"><div class="v">${toShip}</div><div class="l">Paid, not yet shipped</div></div></div>
+    <h3>Daily sales, last 30 days</h3>
+    <div class="bars" role="img" aria-label="Daily sales for the last 30 days">${perDay.map((v,k)=>`<div style="height:${v/max*100}%" title="${days[k]}: ${peso(v)}"></div>`).join("")}</div>
+    <h3>Best sellers this month</h3>
+    <div class="wrap"><table><thead><tr><th>Scent</th><th>Line</th><th class="n">Units</th><th class="n">Sales</th></tr></thead>
+    <tbody>${Object.values(units).sort((a,b)=>b.qty-a.qty).map(u=>`<tr><td>${esc(u.name)}</td><td>${esc(u.line)}</td><td class="n">${u.qty}</td><td class="n">${peso(u.rev)}</td></tr>`).join("") || `<tr><td colspan="4" class="muted">Paid orders this month will show here.</td></tr>`}</tbody></table></div>
+    <p class="muted" style="margin-top:10px">Sales count orders marked Paid or later. Shipping fees are not included.</p>`;
+}
+
+function viewProducts(){
+  return `<p class="muted">Change a price or hide a product, then press Save. The website order form updates right away.</p>
+    <div class="wrap"><table><thead><tr><th>Product</th><th>Line</th><th class="n">Price (₱)</th><th>On sale</th><th></th></tr></thead>
+    <tbody>${S.products.map(p=>`<tr><td>${esc(p.name)}</td><td>${esc(p.line)}</td>
+      <td class="n"><input type="number" min="0" step="1" value="${Number(p.price)}" data-price="${p.id}" style="max-width:110px;text-align:right"></td>
+      <td><input type="checkbox" ${p.active?"checked":""} data-active="${p.id}" style="width:auto;accent-color:var(--gold)" aria-label="Show ${esc(p.name)} on the order form"></td>
+      <td><button class="btn ghost" data-saveprod="${p.id}">Save</button></td></tr>`).join("")}</tbody></table></div>`;
+}
+
+function render(){
+  const body = { orders:viewOrders, customers:viewCustomers, sales:viewSales, products:viewProducts }[S.tab]();
+  shell(body);
+}
+
+// ---------------- Actions ----------------
+async function openOrder(id){
+  S.open = id; S.proofUrl = ""; render();
+  const o = S.orders.find(x=>x.id===id);
+  if (o?.proof_path){
+    const { data } = await db.storage.from("payment-proofs").createSignedUrl(o.proof_path, 600);
+    if (S.open===id){ S.proofUrl = data?.signedUrl || ""; render(); }
+  }
+}
+
+async function updateOrder(id, patch, msg){
+  const { data, error } = await db.from("orders").update(patch).eq("id", id)
+    .select("*, customers(id,name,phone,address), order_items(name,line,qty,unit_price)").single();
+  if (error) return toast("Didn't save: " + error.message);
+  S.orders = S.orders.map(o=>o.id===id?data:o); render(); toast(msg);
+}
+
+app.addEventListener("click", async e => {
+  if (e.target.matches(".sheet[data-close]")) { S.open=null; return render(); }
+  const b = e.target.closest("button"); if(!b) return;
+  const d = b.dataset;
+  if (d.tab){ S.tab=d.tab; S.open=null; render(); }
+  else if (d.filter){ S.filter=d.filter; render(); }
+  else if (d.order){ openOrder(d.order); }
+  else if ("close" in d){ S.open=null; render(); }
+  else if (d.status){ await updateOrder(S.open, { status:d.status }, `Marked ${LABEL[d.status]}`); }
+  else if ("save" in d){
+    await updateOrder(S.open, { shipping_fee:Number(document.getElementById("f-ship").value)||0,
+      tracking_no:document.getElementById("f-track").value.trim()||null, admin_note:document.getElementById("f-note").value.trim()||null }, "Details saved");
+  }
+  else if (d.saveprod){
+    const price = Number(app.querySelector(`[data-price="${d.saveprod}"]`).value);
+    const active = app.querySelector(`[data-active="${d.saveprod}"]`).checked;
+    if (active && !(price > 0)) return toast("Set a price above ₱0 before putting it on sale");
+    const { error } = await db.from("products").update({ price, active }).eq("id", d.saveprod);
+    if (error) return toast("Didn't save: " + error.message);
+    S.products = S.products.map(p=>p.id===d.saveprod?{...p,price,active}:p); toast("Product saved");
+  }
+  else if (b.id==="refresh"){ await load(); render(); toast("Up to date"); }
+  else if (b.id==="logout"){ await db.auth.signOut(); viewLogin(); }
+});
+app.addEventListener("input", e => { if (e.target.id==="q"){ S.q=e.target.value; const pos=e.target.selectionStart; render(); const q=document.getElementById("q"); q.focus(); q.setSelectionRange(pos,pos);} });
+
+// New orders show up live while the dashboard is open
+function live(){
+  db.channel("orders").on("postgres_changes", { event:"INSERT", schema:"public", table:"orders" }, async () => {
+    await load(); render(); toast("New order received");
+  }).subscribe();
+}
+
+async function boot(){
+  const { data:{ session } } = await db.auth.getSession();
+  if (!session) return viewLogin();
+  try { await load(); } catch(e){ await db.auth.signOut(); return viewLogin("This account can't view orders. Sign in with the admin email."); }
+  render(); live();
+}
+boot();
+</script>
+</body>
+</html>
