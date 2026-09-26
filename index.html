@@ -1,311 +1,743 @@
 <!doctype html>
-<html lang="en">
+<html lang="en-PH">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="robots" content="noindex, nofollow">
-<meta name="theme-color" content="#0c0b09">
-<title>Pappi Orders</title>
-<style>
-  :root{--bg:#0c0b09;--panel:#16140f;--panel2:#1d1a13;--line:#2d2819;--gold:#c9a45c;--gold-hi:#e3c585;--text:#f3ede0;--mute:#a39a86;--new:#e3c585;--paid:#7fc8a9;--packed:#8fb3e8;--shipped:#b89ae8;--done:#6f6a5c;--cancel:#ff8a7a}
-  *{box-sizing:border-box}
-  html,body{margin:0;background:var(--bg);color:var(--text);font:15px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
-  body{padding:env(safe-area-inset-top) 0 env(safe-area-inset-bottom)}
-  button,input,select,textarea{font:inherit;color:inherit}
-  button{cursor:pointer}
-  :focus-visible{outline:2px solid var(--gold);outline-offset:2px}
-  header{position:sticky;top:0;z-index:5;background:var(--bg);border-bottom:1px solid var(--line)}
-  .top{display:flex;align-items:center;justify-content:space-between;max-width:1100px;margin:0 auto;padding:14px 16px}
-  .brand{font-weight:700;letter-spacing:.02em}.brand span{color:var(--gold)}
-  nav{display:flex;gap:4px;max-width:1100px;margin:0 auto;padding:0 12px 10px;overflow-x:auto}
-  nav button{border:0;background:none;padding:8px 14px;border-radius:999px;color:var(--mute);white-space:nowrap}
-  nav button[aria-current="page"]{background:var(--gold);color:#1a1409;font-weight:600}
-  main{max-width:1100px;margin:0 auto;padding:16px}
-  .muted{color:var(--mute)}
-  .btn{border:0;border-radius:999px;padding:10px 18px;background:var(--gold);color:#1a1409;font-weight:700}
-  .btn.ghost{background:transparent;border:1px solid var(--line);color:var(--text);font-weight:500}
-  .btn:disabled{opacity:.5}
-  input,select,textarea{width:100%;padding:10px 12px;border-radius:10px;border:1px solid var(--line);background:var(--panel)}
-  .filters{display:flex;gap:6px;overflow-x:auto;margin-bottom:14px}
-  .chip{border:1px solid var(--line);background:none;border-radius:999px;padding:6px 12px;white-space:nowrap;color:var(--mute)}
-  .chip[aria-pressed="true"]{border-color:var(--gold);color:var(--gold-hi)}
-  .chip b{color:var(--text);margin-left:4px}
-  .list{display:grid;gap:8px}
-  .row{display:grid;grid-template-columns:auto 1fr auto;gap:12px;align-items:center;padding:12px 14px;background:var(--panel);border:1px solid var(--line);border-radius:12px;text-align:left;width:100%}
-  .row:hover{border-color:var(--gold)}
-  .dot{width:10px;height:10px;border-radius:50%}
-  .s-new{background:var(--new)}.s-paid{background:var(--paid)}.s-packed{background:var(--packed)}.s-shipped{background:var(--shipped)}.s-completed{background:var(--done)}.s-cancelled{background:var(--cancel)}
-  .row small{display:block;color:var(--mute)}
-  .amt{font-weight:700;text-align:right}
-  .sheet{position:fixed;inset:0;z-index:10;background:rgba(0,0,0,.6);display:flex;justify-content:flex-end}
-  .sheet>div{width:min(560px,100%);height:100%;overflow:auto;background:var(--panel2);border-left:1px solid var(--line);padding:20px 18px calc(24px + env(safe-area-inset-bottom))}
-  .sheet h2{margin:0 0 2px;font-size:1.4rem}
-  .kv{display:grid;grid-template-columns:110px 1fr;gap:6px 12px;margin:16px 0}
-  .kv dt{color:var(--mute)}.kv dd{margin:0;word-break:break-word}
-  .proof{width:100%;border-radius:10px;border:1px solid var(--line);background:#000;margin-top:6px}
-  .pipeline{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin:16px 0}
-  .pipeline button{border:1px solid var(--line);background:var(--panel);border-radius:10px;padding:10px 4px;font-size:.9rem}
-  .pipeline button[aria-pressed="true"]{border-color:var(--gold);background:var(--gold);color:#1a1409;font-weight:700}
-  .items{list-style:none;margin:0;padding:0}.items li{display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--line)}
-  .field{margin-top:12px}.field label{display:block;color:var(--mute);margin-bottom:4px;font-size:.9rem}
-  .actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
-  .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:10px;margin-bottom:18px}
-  .stat{padding:14px;background:var(--panel);border:1px solid var(--line);border-radius:12px}
-  .stat .v{font-size:1.6rem;font-weight:700}
-  .stat .l{color:var(--mute);font-size:.9rem}
-  .bars{display:flex;align-items:flex-end;gap:3px;height:140px;padding:12px;background:var(--panel);border:1px solid var(--line);border-radius:12px;margin-bottom:18px}
-  .bars div{flex:1;background:var(--gold);border-radius:3px 3px 0 0;min-height:2px}
-  table{width:100%;border-collapse:collapse}
-  th,td{padding:10px 8px;border-bottom:1px solid var(--line);text-align:left}
-  th{color:var(--mute);font-weight:500}
-  td.n,th.n{text-align:right}
-  .wrap{overflow-x:auto;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:4px 8px}
-  .login{max-width:360px;margin:12vh auto;padding:24px;background:var(--panel);border:1px solid var(--line);border-radius:16px}
-  .login h1{margin:0 0 4px;font-size:1.4rem}
-  .login .field{margin-top:14px}
-  .err{color:var(--cancel);min-height:1.3em;margin-top:10px}
-  .toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom));transform:translateX(-50%);background:var(--gold);color:#1a1409;padding:10px 18px;border-radius:999px;font-weight:600;z-index:20}
-  h3{margin:22px 0 10px;font-size:1.05rem}
-  @media (max-width:560px){.row{grid-template-columns:auto 1fr}.row .amt{grid-column:2;text-align:left}.kv{grid-template-columns:90px 1fr}}
-</style>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Pappi Suds &amp; Scents Shop Philippines | Parfum, Elixir &amp; Artisan Savon</title>
+  <meta name="description" content="Shop Pappi Parfum, concentrated 40% Elixir fragrances and Pappi Savon artisan cleansing bars. Next-day dispatch and delivery across the Philippines.">
+  <meta name="robots" content="index, follow, max-image-preview:large">
+  <meta name="author" content="Pappi Suds &amp; Scents Shop">
+  <meta name="theme-color" content="#0c0b09">
+  <link rel="canonical" href="https://pappiscents.shop/">
+  <meta property="og:title" content="Pappi Suds &amp; Scents Shop — Your ritual, bottled.">
+  <meta property="og:description" content="Distinctive fragrance and beautifully crafted savon, made for every day.">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Pappi Suds &amp; Scents Shop">
+  <meta property="og:locale" content="en_PH">
+  <meta property="og:url" content="https://pappiscents.shop/">
+  <meta property="og:image" content="https://pappiscents.shop/assets/brand/elixir-40.png">
+  <meta property="og:image:width" content="1000">
+  <meta property="og:image:height" content="1000">
+  <meta property="og:image:alt" content="Pappi Elixir 40% fragrance bottle">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Pappi Suds &amp; Scents Shop — Your ritual, bottled.">
+  <meta name="twitter:description" content="Distinctive fragrance and beautifully crafted artisan savon, delivered across the Philippines.">
+  <meta name="twitter:image" content="https://pappiscents.shop/assets/brand/elixir-40.png">
+  <link rel="icon" href="assets/brand/logo.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&amp;family=Italiana&amp;display=swap" rel="stylesheet">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Store",
+    "name": "Pappi Suds & Scents Shop",
+    "url": "https://pappiscents.shop/",
+    "logo": "https://pappiscents.shop/assets/brand/logo.png",
+    "image": "https://pappiscents.shop/assets/brand/elixir-40.png",
+    "description": "Pappi Parfum, concentrated Elixir fragrances and Pappi Savon artisan cleansing bars in the Philippines.",
+    "email": "verge.gamotan@gmail.com",
+    "telephone": "+63 905 561 3013",
+    "hasMap": "https://maps.app.goo.gl/wPRMuWsfBQyrzJ5r5",
+    "founder": { "@type": "Person", "name": "Verge" },
+    "foundingDate": "2025-04",
+    "foundingLocation": { "@type": "Place", "name": "Cebu, Philippines" },
+    "areaServed": { "@type": "Country", "name": "Philippines" },
+    "sameAs": ["https://shopee.ph/bilyotoy"]
+  }
+  </script>
+  <style>
+    :root {
+      --ink: #11100e;
+      --black: #0c0b09;
+      --cream: #f5efe3;
+      --paper: #fbf8f1;
+      --gold: #c89b3c;
+      --gold-light: #e8cb88;
+      --line: rgba(17,16,14,.15);
+      --muted: #6f6a61;
+      --serif: "Italiana", Georgia, serif;
+      --sans: "DM Sans", system-ui, sans-serif;
+      --shadow: 0 24px 70px rgba(24,18,8,.12);
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body { margin: 0; color: var(--ink); background: var(--paper); font-family: var(--sans); line-height: 1.6; }
+    img { display: block; max-width: 100%; }
+    a { color: inherit; }
+    button, input, select, textarea { font: inherit; }
+    .wrap { width: min(1160px, calc(100% - 40px)); margin-inline: auto; }
+    .eyebrow { margin: 0 0 13px; color: #946c1f; font-size: .74rem; font-weight: 700; letter-spacing: .18em; text-transform: uppercase; }
+    h1, h2, h3, p { margin-top: 0; }
+    h1, h2, .serif { font-family: var(--serif); font-weight: 400; }
+    h2 { margin-bottom: 18px; font-size: clamp(2.3rem, 5vw, 4.7rem); line-height: 1.02; letter-spacing: -.025em; }
+    .lede { max-width: 640px; color: var(--muted); font-size: 1.06rem; }
+    .button { display: inline-flex; min-height: 52px; align-items: center; justify-content: center; gap: 10px; padding: 0 24px; border: 1px solid var(--black); border-radius: 999px; background: var(--black); color: white; font-weight: 700; text-decoration: none; transition: transform .2s, background .2s, color .2s; cursor: pointer; }
+    .button:hover { transform: translateY(-2px); background: #29251f; }
+    .button--light { border-color: rgba(255,255,255,.35); background: white; color: var(--black); }
+    .button--ghost { background: transparent; color: var(--ink); }
+    .button--gold { border-color: var(--gold); background: var(--gold); color: var(--black); }
+    .button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible { outline: 3px solid var(--gold-light); outline-offset: 3px; }
+
+    .announcement { padding: 9px 20px; background: var(--gold); color: #18130a; text-align: center; font-size: .78rem; font-weight: 700; letter-spacing: .07em; text-transform: uppercase; }
+    nav { position: absolute; z-index: 10; width: 100%; border-bottom: 1px solid rgba(255,255,255,.16); color: white; }
+    .nav-inner { display: flex; height: 84px; align-items: center; justify-content: space-between; }
+    .brand { display: flex; align-items: center; gap: 12px; color: white; text-decoration: none; }
+    .brand img { width: 64px; height: 64px; object-fit: contain; }
+    .brand-name { font-family: var(--serif); font-size: 1.1rem; letter-spacing: .03em; white-space: nowrap; }
+    .nav-links { display: flex; align-items: center; gap: 28px; }
+    .nav-links a { font-size: .84rem; font-weight: 600; text-decoration: none; }
+    .nav-links a:hover { color: var(--gold-light); }
+    .nav-links .button { min-height: 42px; padding-inline: 19px; }
+
+    .hero { position: relative; min-height: 760px; overflow: hidden; background: radial-gradient(circle at 78% 34%, #383126 0, #17140f 30%, #0c0b09 68%); color: white; }
+    .hero::before { position: absolute; inset: 0; background: linear-gradient(90deg, rgba(12,11,9,.98) 0 42%, rgba(12,11,9,.25) 75%); content: ""; }
+    .hero::after { position: absolute; top: 145px; right: -150px; width: 660px; height: 660px; border: 1px solid rgba(200,155,60,.3); border-radius: 50%; box-shadow: 0 0 0 45px rgba(200,155,60,.05), 0 0 0 110px rgba(200,155,60,.025); content: ""; }
+    .hero-inner { position: relative; z-index: 2; display: grid; min-height: 760px; align-items: center; grid-template-columns: 1.05fr .95fr; padding-top: 84px; }
+    .hero-copy { max-width: 650px; padding: 80px 0; }
+    .hero h1 { margin-bottom: 24px; font-size: clamp(4rem, 8.2vw, 7.8rem); line-height: .88; letter-spacing: -.045em; }
+    .hero h1 em { display: block; color: var(--gold-light); font-style: normal; }
+    .hero-copy > p:not(.eyebrow) { max-width: 560px; margin-bottom: 32px; color: #d8d2c7; font-size: 1.08rem; }
+    .hero-actions { display: flex; flex-wrap: wrap; gap: 12px; }
+    .hero-art { position: relative; align-self: stretch; }
+    .hero-art img { position: absolute; width: auto; object-fit: contain; border: 0; border-radius: 0; background: transparent; box-shadow: none; }
+    .hero-bottle-1 { z-index: 3; right: 12%; bottom: 3%; height: min(84%, 650px); }
+    .hero-bottle-2 { z-index: 2; right: -2%; bottom: 7%; height: min(67%, 520px); opacity: .88; transform: rotate(4deg); }
+    .microproof { display: flex; gap: 28px; margin-top: 42px; color: #f1e9dc; font-size: .78rem; font-weight: 600; }
+    .microproof span::before { display: inline-block; width: 6px; height: 6px; margin: 0 9px 2px 0; border-radius: 50%; background: var(--gold); content: ""; }
+
+    .trust { background: var(--cream); border-bottom: 1px solid var(--line); }
+    .trust-grid { display: grid; grid-template-columns: repeat(3,1fr); }
+    .trust-item { padding: 25px 30px; border-right: 1px solid var(--line); text-align: center; }
+    .trust-item:last-child { border: 0; }
+    .trust-item strong { display: block; font-family: var(--serif); font-size: 1.24rem; font-weight: 400; }
+    .trust-item span { color: var(--muted); font-size: .78rem; }
+
+    section { padding: 116px 0; }
+    .section-head { display: flex; align-items: end; justify-content: space-between; gap: 50px; margin-bottom: 54px; }
+    .section-head > div:first-child { max-width: 660px; }
+    .section-note { max-width: 330px; padding-left: 20px; border-left: 1px solid var(--gold); color: var(--muted); font-size: .88rem; }
+    .formats { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 44px; }
+    .format { display: grid; min-height: 220px; overflow: hidden; grid-template-columns: 180px 1fr auto; align-items: center; gap: 24px; padding: 0 28px 0 0; border: 0; border-radius: 18px; background: white; }
+    .format--dark { background: var(--black); color: white; }
+    .format h3 { margin: 0 0 3px; font-family: var(--serif); font-size: 1.65rem; font-weight: 400; }
+    .format p { margin: 0; color: var(--muted); font-size: .85rem; }
+    .format--dark p { color: #bbb4aa; }
+    .format-image { display: block; width: 100%; height: 210px; padding: 16px 12px; object-fit: contain; object-position: center bottom; border: 0; outline: 0; background: transparent; box-shadow: none; }
+    .format-badge { flex: 0 0 auto; padding: 7px 12px; border: 1px solid currentColor; border-radius: 999px; color: var(--gold); font-size: .7rem; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; }
+    .scent-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; }
+    .product-card { position: relative; overflow: hidden; border: 1px solid var(--line); border-radius: 18px; background: #eee8dc; transition: transform .25s, box-shadow .25s; }
+    .product-card:hover { transform: translateY(-6px); box-shadow: var(--shadow); }
+    .product-image { display: grid; height: 370px; place-items: center; overflow: hidden; background: linear-gradient(145deg,#f5efe3,#ded4c1); }
+    .product-image img { width: 100%; height: 100%; object-fit: cover; transition: transform .35s; }
+    .product-card:hover .product-image img { transform: scale(1.045); }
+    .product-body { padding: 22px 24px 24px; background: white; }
+    .product-body h3 { margin: 0 0 6px; font-family: var(--serif); font-size: 1.55rem; font-weight: 400; }
+    .product-body p { min-height: 44px; margin-bottom: 18px; color: var(--muted); font-size: .85rem; }
+    .product-meta { display: flex; align-items: center; justify-content: space-between; gap: 15px; }
+    .chips { display: flex; gap: 6px; }
+    .chip { padding: 5px 9px; border: 1px solid var(--line); border-radius: 999px; font-size: .66rem; font-weight: 700; text-transform: uppercase; }
+    .pick { border: 0; background: none; color: #8b651b; font-size: .78rem; font-weight: 700; cursor: pointer; text-decoration: underline; text-underline-offset: 4px; }
+
+    .campaign { overflow: hidden; padding: 88px 0; background: var(--black); color: white; }
+    .campaign .eyebrow { color: var(--gold-light); }
+    .campaign .lede { color: #bcb5ab; }
+    .campaign-head { display: flex; align-items: end; justify-content: space-between; gap: 40px; margin-bottom: 46px; }
+    .campaign-head > div { max-width: 700px; }
+    .campaign-hint { color: #8f897f; font-size: .76rem; letter-spacing: .08em; text-transform: uppercase; }
+    .carousel { --visible-slides: 3; --slide-gap: 16px; --slide-width: calc((100% - 32px) / 3); position: relative; width: 100%; margin-inline: auto; }
+    .carousel-viewport { overflow: hidden; border: 0; border-radius: 18px; background: transparent; touch-action: pan-y; }
+    .carousel-track { display: flex; align-items: flex-start; gap: var(--slide-gap); transition: transform .7s cubic-bezier(.22,.8,.28,1); }
+    .carousel-slide { flex: 0 0 var(--slide-width); min-width: 0; overflow: hidden; margin: 0; border: 1px solid rgba(232,203,136,.25); border-radius: 18px; background: #181612; box-shadow: 0 18px 44px rgba(0,0,0,.28); }
+    .campaign-open { display: block; width: 100%; padding: 0; border: 0; background: transparent; cursor: zoom-in; }
+    .carousel-slide img { display: block; width: 100%; height: auto; aspect-ratio: 1 / 1; object-fit: contain; }
+    .campaign-open:focus-visible { outline: 3px solid var(--gold-light); outline-offset: -4px; }
+    .carousel-controls { display: grid; grid-template-columns: 52px 1fr 52px; align-items: center; gap: 18px; margin-top: 24px; }
+    .carousel-arrow { display: grid; width: 52px; height: 52px; place-items: center; border: 1px solid rgba(255,255,255,.25); border-radius: 50%; background: transparent; color: white; font-size: 1.35rem; cursor: pointer; transition: border-color .2s, background .2s, transform .2s; }
+    .carousel-arrow:hover { border-color: var(--gold); background: rgba(200,155,60,.12); transform: translateY(-2px); }
+    .carousel-dots { display: flex; align-items: center; justify-content: center; gap: 9px; }
+    .carousel-dot { width: 9px; height: 9px; padding: 0; border: 0; border-radius: 999px; background: #59544c; cursor: pointer; transition: width .25s, background .25s; }
+    .carousel-dot.is-active { width: 34px; background: var(--gold); }
+    .carousel-caption { margin: 20px auto 0; color: #8f897f; text-align: center; font-size: .76rem; }
+    .campaign-modal { width: 100vw; max-width: none; height: 100vh; max-height: none; margin: 0; padding: 0; border: 0; background: transparent; color: white; }
+    .campaign-modal[open] { display: grid; place-items: center; }
+    .campaign-modal::backdrop { background: rgba(5,5,4,.9); backdrop-filter: blur(8px); }
+    .campaign-modal-card { position: relative; display: grid; max-width: min(1100px,92vw); max-height: 92vh; place-items: center; gap: 12px; }
+    .campaign-modal img { display: block; width: auto; max-width: 92vw; height: auto; max-height: 84vh; object-fit: contain; border-radius: 14px; box-shadow: 0 28px 90px rgba(0,0,0,.5); }
+    .campaign-modal-caption { margin: 0; color: #ddd5c8; font-size: .78rem; text-align: center; }
+    .campaign-modal-close { position: absolute; z-index: 2; top: 10px; right: 10px; display: grid; width: 44px; height: 44px; place-items: center; border: 1px solid rgba(255,255,255,.45); border-radius: 50%; background: rgba(12,11,9,.82); color: white; font-size: 1.35rem; line-height: 1; cursor: pointer; }
+    .campaign-modal-close:hover { background: var(--gold); color: var(--black); }
+    body.modal-open { overflow: hidden; }
+
+    .savon-section { background: #171512; color: white; }
+    .savon-section .eyebrow { color: var(--gold-light); }
+    .savon-section .lede, .savon-section .section-note { color: #bcb5ab; }
+    .savon-gallery { display: grid; gap: 18px; margin-bottom: 48px; }
+    .savon-gallery-feature, .savon-gallery-tile { display: block; overflow: hidden; margin: 0; border: 1px solid rgba(255,255,255,.14); border-radius: 20px; background: #24211d; }
+    .savon-gallery-feature img { display: block; width: 100%; height: auto; aspect-ratio: auto; object-fit: contain; object-position: center; transition: transform .45s; }
+    .savon-gallery-feature:hover img { transform: scale(1.015); }
+    .savon-gallery-secondary { display: grid; grid-template-columns: 1.45fr 1fr; gap: 18px; }
+    .savon-gallery-tile img { width: 100%; height: 410px; object-fit: cover; transition: transform .45s; }
+    .savon-gallery-tile:hover img { transform: scale(1.025); }
+    .soap-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; }
+    .soap-card { overflow: hidden; border: 1px solid rgba(255,255,255,.14); border-radius: 18px; background: #24211d; }
+    .soap-card .product-image { height: 400px; padding: 28px 28px 0; background: radial-gradient(circle at 50% 35%, #4a4337, #211e1a 68%); }
+    .soap-card .product-image img { width: 90%; object-fit: contain; }
+    .soap-card .product-body { background: transparent; }
+    .soap-card .product-body p { color: #bcb5ab; }
+    .soap-card .pick { color: var(--gold-light); }
+    .soap-number { color: var(--gold); font-size: .72rem; letter-spacing: .16em; }
+    .savon-logo { display: block; width: clamp(104px, 10vw, 138px); height: auto; aspect-ratio: 1 / 1; margin: 0 0 24px; object-fit: contain; object-position: center; filter: drop-shadow(0 8px 24px rgba(200,155,60,.18)); }
+
+    .channels { background: var(--cream); }
+    .channel-grid { display: grid; grid-template-columns: 1.3fr .85fr .85fr; gap: 18px; }
+    .channel { display: flex; min-height: 300px; flex-direction: column; justify-content: space-between; padding: 34px; border: 1px solid var(--line); border-radius: 20px; background: var(--paper); }
+    .channel--shopee { background: #ee4d2d; color: white; }
+    .channel h3 { margin-bottom: 8px; font-family: var(--serif); font-size: 2rem; font-weight: 400; }
+    .channel p { color: var(--muted); font-size: .9rem; }
+    .channel--shopee p { color: rgba(255,255,255,.82); }
+    .channel-logo { width: auto; height: 52px; margin-bottom: 20px; object-fit: contain; object-position: left center; background: transparent; }
+    .channel--shopee .channel-logo { color: white; }
+    .channel:not(.channel--shopee) .channel-logo { height: 48px; }
+    .coming { display: inline-flex; align-self: flex-start; padding: 7px 10px; border-radius: 999px; background: #e5dfd3; color: var(--muted); font-size: .68rem; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; }
+
+    .about { overflow: hidden; background: var(--paper); }
+    .about-grid { display: grid; grid-template-columns: .9fr 1.1fr; align-items: stretch; gap: 70px; }
+    .about-visual { min-height: 620px; overflow: hidden; margin: 0; border-radius: 24px; background: #d7c6a4; box-shadow: var(--shadow); }
+    .about-visual img { width: 100%; height: 100%; object-fit: cover; object-position: center 38%; }
+    .about-copy { align-self: center; }
+    .about-copy h2 { max-width: 720px; }
+    .about-copy .lede { margin-bottom: 25px; color: #403b34; }
+    .about-copy p:not(.eyebrow):not(.lede) { max-width: 710px; color: var(--muted); }
+    .about-milestones { display: grid; grid-template-columns: repeat(3,1fr); gap: 12px; margin-top: 34px; }
+    .about-milestone { padding: 18px; border-top: 2px solid var(--gold); background: var(--cream); }
+    .about-milestone strong { display: block; margin-bottom: 5px; font-family: var(--serif); font-size: 1.35rem; font-weight: 400; }
+    .about-milestone span { color: var(--muted); font-size: .75rem; line-height: 1.45; }
+
+    .about-timeline { margin-top: 76px; padding-top: 64px; border-top: 1px solid var(--line); }
+    .about-timeline-head { max-width: 640px; margin-bottom: 42px; }
+    .about-timeline-head h3 { margin: 0 0 10px; font-family: var(--serif); font-size: clamp(1.7rem, 3vw, 2.3rem); font-weight: 400; }
+    .about-timeline-head p { margin: 0; color: var(--muted); font-size: .92rem; }
+    .timeline { position: relative; max-width: 780px; padding-left: 36px; }
+    .timeline::before { position: absolute; top: 6px; bottom: 6px; left: 6px; width: 1px; background: linear-gradient(180deg, var(--gold), rgba(200,155,60,.12)); content: ''; }
+    .timeline-era { margin: 0 0 22px; padding-top: 26px; border-top: 1px solid var(--line); color: #8f897f; font-size: .72rem; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; }
+    .timeline-era:first-child { padding-top: 0; border-top: 0; }
+    .timeline-entry { position: relative; padding-bottom: 28px; }
+    .timeline-entry:last-child { padding-bottom: 0; }
+    .timeline-entry::before { position: absolute; top: 3px; left: -36px; width: 11px; height: 11px; border: 2px solid var(--gold); border-radius: 50%; background: var(--paper); content: ''; }
+    .timeline-entry.is-milestone::before { background: var(--gold); }
+    .timeline-when { margin-bottom: 3px; color: #946c1f; font-family: var(--serif); font-size: .92rem; font-style: italic; }
+    .timeline-what { margin-bottom: 4px; font-size: 1rem; font-weight: 700; }
+    .timeline-detail { max-width: 620px; color: var(--muted); font-size: .86rem; line-height: 1.65; }
+    .timeline-detail strong { color: var(--ink); }
+
+    .memory { position: relative; overflow: hidden; padding: 92px 0; background: var(--black); color: white; text-align: center; }
+    .memory::before { position: absolute; inset: -35%; background: radial-gradient(circle, rgba(200,155,60,.14), transparent 52%); content: ""; }
+    .memory-inner { position: relative; z-index: 1; }
+    .memory blockquote { max-width: 900px; margin: 0 auto 24px; font-family: var(--serif); font-size: clamp(2.5rem,5.8vw,5.3rem); line-height: 1.02; letter-spacing: -.025em; }
+    .memory blockquote em { color: var(--gold-light); font-style: normal; }
+    .memory p { max-width: 590px; margin: 0 auto; color: #bcb5ab; font-size: .9rem; }
+    .memory-quotes { display: grid; max-width: 900px; grid-template-columns: 1fr 1fr; gap: 14px; margin: 38px auto 0; }
+    .memory-quotes q { padding: 18px 24px; border: 1px solid rgba(232,203,136,.22); border-radius: 999px; color: #e7dfd3; font-family: var(--serif); font-size: 1.08rem; }
+
+    .testimonials { background: var(--cream); }
+    .testimonial-intro { max-width: 660px; }
+    .testimonial-grid { display: grid; grid-template-columns: repeat(6,1fr); gap: 16px; }
+    .testimonial { display: flex; min-height: 285px; grid-column: span 2; flex-direction: column; justify-content: space-between; padding: 28px; border: 1px solid var(--line); border-radius: 20px; background: white; box-shadow: 0 14px 36px rgba(24,18,8,.06); }
+    .testimonial:nth-child(4), .testimonial:nth-child(5) { grid-column: span 3; }
+    .testimonial-stars { margin-bottom: 18px; color: var(--gold); font-size: .78rem; letter-spacing: .18em; }
+    .testimonial blockquote { margin: 0 0 28px; color: #38332d; font-family: var(--serif); font-size: 1.37rem; line-height: 1.38; }
+    .testimonial-person { display: flex; align-items: center; gap: 12px; }
+    .testimonial-avatar { display: grid; width: 42px; height: 42px; flex: 0 0 auto; place-items: center; border-radius: 50%; background: var(--black); color: var(--gold-light); font-size: .72rem; font-weight: 700; }
+    .testimonial-person strong { display: block; font-size: .84rem; }
+    .testimonial-person span { display: block; color: var(--muted); font-size: .72rem; }
+
+    .order { background: var(--paper); }
+    .order-grid { display: grid; grid-template-columns: .85fr 1.15fr; gap: 74px; align-items: start; }
+    .delivery-card { margin-top: 36px; border-top: 1px solid var(--line); }
+    .delivery-row { display: grid; grid-template-columns: 42px 1fr; gap: 14px; padding: 20px 0; border-bottom: 1px solid var(--line); }
+    .delivery-row b { display: block; margin-bottom: 2px; font-size: .92rem; }
+    .delivery-row p { margin: 0; color: var(--muted); font-size: .84rem; }
+    .delivery-icon { display: grid; width: 36px; height: 36px; place-items: center; border: 1px solid var(--gold); border-radius: 50%; color: #8b651b; font-size: .78rem; font-weight: 700; }
+    .contact-links { display: grid; gap: 10px; margin-top: 26px; }
+    .contact-link { display: flex; min-height: 48px; align-items: center; justify-content: space-between; gap: 18px; padding: 11px 15px; border: 1px solid var(--line); border-radius: 12px; background: white; color: var(--ink); font-size: .82rem; font-weight: 700; text-decoration: none; transition: border-color .2s, transform .2s; }
+    .contact-link:hover { border-color: var(--gold); transform: translateX(3px); }
+    .contact-link span { color: var(--muted); font-weight: 500; }
+    form { padding: 36px; border: 1px solid var(--line); border-radius: 24px; background: white; box-shadow: var(--shadow); }
+    .form-title { margin-bottom: 26px; font-family: var(--serif); font-size: 2rem; }
+    .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 17px; }
+    .field { display: flex; flex-direction: column; gap: 7px; }
+    .field--wide { grid-column: 1 / -1; }
+    label { font-size: .76rem; font-weight: 700; letter-spacing: .04em; }
+    input, select, textarea { width: 100%; min-height: 50px; border: 1px solid #ccc4b8; border-radius: 10px; background: #fdfbf6; padding: 12px 14px; color: var(--ink); }
+    textarea { min-height: 130px; resize: vertical; }
+    input:focus, select:focus, textarea:focus { border-color: var(--gold); }
+    .form-help { margin: 14px 0 20px; color: var(--muted); font-size: .75rem; }
+    form .button { width: 100%; }
+    .success { display: none; margin-top: 14px; padding: 12px; border-radius: 10px; background: #eef5e8; color: #355227; font-size: .82rem; }
+    .success.show { display: block; }
+
+    .promise { padding: 72px 0; background: var(--gold); text-align: center; }
+    .promise blockquote { max-width: 870px; margin: 0 auto 18px; font-family: var(--serif); font-size: clamp(2rem,4vw,3.7rem); line-height: 1.1; }
+    .promise p { margin: 0; font-size: .78rem; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; }
+    footer { padding: 50px 0 88px; background: var(--black); color: white; }
+    .footer-inner { display: flex; align-items: end; justify-content: space-between; gap: 40px; }
+    .footer-brand { display: flex; align-items: center; gap: 15px; }
+    .footer-brand img { width: 70px; height: 70px; object-fit: contain; }
+    .footer-brand strong { display: block; font-family: var(--serif); font-size: 1.4rem; font-weight: 400; }
+    .footer-brand span, .footer-meta { color: #8f897f; font-size: .75rem; }
+    .mobile-order { display: none; }
+
+    @media (max-width: 900px) {
+      .nav-links a:not(.button) { display: none; }
+      .hero-inner { grid-template-columns: 1fr; }
+      .hero-copy { z-index: 3; padding: 130px 0 400px; }
+      .hero-art { position: absolute; inset: 0; }
+      .hero-bottle-1 { right: 18%; bottom: 1%; width: auto; height: min(49vw,430px); }
+      .hero-bottle-2 { right: 1%; bottom: 5%; width: auto; height: min(42vw,370px); }
+      .section-head { display: block; }
+      .campaign-head { display: block; }
+      .campaign-hint { margin-top: 18px; }
+      .carousel { --visible-slides: 2; --slide-width: calc((100% - 16px) / 2); }
+      .section-note { margin-top: 22px; }
+      .scent-grid, .soap-grid { grid-template-columns: repeat(2,1fr); }
+      .savon-gallery-secondary { grid-template-columns: 1fr 1fr; }
+      .savon-gallery-tile img { height: 330px; }
+      .channel-grid { grid-template-columns: 1fr 1fr; }
+      .channel--shopee { grid-column: 1/-1; }
+      .about-grid { grid-template-columns: 1fr; gap: 44px; }
+      .about-visual { min-height: 500px; }
+      .testimonial { grid-column: span 3; }
+      .testimonial:nth-child(5) { grid-column: 2 / span 4; }
+      .order-grid { grid-template-columns: 1fr; gap: 48px; }
+    }
+    @media (max-width: 620px) {
+      .wrap { width: min(100% - 28px,1160px); }
+      .announcement { font-size: .64rem; }
+      .brand-name { display: none; }
+      .nav-inner { height: 72px; }
+      .brand img { width: 48px; height: 48px; }
+      .savon-logo { width: 104px; height: 104px; }
+      .hero, .hero-inner { min-height: 730px; }
+      .hero-copy { padding-top: 100px; padding-bottom: 350px; }
+      .hero h1 { font-size: clamp(3.4rem,18vw,5rem); }
+      .hero-actions .button { width: 100%; }
+      .microproof { flex-direction: column; gap: 7px; margin-top: 28px; }
+      .hero-bottle-1 { right: 16%; bottom: 1%; width: auto; height: min(86vw,440px); }
+      .hero-bottle-2 { right: 0; bottom: 3%; width: auto; height: min(70vw,360px); }
+      .trust-grid { grid-template-columns: 1fr; }
+      .trust-item { padding: 17px; border-right: 0; border-bottom: 1px solid var(--line); }
+      section { padding: 80px 0; }
+      .formats, .scent-grid, .soap-grid, .channel-grid { grid-template-columns: 1fr; }
+      .savon-gallery-secondary { grid-template-columns: 1fr; }
+      .savon-gallery-tile img { height: auto; aspect-ratio: 1; }
+      .format { min-height: 180px; grid-template-columns: 110px 1fr; align-items: center; gap: 14px; padding: 0 18px 0 0; }
+      .format-image { width: 100%; height: 170px; padding: 12px 8px; }
+      .format-badge { display: none; }
+      .product-image, .soap-card .product-image { height: 350px; }
+      .campaign { padding: 72px 0; }
+      .carousel { --visible-slides: 1; --slide-gap: 12px; --slide-width: 100%; }
+      .carousel-viewport, .carousel-slide { border-radius: 16px; }
+      .carousel-controls { grid-template-columns: 46px 1fr 46px; gap: 10px; }
+      .carousel-arrow { width: 46px; height: 46px; }
+      .channel--shopee { grid-column: auto; }
+      .channel { min-height: 250px; padding: 28px; }
+      .channel-logo { height: 44px; }
+      .about-grid { gap: 34px; }
+      .about-visual { min-height: 0; aspect-ratio: 3 / 4; }
+      .about-milestones { grid-template-columns: 1fr; }
+      .about-timeline { margin-top: 52px; padding-top: 44px; }
+      .timeline { padding-left: 28px; }
+      .timeline-entry::before { left: -28px; }
+      .memory { padding: 72px 0; }
+      .memory-quotes { grid-template-columns: 1fr; }
+      .memory-quotes q { border-radius: 18px; }
+      .testimonial-grid { grid-template-columns: 1fr; }
+      .testimonial, .testimonial:nth-child(4), .testimonial:nth-child(5) { min-height: 0; grid-column: auto; }
+      form { padding: 24px 18px; }
+      .form-grid { grid-template-columns: 1fr; }
+      .field--wide { grid-column: auto; }
+      .footer-inner { align-items: flex-start; flex-direction: column; }
+      .mobile-order { position: fixed; z-index: 20; right: 14px; bottom: 14px; left: 14px; display: flex; box-shadow: 0 8px 32px rgba(0,0,0,.28); }
+      footer { padding-bottom: 120px; }
+    }
+    @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } * { transition: none !important; } }
+  </style>
 </head>
 <body>
-<div id="app"></div>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
-<script>
-// ------------------------- SETTINGS (same as the order widget) -------------------------
-const SUPABASE_URL = "https://bkklvfioefrdaddbcisz.supabase.co";
-const SUPABASE_ANON_KEY = "sb_publishable_sXZa6c917YXzSkvKdhzaig_FgrdDbjQ";
-// ---------------------------------------------------------------------------------------
+  <div class="announcement">Now available on Shopee · Next-day dispatch across the Philippines</div>
+  <nav aria-label="Main navigation">
+    <div class="wrap nav-inner">
+      <a class="brand" href="#top" aria-label="Pappi Suds and Scents Shop home"><img src="assets/brand/logo.png" width="500" height="500" alt="Pappi Parfum logo" decoding="async"><span class="brand-name">Pappi Suds &amp; Scents Shop</span></a>
+      <div class="nav-links"><a href="#fragrances">Fragrances</a><a href="#savon">Savon</a><a href="#about">About</a><a href="#delivery">Delivery</a><a class="button button--gold" href="#order">Order direct</a></div>
+    </div>
+  </nav>
 
-const db = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-const app = document.getElementById("app");
-const peso = n => "₱" + Number(n || 0).toLocaleString("en-PH");
-const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;" }[c]));
-const fmtDate = d => new Date(d).toLocaleString("en-PH", { month:"short", day:"numeric", hour:"numeric", minute:"2-digit" });
-const STATUSES = ["new","paid","packed","shipped","completed","cancelled"];
-const LABEL = { new:"New", paid:"Paid", packed:"Packed", shipped:"Shipped", completed:"Completed", cancelled:"Cancelled" };
-const DELIVERY = { nationwide:"Nationwide", cebu_express:"Cebu express", pickup:"Pickup" };
-const REVENUE_STATUSES = ["paid","packed","shipped","completed"];
+  <main id="top">
+    <header class="hero">
+      <div class="wrap hero-inner">
+        <div class="hero-copy">
+          <p class="eyebrow">Pappi Suds &amp; Scents Shop</p>
+          <h1>Your ritual, <em>bottled.</em></h1>
+          <p>Distinctive fragrance. Beautifully crafted savon. Everyday luxuries made to stay with you—from the first spritz to the last rinse.</p>
+          <div class="hero-actions"><a class="button button--gold" href="#fragrances">Find your scent →</a><a class="button button--light" href="https://shopee.ph/bilyotoy" rel="noopener" target="_blank">Shop on Shopee</a></div>
+          <div class="microproof"><span>9 signature scents</span><span>2 fragrance styles</span><span>3 artisan savon bars</span></div>
+        </div>
+        <div class="hero-art"><img class="hero-bottle-1" src="assets/brand/elixir-40-cutout.png" width="377" height="656" alt="Pappi Elixir 40% concentrated fragrance bottle on a transparent background" fetchpriority="high" decoding="async"><img class="hero-bottle-2" src="assets/brand/parfum-20-cutout.png" width="381" height="1231" alt="Pappi Parfum 20% everyday body spray bottle on a transparent background" decoding="async"></div>
+      </div>
+    </header>
 
-const S = { tab:"orders", filter:"new", orders:[], customers:[], products:[], open:null, proofUrl:"", q:"" };
+    <div class="trust"><div class="wrap trust-grid"><div class="trust-item"><strong>Ships next day</strong><span>For orders placed anywhere in the Philippines</span></div><div class="trust-item"><strong>3–5 day arrival</strong><span>Estimated nationwide delivery timeframe</span></div><div class="trust-item"><strong>1–2 hours in Cebu</strong><span>Via Maxim, Grab or Angkas booking</span></div></div></div>
 
-function toast(msg){ const t=document.createElement("div"); t.className="toast"; t.textContent=msg; document.body.append(t); setTimeout(()=>t.remove(),2200); }
+    <section id="fragrances">
+      <div class="wrap">
+        <div class="section-head"><div><p class="eyebrow">The fragrance wardrobe</p><h2>A scent for every version of you.</h2><p class="lede">Choose your scent, then choose how you want to wear it. All nine signature variants are available in Parfum and concentrated Elixir.</p></div><p class="section-note">Not sure where to begin? Tell us what you usually love—fresh, floral, sweet, warm or bold—and we’ll help you choose.</p></div>
+        <div class="formats"><div class="format"><img class="format-image" src="assets/brand/parfum-20-cutout.png" width="381" height="1231" alt="Pappi Parfum 20% oil-base body spray bottle" loading="lazy" decoding="async"><div><h3>Pappi Parfum · 20%</h3><p>A polished 50 ml signature for everyday wear.</p></div><span class="format-badge">Everyday</span></div><div class="format format--dark"><img class="format-image" src="assets/brand/elixir-40-cutout.png" width="377" height="656" alt="Pappi Elixir 40% concentrated fragrance bottle" loading="lazy" decoding="async"><div><h3>Pappi Elixir · 40%</h3><p>Our concentrated 50 ml expression for deeper presence.</p></div><span class="format-badge">Intense</span></div></div>
+        <div class="scent-grid">
+          <article class="product-card"><div class="product-image"><img src="assets/fragrances/gg-fantasy.jpg" width="900" height="900" alt="Pappi Fantasy Parfum and Elixir with red berries, jasmine, vanilla and amber" loading="lazy" decoding="async"></div><div class="product-body"><h3>Fantasy</h3><p>Warm, glamorous and sweet—a dressed-up scent with magnetic energy.</p><div class="product-meta"><div class="chips"><span class="chip">Parfum</span><span class="chip">Elixir</span></div><button class="pick" data-product="Fantasy">Choose</button></div></div></article>
+          <article class="product-card"><div class="product-image"><img src="assets/fragrances/jm-english-pear.jpg" width="900" height="900" alt="Pappi English Pear Parfum and Elixir with pear and freesia" loading="lazy" decoding="async"></div><div class="product-body"><h3>English Pear</h3><p>Crisp pear and airy florals for an elegant, freshly gathered feel.</p><div class="product-meta"><div class="chips"><span class="chip">Parfum</span><span class="chip">Elixir</span></div><button class="pick" data-product="English Pear">Choose</button></div></div></article>
+          <article class="product-card"><div class="product-image"><img src="assets/fragrances/dr-savage.jpg" width="900" height="900" alt="Pappi Savage Parfum and Elixir with bergamot, lavender and pepper" loading="lazy" decoding="async"></div><div class="product-body"><h3>Savage</h3><p>Fresh spice and confident woods with a clean, commanding trail.</p><div class="product-meta"><div class="chips"><span class="chip">Parfum</span><span class="chip">Elixir</span></div><button class="pick" data-product="Savage">Choose</button></div></div></article>
+          <article class="product-card"><div class="product-image"><img src="assets/fragrances/lv-imagine.jpg" width="900" height="900" alt="Pappi Imagination Parfum and Elixir with lemon, bergamot, ginger and tea" loading="lazy" decoding="async"></div><div class="product-body"><h3>Imagination</h3><p>Bright citrus and cool freshness with a clean, modern finish.</p><div class="product-meta"><div class="chips"><span class="chip">Parfum</span><span class="chip">Elixir</span></div><button class="pick" data-product="Imagination">Choose</button></div></div></article>
+          <article class="product-card"><div class="product-image"><img src="assets/fragrances/vs-vanilla.jpg" width="900" height="900" alt="Pappi Vanilla Lace Parfum and Elixir with vanilla, cotton flower and amber" loading="lazy" decoding="async"></div><div class="product-body"><h3>Vanilla Lace</h3><p>Soft, creamy vanilla warmth made for cozy, close-to-skin days.</p><div class="product-meta"><div class="chips"><span class="chip">Parfum</span><span class="chip">Elixir</span></div><button class="pick" data-product="Vanilla Lace">Choose</button></div></div></article>
+          <article class="product-card"><div class="product-image"><img src="assets/fragrances/jm-sweet-pea.jpg" width="900" height="900" alt="Pappi Sweet Pea Parfum and Elixir with pear and sweet pea" loading="lazy" decoding="async"></div><div class="product-body"><h3>Sweet Pea</h3><p>A tender bouquet with a soft fruity lift—pretty, graceful and light.</p><div class="product-meta"><div class="chips"><span class="chip">Parfum</span><span class="chip">Elixir</span></div><button class="pick" data-product="Sweet Pea">Choose</button></div></div></article>
+          <article class="product-card"><div class="product-image"><img src="assets/fragrances/br-540-red.jpg" width="900" height="900" alt="Pappi 540 Red Parfum and Elixir with saffron, jasmine, amber and cedar" loading="lazy" decoding="async"></div><div class="product-body"><h3>540 Red</h3><p>Luminous amber warmth with a rich, unforgettable sweetness.</p><div class="product-meta"><div class="chips"><span class="chip">Parfum</span><span class="chip">Elixir</span></div><button class="pick" data-product="540 Red">Choose</button></div></div></article>
+          <article class="product-card"><div class="product-image"><img src="assets/fragrances/ln-eclat.jpg" width="900" height="900" alt="Pappi Eclat Parfum and Elixir with lilac, peony and peach blossom" loading="lazy" decoding="async"></div><div class="product-body"><h3>Éclat</h3><p>Delicate florals with a serene, polished softness from day to night.</p><div class="product-meta"><div class="chips"><span class="chip">Parfum</span><span class="chip">Elixir</span></div><button class="pick" data-product="Eclat">Choose</button></div></div></article>
+          <article class="product-card"><div class="product-image"><img src="assets/fragrances/ga-acqua.jpg" width="900" height="900" alt="Pappi Acqua DG Parfum and Elixir with bergamot, sea salt and woods" loading="lazy" decoding="async"></div><div class="product-body"><h3>Acqua DG</h3><p>Aquatic freshness, bright citrus and an easy coastal confidence.</p><div class="product-meta"><div class="chips"><span class="chip">Parfum</span><span class="chip">Elixir</span></div><button class="pick" data-product="Acqua DG">Choose</button></div></div></article>
+        </div>
+      </div>
+    </section>
 
-// ---------------- Auth ----------------
-function viewLogin(err=""){
-  app.innerHTML = `<form class="login" id="login">
-    <h1>Pappi Orders</h1><p class="muted">Sign in to manage orders.</p>
-    <div class="field"><label for="em">Email</label><input id="em" type="email" autocomplete="username" required></div>
-    <div class="field"><label for="pw">Password</label><input id="pw" type="password" autocomplete="current-password" required></div>
-    <p class="err">${esc(err)}</p>
-    <button class="btn" style="width:100%">Sign in</button></form>`;
-  document.getElementById("login").onsubmit = async e => {
-    e.preventDefault();
-    const { error } = await db.auth.signInWithPassword({ email: em.value.trim(), password: pw.value });
-    if (error) return viewLogin("Wrong email or password.");
-    boot();
-  };
-}
+    <section class="campaign" id="campaign">
+      <div class="wrap">
+        <div class="campaign-head">
+          <div><p class="eyebrow">Inside the 40% Elixir</p><h2>More presence. Fewer touch-ups.</h2><p class="lede">Meet the richer side of Pappi through our campaign stories—from signature selections to day-to-night wear.</p></div>
+          <p class="campaign-hint">Moves automatically · swipe or use arrows</p>
+        </div>
+        <div class="carousel" aria-roledescription="carousel" aria-label="Pappi Elixir campaign highlights">
+          <div class="carousel-viewport" tabindex="0">
+            <div class="carousel-track">
+              <figure class="carousel-slide"><button class="campaign-open" type="button" aria-label="Enlarge day-to-night Pappi Elixir campaign"><img src="assets/campaign/day-to-night.jpg" width="1100" height="1100" alt="Pappi 40% Elixir day-to-night fragrance campaign" loading="lazy" decoding="async"></button></figure>
+              <figure class="carousel-slide"><button class="campaign-open" type="button" aria-label="Enlarge Pappi Elixir scent selection for him"><img src="assets/campaign/men.jpg" width="1100" height="1100" alt="Pappi 40% Elixir scent selection for him" loading="lazy" decoding="async"></button></figure>
+              <figure class="carousel-slide"><button class="campaign-open" type="button" aria-label="Enlarge Pappi Elixir scent selection for her"><img src="assets/campaign/women.jpg" width="1100" height="1100" alt="Pappi 40% Elixir scent selection for her" loading="lazy" decoding="async"></button></figure>
+              <figure class="carousel-slide"><button class="campaign-open" type="button" aria-label="Enlarge Pappi 40% Elixir benefits campaign"><img src="assets/campaign/elixir-40.jpg" width="1100" height="1100" alt="Pappi 40% Elixir benefits and 50 ml bottle" loading="lazy" decoding="async"></button></figure>
+              <figure class="carousel-slide"><button class="campaign-open" type="button" aria-label="Enlarge Pappi Elixir comparison campaign"><img src="assets/campaign/compare.jpg" width="1100" height="1100" alt="Pappi 40% Elixir compared with 20% Parfum" loading="lazy" decoding="async"></button></figure>
+            </div>
+          </div>
+          <div class="carousel-controls">
+            <button class="carousel-arrow carousel-prev" type="button" aria-label="Previous campaign image">←</button>
+            <div class="carousel-dots" aria-label="Choose campaign image"></div>
+            <button class="carousel-arrow carousel-next" type="button" aria-label="Next campaign image">→</button>
+          </div>
+          <p class="carousel-caption" aria-live="polite">Campaign 1 of 5 · Day-to-night presence</p>
+        </div>
+        <dialog class="campaign-modal" id="campaign-modal" aria-label="Enlarged Pappi campaign image">
+          <div class="campaign-modal-card"><button class="campaign-modal-close" type="button" aria-label="Close enlarged image">×</button><img src="assets/campaign/day-to-night.jpg" width="1100" height="1100" alt=""><p class="campaign-modal-caption"></p></div>
+        </dialog>
+      </div>
+    </section>
 
-// ---------------- Data ----------------
-async function load(){
-  const since = new Date(Date.now() - 1000*60*60*24*365).toISOString();
-  const [o, c, p] = await Promise.all([
-    db.from("orders").select("*, customers(id,name,phone,address), order_items(name,line,qty,unit_price)").gte("created_at", since).order("created_at",{ascending:false}),
-    db.from("customers").select("*").order("created_at",{ascending:false}),
-    db.from("products").select("*").order("sort"),
-  ]);
-  if (o.error) throw o.error;
-  S.orders = o.data; S.customers = c.data || []; S.products = p.data || [];
-}
+    <section class="savon-section" id="savon">
+      <div class="wrap">
+        <div class="section-head"><div><img class="savon-logo" src="assets/brand/savon-logo.png" width="500" height="500" alt="Pappi Savon logo" loading="lazy" decoding="async"><p class="eyebrow">Pappi Savon</p><h2>Turn the everyday shower into a ritual.</h2><p class="lede">Artisan cleansing bars with creamy lather, a comfortable clean and a beautiful finish.</p></div><p class="section-note">Each bar has its own character. Choose the ritual that suits your mood—or bring home the full trio.</p></div>
+        <div class="savon-gallery">
+          <a class="savon-gallery-feature" href="#savon-products" aria-label="Shop the Pappi Savon collection">
+            <img src="assets/savon-gallery/collection-hero.jpg" width="1600" height="800" alt="Pappi Savon handcrafted botanical soap collection featuring Noir Charcoal, Coconut Silk and Golden Glow" loading="lazy" decoding="async">
+          </a>
+          <div class="savon-gallery-secondary">
+            <figure class="savon-gallery-tile"><img src="assets/savon-gallery/parfum-savon-collection.jpg" width="1500" height="844" alt="Pappi Parfum bottles displayed with Coconut Silk, Golden Glow and Noir Charcoal artisan soaps" loading="lazy" decoding="async"></figure>
+            <figure class="savon-gallery-tile"><img src="assets/savon-gallery/artisan-trio.jpg" width="1100" height="1100" alt="Pappi Savon artisan cleansing bar trio with charcoal, coconut, oatmeal and turmeric ingredients" loading="lazy" decoding="async"></figure>
+          </div>
+        </div>
+        <div class="soap-grid" id="savon-products">
+          <article class="soap-card"><div class="product-image"><img src="assets/savon/coconut-silk.png" width="723" height="760" alt="Pappi Savon Coconut Silk artisan cleansing bar" loading="lazy" decoding="async"></div><div class="product-body"><span class="soap-number">RITUAL 01</span><h3>Coconut Silk</h3><p>A soft, comforting cleanse with creamy lather for normal, dry and combination skin.</p><button class="pick" data-product="Coconut Silk Savon">Add to order →</button></div></article>
+          <article class="soap-card"><div class="product-image"><img src="assets/savon/golden-glow.png" width="731" height="760" alt="Pappi Savon Golden Glow artisan cleansing bar" loading="lazy" decoding="async"></div><div class="product-body"><span class="soap-number">RITUAL 02</span><h3>Golden Glow</h3><p>A warm, uplifting cleanse with artisan golden swirls for dull, normal and combination skin.</p><button class="pick" data-product="Golden Glow Savon">Add to order →</button></div></article>
+          <article class="soap-card"><div class="product-image"><img src="assets/savon/noir-charcoal.png" width="723" height="760" alt="Pappi Savon Noir Charcoal artisan cleansing bar" loading="lazy" decoding="async"></div><div class="product-body"><span class="soap-number">RITUAL 03</span><h3>Noir Charcoal</h3><p>A bold charcoal-inspired bar with a refined black-and-gold finish for a fresh daily cleanse.</p><button class="pick" data-product="Noir Charcoal Savon">Add to order →</button></div></article>
+        </div>
+      </div>
+    </section>
 
-// ---------------- Views ----------------
-function shell(body){
-  const tabs = [["orders","Orders"],["customers","Customers"],["sales","Sales"],["products","Products"]];
-  app.innerHTML = `<header><div class="top"><div class="brand">Pappi <span>Orders</span></div>
-      <div><button class="btn ghost" id="refresh">Refresh</button> <button class="btn ghost" id="logout">Sign out</button></div></div>
-    <nav>${tabs.map(([k,l])=>`<button data-tab="${k}" ${S.tab===k?'aria-current="page"':""}>${l}</button>`).join("")}</nav></header>
-    <main>${body}</main>${S.open ? viewOrder() : ""}`;
-}
+    <section class="channels" id="shop">
+      <div class="wrap"><div class="section-head"><div><p class="eyebrow">Choose how to shop</p><h2>Your next signature is closer than you think.</h2></div></div>
+        <div class="channel-grid">
+          <article class="channel channel--shopee"><div><img class="channel-logo" src="assets/brand/shopee-logo.svg" width="64" height="64" alt="Shopee logo" loading="lazy" decoding="async"><h3>Available now on Shopee</h3><p>Prefer checkout in the app? Browse Pappi, place your order and track delivery from your Shopee account.</p></div><a class="button button--light" href="https://shopee.ph/bilyotoy" rel="noopener" target="_blank">Open Shopee →</a></article>
+          <article class="channel"><div><img class="channel-logo" src="assets/brand/tiktok-logo.svg" width="64" height="64" alt="TikTok logo" loading="lazy" decoding="async"><span class="coming">Coming soon</span><h3>TikTok Shop</h3><p>Live selling, scent stories and easy TikTok checkout are on the way.</p></div><span aria-hidden="true">TikTok Shop · Pending</span></article>
+          <article class="channel"><div><div class="channel-icon">✦</div><h3>Order direct</h3><p>Tell us exactly what you want. We’ll confirm availability and get back to you as soon as possible.</p></div><a class="button button--ghost" href="#order">Start an order →</a></article>
+        </div>
+      </div>
+    </section>
 
-function viewOrders(){
-  const counts = Object.fromEntries(STATUSES.map(s=>[s, S.orders.filter(o=>o.status===s).length]));
-  const list = S.orders.filter(o => S.filter==="all" || o.status===S.filter);
-  return `<div class="filters">${["new","paid","packed","shipped","completed","cancelled","all"].map(f=>
-      `<button class="chip" data-filter="${f}" aria-pressed="${S.filter===f}">${f==="all"?"All":LABEL[f]}<b>${f==="all"?S.orders.length:counts[f]}</b></button>`).join("")}</div>
-    <div class="list">${list.length ? list.map(o=>`
-      <button class="row" data-order="${o.id}">
-        <span class="dot s-${o.status}" title="${LABEL[o.status]}"></span>
-        <span><b>${esc(o.order_no)}</b> · ${esc(o.customers?.name)}
-          <small>${o.order_items.map(i=>`${i.qty}× ${esc(i.name)} ${i.line.split(" ")[0]}`).join(", ")} · ${DELIVERY[o.delivery]} · ${fmtDate(o.created_at)}</small></span>
-        <span class="amt">${peso(o.total)}<small>${esc(o.payment_method)}</small></span>
-      </button>`).join("") : `<p class="muted">No ${S.filter==="all"?"":LABEL[S.filter].toLowerCase()+" "}orders. New website orders appear here and on Telegram.</p>`}</div>`;
-}
+    <section class="about" id="about">
+      <div class="wrap about-grid">
+        <figure class="about-visual"><img src="assets/brand/verge-pappi-story.jpg" width="941" height="1672" alt="Verge, founder of Pappi Suds and Scents Shop, holding a Pappi fragrance bottle and artisan savon bar" loading="lazy" decoding="async"></figure>
+        <div class="about-copy">
+          <p class="eyebrow">About Pappi · Founded by Verge</p>
+          <h2>A partner’s obsession. A group chat. A brand.</h2>
+          <p class="lede">Pappi started with two things colliding: my partner Larry’s fascination with perfume—and the money he kept spending on it—and a TikTok chat with friends in Singapore who loved luxury fragrance but hated the price tag.</p>
+          <p>I didn’t have an answer for them at first. So I went looking for one: Sephora every other day, sniffing everything I could reach, studying mixes, watching videos, flipping through books. Eventually I enrolled in a proper perfumery course and visited manufacturing hubs and suppliers for real base ingredients, until I had over 150 oils on a shelf—ready for mixing, like alchemy in a Singapore bedroom my housemates swore smelled different every time the door opened.</p>
+          <p>Some fragrances started as personal requests—friends who wanted a luxury scent without the luxury price—so I named the bottle after them. Under a Singapore-born label called <strong>VG</strong>, that idea traveled with word of mouth into Malaysia and Singapore, and the bottles kept selling.</p>
+          <p>Retrenchment hit in May 2026. It could have ended things—instead it sent me home. As a returning OFW, I qualified for financial assistance to start a business, so I made it official. My brothers were dealing with chicken skin and wanted a natural alternative, which became <strong>Savon</strong>. And the perfume line, once VG, became <strong>Pappi</strong> the moment I landed back in the Philippines—black for the dark days it took to get here, gold for what came after.</p>
+          <div class="about-milestones" aria-label="Pappi story highlights">
+            <div class="about-milestone"><strong>150+ oils</strong><span>Gathered from suppliers and manufacturing hubs</span></div>
+            <div class="about-milestone"><strong>April 2025</strong><span>First bottles sold under VG—2,000+ since</span></div>
+            <div class="about-milestone"><strong>Home in Cebu</strong><span>Rebuilt as Pappi Suds &amp; Scents, 2026</span></div>
+          </div>
+        </div>
+      </div>
 
-function viewOrder(){
-  const o = S.orders.find(x=>x.id===S.open); if(!o) return "";
-  const pipe = ["paid","packed","shipped","completed"];
-  const repeat = S.orders.filter(x=>x.customer_id===o.customer_id).length;
-  return `<div class="sheet" data-close><div role="dialog" aria-label="Order ${esc(o.order_no)}">
-    <div style="display:flex;justify-content:space-between;align-items:start">
-      <div><h2>${esc(o.order_no)}</h2><span class="muted">${fmtDate(o.created_at)} · ${LABEL[o.status]}</span></div>
-      <button class="btn ghost" data-close>Close</button></div>
-    <div class="pipeline">${pipe.map(s=>`<button data-status="${s}" aria-pressed="${o.status===s}">${LABEL[s]}</button>`).join("")}</div>
-    <ul class="items">${o.order_items.map(i=>`<li><span>${i.qty} × ${esc(i.name)} <span class="muted">${esc(i.line)}</span></span><span>${peso(i.qty*i.unit_price)}</span></li>`).join("")}
-      <li><span>Shipping</span><span>${peso(o.shipping_fee)}</span></li>
-      <li><b>Total</b><b>${peso(o.total)}</b></li></ul>
-    <dl class="kv">
-      <dt>Customer</dt><dd>${esc(o.customers?.name)}${repeat>1?` <span style="color:var(--gold-hi)">· ${repeat} orders</span>`:""}</dd>
-      <dt>Mobile</dt><dd><a style="color:var(--gold-hi)" href="tel:${esc(o.customers?.phone)}">${esc(o.customers?.phone)}</a> · <a style="color:var(--gold-hi)" href="sms:${esc(o.customers?.phone)}">Text</a></dd>
-      <dt>Delivery</dt><dd>${DELIVERY[o.delivery]}</dd>
-      ${o.address?`<dt>Address</dt><dd>${esc(o.address)}</dd>`:""}
-      <dt>Paid via</dt><dd>${esc(o.payment_method)} · expected ${peso(o.subtotal)}</dd>
-      ${o.customer_note?`<dt>Their note</dt><dd>${esc(o.customer_note)}</dd>`:""}
-    </dl>
-    <div class="muted">Payment screenshot</div>
-    ${S.proofUrl?`<a href="${S.proofUrl}" target="_blank" rel="noopener"><img class="proof" src="${S.proofUrl}" alt="Payment screenshot for ${esc(o.order_no)}"></a>`:`<p class="muted">${o.proof_path?"Loading…":"No screenshot"}</p>`}
-    <div class="field"><label for="f-ship">Shipping fee (₱)</label><input id="f-ship" type="number" min="0" step="1" value="${Number(o.shipping_fee)}"></div>
-    <div class="field"><label for="f-track">Tracking number</label><input id="f-track" value="${esc(o.tracking_no)}"></div>
-    <div class="field"><label for="f-note">Private note</label><textarea id="f-note" rows="2">${esc(o.admin_note)}</textarea></div>
-    <div class="actions"><button class="btn" data-save>Save details</button>
-      ${o.status!=="cancelled"?`<button class="btn ghost" data-status="cancelled">Cancel order</button>`:`<button class="btn ghost" data-status="new">Reopen order</button>`}</div>
-  </div></div>`;
-}
+      <div class="wrap about-timeline">
+        <div class="about-timeline-head">
+          <h3>How Pappi came to be.</h3>
+          <p>From a partner’s perfume habit to a name with its own story—here’s the full timeline.</p>
+        </div>
+        <div class="timeline">
 
-function customerStats(){
-  const by = {};
-  for (const o of S.orders){
-    if (!REVENUE_STATUSES.includes(o.status) && o.status!=="new") continue;
-    const c = by[o.customer_id] ||= { orders:0, spent:0, last:null, scents:{} };
-    c.orders++; if (REVENUE_STATUSES.includes(o.status)) c.spent += Number(o.total);
-    if (!c.last || o.created_at > c.last) c.last = o.created_at;
-    for (const i of o.order_items) c.scents[i.name] = (c.scents[i.name]||0) + i.qty;
-  }
-  return by;
-}
+          <p class="timeline-era">Singapore — discovery</p>
+          <div class="timeline-entry">
+            <p class="timeline-when">The spark</p>
+            <p class="timeline-what">Larry’s stash grows, and a question follows</p>
+            <p class="timeline-detail">My partner Larry’s fascination with perfume—and the money spent on it—sits alongside a TikTok chat with Singapore friends looking for a cheaper way into luxury scents.</p>
+          </div>
+          <div class="timeline-entry">
+            <p class="timeline-when">Months of learning</p>
+            <p class="timeline-what">Sephora, YouTube, and an online perfumery course</p>
+            <p class="timeline-detail">Sniffing at Sephora every other day, studying mixes, watching countless videos, flipping through books—then enrolling in a proper course and visiting manufacturing hubs and suppliers for base ingredients.</p>
+          </div>
+          <div class="timeline-entry is-milestone">
+            <p class="timeline-when">The lab</p>
+            <p class="timeline-what">150+ oils, one Singapore bedroom</p>
+            <p class="timeline-detail">A room that housemates said smelled different every time the door opened—each blend tested side-by-side against the real designer scent, like alchemy.</p>
+          </div>
+          <div class="timeline-entry">
+            <p class="timeline-when">Naming the bottles</p>
+            <p class="timeline-what">Fragrances named after the friends who requested them</p>
+            <p class="timeline-detail">Arianne, Anne, Ayani, Jo, Ms. Fe, Ms. Jane, Angelina, Maejoy, Khimmy, and more—each one a personal request from someone who wanted a luxury scent without the luxury price.</p>
+          </div>
 
-function viewCustomers(){
-  const st = customerStats(); const q = S.q.toLowerCase();
-  const rows = S.customers.filter(c=>!q || c.name.toLowerCase().includes(q) || c.phone.includes(q))
-    .map(c=>({ ...c, ...(st[c.id]||{orders:0,spent:0,last:null,scents:{}}) }))
-    .sort((a,b)=>b.spent-a.spent);
-  const fav = s => Object.entries(s).sort((a,b)=>b[1]-a[1])[0]?.[0] || "—";
-  const repeaters = rows.filter(r=>r.orders>1).length;
-  return `<div class="stats">
-      <div class="stat"><div class="v">${S.customers.length}</div><div class="l">Customers</div></div>
-      <div class="stat"><div class="v">${repeaters}</div><div class="l">Repeat buyers</div></div>
-      <div class="stat"><div class="v">${S.customers.length?Math.round(repeaters/S.customers.length*100):0}%</div><div class="l">Repeat rate</div></div></div>
-    <input id="q" placeholder="Search name or number" value="${esc(S.q)}" style="margin-bottom:12px">
-    <div class="wrap"><table><thead><tr><th>Name</th><th>Mobile</th><th class="n">Orders</th><th class="n">Spent</th><th>Favorite</th><th>Last order</th></tr></thead>
-    <tbody>${rows.map(r=>`<tr><td>${esc(r.name)}</td><td><a style="color:var(--gold-hi)" href="sms:${esc(r.phone)}">${esc(r.phone)}</a></td>
-      <td class="n">${r.orders}</td><td class="n">${peso(r.spent)}</td><td>${esc(fav(r.scents))}</td><td>${r.last?fmtDate(r.last):"—"}</td></tr>`).join("") || `<tr><td colspan="6" class="muted">Customers are added automatically when they order.</td></tr>`}</tbody></table></div>`;
-}
+          <p class="timeline-era">April 2025 — going to market</p>
+          <div class="timeline-entry is-milestone">
+            <p class="timeline-when">April 7, 2025</p>
+            <p class="timeline-what">First bottles sold</p>
+            <p class="timeline-detail">The start of tracked sales—over 2,000 bottles (10–30ml) sold since this date, under the original “VG” label.</p>
+          </div>
+          <div class="timeline-entry">
+            <p class="timeline-when">Expanding</p>
+            <p class="timeline-what">Distribution into Malaysia and Singapore</p>
+            <p class="timeline-detail">Word spread beyond the original friend group; packaging upgraded from loose bottles to named boxes.</p>
+          </div>
+          <div class="timeline-entry">
+            <p class="timeline-when">Giving back</p>
+            <p class="timeline-what">Giveaways for Filipino community groups abroad</p>
+            <p class="timeline-detail">Plus a personalized line built specifically for gifting.</p>
+          </div>
 
-function viewSales(){
-  const paid = S.orders.filter(o=>REVENUE_STATUSES.includes(o.status));
-  const now = new Date(); const today = now.toDateString();
-  const ym = `${now.getFullYear()}-${now.getMonth()}`;
-  const sum = arr => arr.reduce((s,o)=>s+Number(o.subtotal),0);
-  const tOrders = paid.filter(o=>new Date(o.paid_at||o.created_at).toDateString()===today);
-  const mOrders = paid.filter(o=>{const d=new Date(o.paid_at||o.created_at);return `${d.getFullYear()}-${d.getMonth()}`===ym;});
-  const units = {}; let elixir=0, parfum=0, savon=0;
-  for (const o of mOrders) for (const i of o.order_items){
-    const k = i.name + " · " + i.line; units[k] = units[k] || { name:i.name, line:i.line, qty:0, rev:0 };
-    units[k].qty += i.qty; units[k].rev += i.qty*i.unit_price;
-    if (i.line.startsWith("Elixir")) elixir+=i.qty; else if (i.line.startsWith("Parfum")) parfum+=i.qty; else savon+=i.qty;
-  }
-  const days = [...Array(30)].map((_,k)=>{ const d=new Date(now); d.setDate(d.getDate()-29+k); return d.toDateString(); });
-  const perDay = days.map(d=>sum(paid.filter(o=>new Date(o.paid_at||o.created_at).toDateString()===d)));
-  const max = Math.max(1,...perDay);
-  const waiting = S.orders.filter(o=>o.status==="new").length;
-  const toShip = S.orders.filter(o=>o.status==="paid"||o.status==="packed").length;
-  return `<div class="stats">
-      <div class="stat"><div class="v">${peso(sum(tOrders))}</div><div class="l">Sales today · ${tOrders.length} orders</div></div>
-      <div class="stat"><div class="v">${peso(sum(mOrders))}</div><div class="l">Sales this month · ${mOrders.length} orders</div></div>
-      <div class="stat"><div class="v">${mOrders.length?peso(Math.round(sum(mOrders)/mOrders.length)):"₱0"}</div><div class="l">Average order this month</div></div>
-      <div class="stat"><div class="v">${elixir} / ${parfum}</div><div class="l">Elixir vs Parfum bottles this month</div></div>
-      <div class="stat"><div class="v">${waiting}</div><div class="l">Waiting for payment check</div></div>
-      <div class="stat"><div class="v">${toShip}</div><div class="l">Paid, not yet shipped</div></div></div>
-    <h3>Daily sales, last 30 days</h3>
-    <div class="bars" role="img" aria-label="Daily sales for the last 30 days">${perDay.map((v,k)=>`<div style="height:${v/max*100}%" title="${days[k]}: ${peso(v)}"></div>`).join("")}</div>
-    <h3>Best sellers this month</h3>
-    <div class="wrap"><table><thead><tr><th>Scent</th><th>Line</th><th class="n">Units</th><th class="n">Sales</th></tr></thead>
-    <tbody>${Object.values(units).sort((a,b)=>b.qty-a.qty).map(u=>`<tr><td>${esc(u.name)}</td><td>${esc(u.line)}</td><td class="n">${u.qty}</td><td class="n">${peso(u.rev)}</td></tr>`).join("") || `<tr><td colspan="4" class="muted">Paid orders this month will show here.</td></tr>`}</tbody></table></div>
-    <p class="muted" style="margin-top:10px">Sales count orders marked Paid or later. Shipping fees are not included.</p>`;
-}
+          <p class="timeline-era">May–August 2026 — the turn</p>
+          <div class="timeline-entry is-milestone">
+            <p class="timeline-when">May 2026</p>
+            <p class="timeline-what">Retrenchment</p>
+            <p class="timeline-detail">The job in Singapore ends—and unexpectedly, it paves the way for what comes next.</p>
+          </div>
+          <div class="timeline-entry">
+            <p class="timeline-when">August 10, 2026</p>
+            <p class="timeline-what">Preparing to embark on a new journey</p>
+            <p class="timeline-detail">Packing up Singapore, closing one chapter.</p>
+          </div>
+          <div class="timeline-entry is-milestone">
+            <p class="timeline-when">August 11, 2026</p>
+            <p class="timeline-what">Arrival in Cebu</p>
+            <p class="timeline-detail">Home, and the start of building something official.</p>
+          </div>
 
-function viewProducts(){
-  return `<p class="muted">Change a price or hide a product, then press Save. The website order form updates right away.</p>
-    <div class="wrap"><table><thead><tr><th>Product</th><th>Line</th><th class="n">Price (₱)</th><th>On sale</th><th></th></tr></thead>
-    <tbody>${S.products.map(p=>`<tr><td>${esc(p.name)}</td><td>${esc(p.line)}</td>
-      <td class="n"><input type="number" min="0" step="1" value="${Number(p.price)}" data-price="${p.id}" style="max-width:110px;text-align:right"></td>
-      <td><input type="checkbox" ${p.active?"checked":""} data-active="${p.id}" style="width:auto;accent-color:var(--gold)" aria-label="Show ${esc(p.name)} on the order form"></td>
-      <td><button class="btn ghost" data-saveprod="${p.id}">Save</button></td></tr>`).join("")}</tbody></table></div>`;
-}
+          <p class="timeline-era">Cebu — rebirth</p>
+          <div class="timeline-entry">
+            <p class="timeline-when">OFW support</p>
+            <p class="timeline-what">Financial assistance becomes the seed capital</p>
+            <p class="timeline-detail">As a returning OFW, assistance to start a business made the decision easy—might as well make it official.</p>
+          </div>
+          <div class="timeline-entry">
+            <p class="timeline-when">A second line is born</p>
+            <p class="timeline-what">Savon—natural soap, for a very personal reason</p>
+            <p class="timeline-detail">My brothers were dealing with chicken skin and wanted a natural alternative—Savon exists because of them.</p>
+          </div>
+          <div class="timeline-entry is-milestone">
+            <p class="timeline-when">The rebrand</p>
+            <p class="timeline-what">Pappi Suds &amp; Scents—black for the dark days, gold for what’s next</p>
+            <p class="timeline-detail">A new name, new bottles, a new crest—built for premium, international, and a new chapter.</p>
+          </div>
+          <div class="timeline-entry">
+            <p class="timeline-when">Now</p>
+            <p class="timeline-what">Live at pappiscents.shop</p>
+            <p class="timeline-detail">Facebook: pappi.artisan · Shopee: bilyotoy</p>
+          </div>
 
-function render(){
-  const body = { orders:viewOrders, customers:viewCustomers, sales:viewSales, products:viewProducts }[S.tab]();
-  shell(body);
-}
+        </div>
+      </div>
+    </section>
 
-// ---------------- Actions ----------------
-async function openOrder(id){
-  S.open = id; S.proofUrl = ""; render();
-  const o = S.orders.find(x=>x.id===id);
-  if (o?.proof_path){
-    const { data } = await db.storage.from("payment-proofs").createSignedUrl(o.proof_path, 600);
-    if (S.open===id){ S.proofUrl = data?.signedUrl || ""; render(); }
-  }
-}
+    <section class="memory" aria-labelledby="memory-title">
+      <div class="wrap memory-inner">
+        <p class="eyebrow">The feeling we bottle</p>
+        <blockquote id="memory-title">“Scents may fade. <em>Memories remain.</em>”</blockquote>
+        <p>A familiar fragrance can carry us across cities, oceans and years—back to the people, places and moments we never want to lose.</p>
+        <div class="memory-quotes"><q>A familiar scent is a quiet way home.</q><q>What we wear becomes part of what they remember.</q></div>
+      </div>
+    </section>
 
-async function updateOrder(id, patch, msg){
-  const { data, error } = await db.from("orders").update(patch).eq("id", id)
-    .select("*, customers(id,name,phone,address), order_items(name,line,qty,unit_price)").single();
-  if (error) return toast("Didn't save: " + error.message);
-  S.orders = S.orders.map(o=>o.id===id?data:o); render(); toast(msg);
-}
+    <section class="testimonials" id="stories" aria-labelledby="stories-title">
+      <div class="wrap">
+        <div class="section-head">
+          <div class="testimonial-intro"><p class="eyebrow">Stories from the Pappi community</p><h2 id="stories-title">A scent can change how a day feels.</h2><p class="lede">From a little everyday confidence to a meaningful gift sent across an ocean, these are the kinds of moments Pappi was created for.</p></div>
+          <p class="section-note">Real fragrance, real connection and a little luxury made more reachable for every kababayan.</p>
+        </div>
+        <div class="testimonial-grid">
+          <article class="testimonial"><div><div class="testimonial-stars" aria-label="Five stars">★★★★★</div><blockquote>“Even my madam and boss were surprised. They thought I had bought an expensive luxury perfume! It felt good to wear something beautiful that still fit my budget.”</blockquote></div><div class="testimonial-person"><span class="testimonial-avatar" aria-hidden="true">MA</span><div><strong>Marites A.</strong><span>OFW · Singapore</span></div></div></article>
+          <article class="testimonial"><div><div class="testimonial-stars" aria-label="Five stars">★★★★★</div><blockquote>“I sprayed it before work and could still smell it when I got home. The next morning, the scent was still softly there on my clothes. Sulit talaga.”</blockquote></div><div class="testimonial-person"><span class="testimonial-avatar" aria-hidden="true">LI</span><div><strong>Liza R.</strong><span>Pappi Elixir wearer</span></div></div></article>
+          <article class="testimonial"><div><div class="testimonial-stars" aria-label="Five stars">★★★★★</div><blockquote>“Fresh lang and easy to wear. Someone kept asking what perfume I was wearing—and now, may jowa na ako. I’m giving Pappi at least a little credit!”</blockquote></div><div class="testimonial-person"><span class="testimonial-avatar" aria-hidden="true">CP</span><div><strong>Carlo P.</strong><span>Cebu City</span></div></div></article>
+          <article class="testimonial"><div><div class="testimonial-stars" aria-label="Five stars">★★★★★</div><blockquote>“I’m in New Zealand, but I was still able to send a heartfelt gift home. My family in the Philippines said opening their Pappi package felt like receiving a little piece of me.”</blockquote></div><div class="testimonial-person"><span class="testimonial-avatar" aria-hidden="true">JI</span><div><strong>Jing N.</strong><span>OFW · New Zealand</span></div></div></article>
+          <article class="testimonial"><div><div class="testimonial-stars" aria-label="Five stars">★★★★★</div><blockquote>“It smells refined, never harsh, and lasts beautifully. The quality genuinely surprised me—it wears as confidently as fragrances that cost so much more.”</blockquote></div><div class="testimonial-person"><span class="testimonial-avatar" aria-hidden="true">AN</span><div><strong>Ana C.</strong><span>Fragrance enthusiast</span></div></div></article>
+        </div>
+      </div>
+    </section>
 
-app.addEventListener("click", async e => {
-  if (e.target.matches(".sheet[data-close]")) { S.open=null; return render(); }
-  const b = e.target.closest("button"); if(!b) return;
-  const d = b.dataset;
-  if (d.tab){ S.tab=d.tab; S.open=null; render(); }
-  else if (d.filter){ S.filter=d.filter; render(); }
-  else if (d.order){ openOrder(d.order); }
-  else if ("close" in d){ S.open=null; render(); }
-  else if (d.status){ await updateOrder(S.open, { status:d.status }, `Marked ${LABEL[d.status]}`); }
-  else if ("save" in d){
-    await updateOrder(S.open, { shipping_fee:Number(document.getElementById("f-ship").value)||0,
-      tracking_no:document.getElementById("f-track").value.trim()||null, admin_note:document.getElementById("f-note").value.trim()||null }, "Details saved");
-  }
-  else if (d.saveprod){
-    const price = Number(app.querySelector(`[data-price="${d.saveprod}"]`).value);
-    const active = app.querySelector(`[data-active="${d.saveprod}"]`).checked;
-    if (active && !(price > 0)) return toast("Set a price above ₱0 before putting it on sale");
-    const { error } = await db.from("products").update({ price, active }).eq("id", d.saveprod);
-    if (error) return toast("Didn't save: " + error.message);
-    S.products = S.products.map(p=>p.id===d.saveprod?{...p,price,active}:p); toast("Product saved");
-  }
-  else if (b.id==="refresh"){ await load(); render(); toast("Up to date"); }
-  else if (b.id==="logout"){ await db.auth.signOut(); viewLogin(); }
-});
-app.addEventListener("input", e => { if (e.target.id==="q"){ S.q=e.target.value; const pos=e.target.selectionStart; render(); const q=document.getElementById("q"); q.focus(); q.setSelectionRange(pos,pos);} });
+    <section class="order" id="order">
+      <div class="wrap order-grid">
+        <div id="delivery"><p class="eyebrow">Direct order</p><h2>Tell us what you’d love.</h2><p class="lede">Share your details and order message. We’ll review it, confirm your total and reply as soon as possible.</p>
+          <div class="delivery-card"><div class="delivery-row"><span class="delivery-icon">PH</span><div><b>Nationwide delivery</b><p>We aim to ship the next day. Your order should reach you in approximately 3–5 days.</p></div></div><div class="delivery-row"><span class="delivery-icon">CEB</span><div><b>Cebu City express delivery</b><p>We can book Maxim, Grab or Angkas so your Pappi order can reach you in around 1–2 hours, subject to rider availability.</p></div></div><div class="delivery-row"><span class="delivery-icon">✓</span><div><b>Personal confirmation</b><p>We’ll confirm stock, delivery fee and payment details before finalizing your order.</p></div></div></div>
+          <div class="contact-links" aria-label="Contact Pappi Suds and Scents Shop">
+            <a class="contact-link" href="tel:+639055613013">Call or text <span>+63 905 561 3013 →</span></a>
+            <a class="contact-link" href="mailto:verge.gamotan@gmail.com">Email us <span>verge.gamotan@gmail.com →</span></a>
+            <a class="contact-link" href="https://maps.app.goo.gl/wPRMuWsfBQyrzJ5r5" target="_blank" rel="noopener">Our location <span>Open Google Maps →</span></a>
+          </div>
+        </div>
+        <form id="order-form">
+          <div class="form-title">Create your order request</div>
+          <div class="form-grid">
+            <div class="field"><label for="name">Name</label><input id="name" name="name" autocomplete="name" required placeholder="Your full name"></div>
+            <div class="field"><label for="contact">Contact number</label><input id="contact" name="contact" autocomplete="tel" inputmode="tel" required placeholder="09XX XXX XXXX"></div>
+            <div class="field field--wide"><label for="address">Delivery address</label><input id="address" name="address" autocomplete="street-address" required placeholder="House/unit, street, barangay, city and province"></div>
+            <div class="field"><label for="type">Fragrance style</label><select id="type" name="type"><option value="Not selected">Select if ordering fragrance</option><option>Pappi Parfum — 50 ml / 20% oil base</option><option>Pappi Elixir — 50 ml / 40% oil base</option></select></div>
+            <div class="field"><label for="product">Scent or savon</label><select id="product" name="product"><option value="Not selected">Choose a product</option><optgroup label="Fragrances"><option>Fantasy</option><option>English Pear</option><option>Savage</option><option>Imagination</option><option>Vanilla Lace</option><option>Sweet Pea</option><option>540 Red</option><option>Éclat</option><option>Acqua DG</option></optgroup><optgroup label="Savon"><option>Coconut Silk Savon</option><option>Golden Glow Savon</option><option>Noir Charcoal Savon</option><option>Full Pappi Savon trio</option></optgroup></select></div>
+            <div class="field field--wide"><label for="message">Order message</label><textarea id="message" name="message" required placeholder="Example: 1 Pappi Elixir in English Pear and 2 Coconut Silk bars. Please include any questions or special delivery notes."></textarea></div>
+          </div>
+          <p class="form-help">Submitting opens your email app and addresses the request to verge.gamotan@gmail.com. No payment is collected on this page.</p>
+          <button class="button button--gold" type="submit">Send my order request →</button>
+          <div class="success" id="success" role="status">Your order details are ready. Please send the prepared email so we can reply soonest.</div>
+        </form>
+      </div>
+    </section>
 
-// New orders show up live while the dashboard is open
-function live(){
-  db.channel("orders").on("postgres_changes", { event:"INSERT", schema:"public", table:"orders" }, async () => {
-    await load(); render(); toast("New order received");
-  }).subscribe();
-}
+    <section class="promise"><div class="wrap"><blockquote>“A little luxury for the moments you repeat every day.”</blockquote><p>Pappi Suds &amp; Scents Shop · Cebu, Philippines</p></div></section>
+  </main>
 
-async function boot(){
-  const { data:{ session } } = await db.auth.getSession();
-  if (!session) return viewLogin();
-  try { await load(); } catch(e){ await db.auth.signOut(); return viewLogin("This account can't view orders. Sign in with the admin email."); }
-  render(); live();
-}
-boot();
-</script>
+  <footer><div class="wrap footer-inner"><div class="footer-brand"><img src="assets/brand/logo.png" width="500" height="500" alt="Pappi Parfum logo" loading="lazy" decoding="async"><div><strong>Pappi Suds &amp; Scents Shop</strong><span>Fragrance &amp; artisan savon</span></div></div><div class="footer-meta">© <span id="year"></span> Pappi Suds &amp; Scents Shop · Philippines</div></div></footer>
+  <a class="button button--gold mobile-order" href="#order">Order direct</a>
+  <script>
+    const form = document.querySelector('#order-form');
+    const product = document.querySelector('#product');
+    document.querySelectorAll('[data-product]').forEach(button => button.addEventListener('click', () => {
+      const wanted = button.dataset.product;
+      [...product.options].forEach(option => { if (option.text.replace('É','E') === wanted) product.value = option.value; });
+      document.querySelector('#order').scrollIntoView({ behavior: 'smooth' });
+      setTimeout(() => document.querySelector('#message').focus(), 650);
+    }));
+    form.addEventListener('submit', event => {
+      event.preventDefault();
+      if (!form.reportValidity()) return;
+      const data = new FormData(form);
+      const subject = encodeURIComponent(`Pappi direct order request — ${data.get('name')}`);
+      const body = encodeURIComponent(`Hi Pappi Suds & Scents Shop,\n\nI would like to place an order.\n\nName: ${data.get('name')}\nContact: ${data.get('contact')}\nDelivery address: ${data.get('address')}\nFragrance style: ${data.get('type')}\nSelected product: ${data.get('product')}\n\nOrder message:\n${data.get('message')}\n\nPlease confirm availability, total amount, delivery fee and payment details. Thank you!`);
+      document.querySelector('#success').classList.add('show');
+      window.location.href = `mailto:verge.gamotan@gmail.com?subject=${subject}&body=${body}`;
+    });
+
+    const carousel = document.querySelector('.carousel');
+    const track = carousel.querySelector('.carousel-track');
+    const slides = [...carousel.querySelectorAll('.carousel-slide')];
+    const dots = carousel.querySelector('.carousel-dots');
+    const caption = carousel.querySelector('.carousel-caption');
+    const captions = ['Day-to-night presence', 'Three scents for him', 'Six scents for her', 'Why choose 40% Elixir', '40% Elixir versus 20% Parfum'];
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    let activeSlide = 0;
+    let carouselTimer;
+    let touchStartX = 0;
+
+    slides.forEach((slide, index) => {
+      slide.setAttribute('role', 'group');
+      slide.setAttribute('aria-label', `${index + 1} of ${slides.length}`);
+      const dot = document.createElement('button');
+      dot.className = 'carousel-dot';
+      dot.type = 'button';
+      dot.setAttribute('aria-label', `Show campaign image ${index + 1}`);
+      dot.addEventListener('click', () => showSlide(index, true));
+      dots.appendChild(dot);
+    });
+
+    const campaignModal = document.querySelector('#campaign-modal');
+    const modalImage = campaignModal.querySelector('img');
+    const modalCaption = campaignModal.querySelector('.campaign-modal-caption');
+    document.querySelectorAll('.campaign-open').forEach((button, index) => {
+      button.addEventListener('click', () => {
+        const selectedImage = button.querySelector('img');
+        modalImage.src = selectedImage.src;
+        modalImage.alt = selectedImage.alt;
+        modalCaption.textContent = captions[index];
+        stopCarousel();
+        document.body.classList.add('modal-open');
+        campaignModal.showModal();
+      });
+    });
+    campaignModal.querySelector('.campaign-modal-close').addEventListener('click', () => campaignModal.close());
+    campaignModal.addEventListener('click', event => { if (event.target === campaignModal) campaignModal.close(); });
+    campaignModal.addEventListener('close', () => {
+      document.body.classList.remove('modal-open');
+      startCarousel();
+    });
+
+    function visibleSlideCount() {
+      return Number.parseInt(getComputedStyle(carousel).getPropertyValue('--visible-slides'), 10) || 1;
+    }
+
+    function showSlide(index, restart = false) {
+      const visible = visibleSlideCount();
+      const maxStart = Math.max(0, slides.length - visible);
+      activeSlide = index > maxStart ? 0 : index < 0 ? maxStart : index;
+      track.style.transform = `translateX(-${slides[activeSlide].offsetLeft}px)`;
+      slides.forEach((slide, slideIndex) => slide.setAttribute('aria-hidden', slideIndex < activeSlide || slideIndex >= activeSlide + visible));
+      [...dots.children].forEach((dot, dotIndex) => {
+        dot.hidden = dotIndex > maxStart;
+        dot.classList.toggle('is-active', dotIndex === activeSlide);
+        dot.setAttribute('aria-current', dotIndex === activeSlide ? 'true' : 'false');
+      });
+      const lastVisible = Math.min(slides.length, activeSlide + visible);
+      caption.textContent = visible > 1 ? `Showing campaigns ${activeSlide + 1}–${lastVisible} of ${slides.length}` : `Campaign ${activeSlide + 1} of ${slides.length} · ${captions[activeSlide]}`;
+      if (restart) startCarousel();
+    }
+
+    function stopCarousel() { clearInterval(carouselTimer); }
+    function startCarousel() {
+      stopCarousel();
+      if (!reduceMotion) carouselTimer = setInterval(() => showSlide(activeSlide + 1), 4800);
+    }
+
+    carousel.querySelector('.carousel-prev').addEventListener('click', () => showSlide(activeSlide - 1, true));
+    carousel.querySelector('.carousel-next').addEventListener('click', () => showSlide(activeSlide + 1, true));
+    carousel.addEventListener('pointerenter', stopCarousel);
+    carousel.addEventListener('pointerleave', startCarousel);
+    carousel.addEventListener('focusin', stopCarousel);
+    carousel.addEventListener('focusout', event => { if (!carousel.contains(event.relatedTarget)) startCarousel(); });
+    carousel.querySelector('.carousel-viewport').addEventListener('keydown', event => {
+      if (event.key === 'ArrowLeft') showSlide(activeSlide - 1, true);
+      if (event.key === 'ArrowRight') showSlide(activeSlide + 1, true);
+    });
+    carousel.addEventListener('touchstart', event => { touchStartX = event.changedTouches[0].clientX; }, { passive: true });
+    carousel.addEventListener('touchend', event => {
+      const distance = event.changedTouches[0].clientX - touchStartX;
+      if (Math.abs(distance) > 45) showSlide(activeSlide + (distance < 0 ? 1 : -1), true);
+    }, { passive: true });
+    window.addEventListener('resize', () => showSlide(activeSlide));
+    document.addEventListener('visibilitychange', () => document.hidden ? stopCarousel() : startCarousel());
+    showSlide(0);
+    startCarousel();
+    document.querySelector('#year').textContent = new Date().getFullYear();
+  </script>
 </body>
 </html>
