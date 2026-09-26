@@ -419,28 +419,36 @@
     .promise blockquote { font-size: clamp(1.7rem, 3vw, 2.8rem); }
     footer { padding: 40px 0 44px; }
 
-    /* Add-to-bag buttons on cards */
-    .add-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-    .add { display: flex; min-height: 40px; flex-direction: column; align-items: center; justify-content: center; padding: 6px 8px; border: 1px solid var(--black); border-radius: 12px; background: var(--black); color: white; font-size: .76rem; font-weight: 700; line-height: 1.2; cursor: pointer; transition: transform .15s, background .15s; }
-    .add small { font-weight: 500; opacity: .75; font-size: .7rem; }
+    /* Add-to-bag buttons on cards: ₱600 Elixir first */
+    .buy { display: grid; gap: 6px; }
+    .add { display: flex; width: 100%; min-height: 50px; align-items: center; justify-content: space-between; gap: 10px; padding: 7px 8px 7px 16px; border: 0; border-radius: 14px; background: var(--black); color: white; text-align: left; cursor: pointer; transition: transform .15s, background .15s; }
     .add:hover { transform: translateY(-1px); background: #29251f; }
-    .add--light { background: white; color: var(--ink); border-color: var(--line); }
-    .add--light:hover { background: var(--cream); }
-    .add.is-added { background: var(--gold); border-color: var(--gold); color: var(--black); }
-    .add[disabled] { opacity: .5; cursor: not-allowed; transform: none; }
-    .soap-card .add { background: var(--gold); border-color: var(--gold); color: var(--black); width: 100%; }
-    .soap-card .add[disabled] { background: transparent; border-color: rgba(255,255,255,.25); color: #bcb5ab; }
+    .add-label { display: grid; line-height: 1.2; }
+    .add-label b { font-size: .84rem; }
+    .add-label small { color: #bcb5ab; font-size: .7rem; }
+    .add-price { padding: 7px 12px; border-radius: 10px; background: var(--gold); color: var(--black); font-size: 1.05rem; font-weight: 800; letter-spacing: -.01em; white-space: nowrap; }
+    .add.is-added, .add-alt.is-added { background: var(--gold); color: var(--black); }
+    .add.is-added .add-price { background: var(--black); color: var(--gold-light); }
+    .add[disabled] { cursor: not-allowed; opacity: .55; transform: none; }
+    .add-alt { justify-self: center; border: 0; background: none; padding: 4px 6px; border-radius: 8px; color: var(--muted); font-size: .76rem; cursor: pointer; }
+    .add-alt span { color: var(--ink); font-weight: 700; text-decoration: underline; text-underline-offset: 3px; }
+    .add-alt:hover span { color: #8b651b; }
+    .add-alt[disabled] { display: none; }
+    .soap-card .add { background: #0f0e0c; border: 1px solid rgba(255,255,255,.14); }
+    .soap-card .add[disabled] .add-price { background: transparent; color: #bcb5ab; font-size: .78rem; font-weight: 600; }
 
     /* =================== The bag =================== */
-    .bag { position: fixed; z-index: 40; top: 16px; right: 16px; bottom: 16px; display: flex; width: 330px; flex-direction: column; overflow: hidden; border: 1px solid var(--line); border-radius: 24px; background: white; box-shadow: 0 24px 70px rgba(24,18,8,.14); }
+    .bag { position: fixed; z-index: 40; right: 20px; bottom: 88px; display: flex; width: 380px; max-height: min(720px, calc(100vh - 110px)); flex-direction: column; overflow: hidden; border: 1px solid var(--line); border-radius: 24px; background: white; box-shadow: 0 30px 80px rgba(24,18,8,.22); opacity: 0; pointer-events: none; transform: translateY(14px) scale(.98); transform-origin: bottom right; transition: opacity .2s ease, transform .2s ease; }
+    .bag.open { opacity: 1; pointer-events: auto; transform: none; }
     .bag-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 18px 20px 14px; border-bottom: 1px solid var(--line); }
     .bag-head h2 { margin: 0; font-size: 1.55rem; letter-spacing: 0; }
     .bag-head h2 span { color: var(--muted); font-family: var(--sans); font-size: .85rem; }
-    .bag-close { display: none; width: 36px; height: 36px; border: 1px solid var(--line); border-radius: 50%; background: none; font-size: 1.2rem; cursor: pointer; }
+    .bag-close { display: grid; place-items: center; width: 36px; height: 36px; border: 1px solid var(--line); border-radius: 50%; background: none; font-size: 1.2rem; cursor: pointer; }
     .bag-body { flex: 1; overflow-y: auto; padding: 14px 20px; overscroll-behavior: contain; }
     .bag-foot { padding: 14px 20px 18px; border-top: 1px solid var(--line); background: #fdfbf6; }
     .bag-row { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 10px; }
     .bag-row b { font-size: 1.15rem; }
+    .bag-free { color: #3d6b2a; font-weight: 700; }
     .bag-note { margin: 0 0 12px; color: var(--muted); font-size: .76rem; line-height: 1.45; }
     .bag-cta { width: 100%; min-height: 48px; border: 0; border-radius: 999px; background: var(--gold); color: var(--black); font-weight: 700; font-size: .92rem; cursor: pointer; }
     .bag-cta:hover { filter: brightness(1.06); }
@@ -491,45 +499,43 @@
     .bag-steps li::before { position: absolute; top: 3px; left: 0; width: 12px; height: 12px; border: 2px solid var(--line); border-radius: 50%; content: ""; }
     .bag-steps li.on { color: var(--ink); font-weight: 600; }
     .bag-steps li.on::before { border-color: var(--gold); background: var(--gold); }
-    .bag-fab { position: fixed; z-index: 35; right: 16px; bottom: 16px; display: none; align-items: center; gap: 10px; min-height: 52px; padding: 0 20px; border: 0; border-radius: 999px; background: var(--black); color: white; font-weight: 700; box-shadow: 0 12px 34px rgba(0,0,0,.28); cursor: pointer; }
-    .bag-fab span { display: grid; min-width: 24px; height: 24px; place-items: center; padding: 0 6px; border-radius: 999px; background: var(--gold); color: var(--black); font-size: .78rem; }
+    .bag-fab { position: fixed; z-index: 41; right: 20px; bottom: 20px; display: flex; align-items: center; gap: 10px; min-height: 54px; padding: 0 8px 0 20px; border: 0; border-radius: 999px; background: var(--black); color: white; font-weight: 700; box-shadow: 0 12px 34px rgba(0,0,0,.28); cursor: pointer; }
+    .bag-fab .fab-total { padding: 8px 12px; border-radius: 999px; background: rgba(255,255,255,.1); font-size: .86rem; }
+    .bag-fab span.fab-count { display: grid; min-width: 24px; height: 24px; place-items: center; padding: 0 6px; border-radius: 999px; background: var(--gold); color: var(--black); font-size: .78rem; }
     .bag-fab.bump { animation: bagbump .35s ease-out; }
     @keyframes bagbump { 50% { transform: scale(1.08); } }
     .bag-shade { position: fixed; z-index: 39; inset: 0; display: none; background: rgba(12,11,9,.45); }
-    .bag-toast { position: fixed; z-index: 45; left: 50%; bottom: 84px; display: flex; white-space: nowrap; max-width: calc(100vw - 24px); gap: 12px; align-items: center; padding: 10px 12px 10px 18px; border-radius: 999px; background: var(--black); color: white; font-size: .84rem; transform: translateX(-50%); box-shadow: 0 12px 34px rgba(0,0,0,.3); }
+    .bag-toast { position: fixed; z-index: 45; right: 20px; bottom: 86px; display: flex; gap: 12px; align-items: center; padding: 10px 12px 10px 18px; border-radius: 999px; background: var(--black); color: white; font-size: .84rem; box-shadow: 0 12px 34px rgba(0,0,0,.3); }
     .bag-toast button { padding: 6px 12px; border: 0; border-radius: 999px; background: var(--gold); color: var(--black); font-weight: 700; font-size: .78rem; cursor: pointer; }
-    .nav-bag { display: none; }
+    .nav-bag { display: inline-flex; }
+    .bag-sum { margin: 0 0 12px; font-size: .84rem; }
+    .bag-sum div { display: flex; justify-content: space-between; padding: 3px 0; }
+    .bag-sum .tot { margin-top: 4px; padding-top: 8px; border-top: 1px solid var(--line); font-size: 1rem; font-weight: 700; }
+    .bag-grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 0 10px; }
+    .bag-sec { margin: 18px 0 2px; padding-top: 14px; border-top: 1px solid var(--line); font-weight: 700; font-size: .84rem; }
+    .bag-opts label.soon { opacity: .55; cursor: not-allowed; }
+    .bag-opts .tag { margin-left: 6px; padding: 2px 7px; border-radius: 999px; background: var(--cream); color: var(--muted); font-size: .64rem; font-weight: 700; }
 
-    /* Wide screens: bag sits beside the page */
-    @media (min-width: 1280px) {
-      body { padding-right: 346px; }
-      .site { margin: 16px auto 16px max(16px, calc((100vw - 346px - 1120px) / 2)); }
-    }
-    /* Smaller screens: bag slides in from the right */
-    @media (max-width: 1279px) {
-      .bag { top: 0; right: 0; bottom: 0; width: min(400px, 100vw); border-radius: 22px 0 0 22px; transform: translateX(105%); transition: transform .28s ease; }
-      .bag.open { transform: none; }
-      .bag-close { display: grid; place-items: center; }
-      .bag-shade.open { display: block; }
-      .bag-fab { display: flex; }
-      .nav-bag { display: inline-flex; }
-      .site { margin: 14px; }
-      body.bag-open { overflow: hidden; }
-    }
+    @media (max-width: 1279px) { .site { margin: 14px; } }
     @media (max-width: 620px) {
       .site { margin: 0; border-radius: 0; }
       .wrap { width: min(100% - 32px, 980px); }
       section { padding: 60px 0; }
-      .bag { width: 100vw; border-radius: 0; }
-      .bag-fab { right: 12px; bottom: 12px; left: 12px; justify-content: center; }
+      .bag { right: 0; bottom: 0; left: 0; width: 100%; max-height: 92vh; border-radius: 22px 22px 0 0; transform: translateY(40px); }
+      .bag-shade.open { display: block; }
+      body.bag-open { overflow: hidden; }
+      .bag-fab { right: 12px; bottom: 12px; left: 12px; justify-content: space-between; }
+      body.bag-open .bag-fab { display: none; }
+      .bag-toast { right: 12px; left: 12px; bottom: 78px; justify-content: space-between; }
       .product-image, .soap-card .product-image { height: 300px; }
+      .bag-grid2 { grid-template-columns: 1fr; }
     }
     @media (prefers-reduced-motion: reduce) { .bag { transition: none; } .bag-fab.bump { animation: none; } }
   </style>
 </head>
 <body>
 <div class="site">
-  <div class="announcement">Now available on Shopee · Next-day dispatch across the Philippines</div>
+  <div class="announcement">Free shipping on orders over ₱1,500 · Flat ₱80 nationwide</div>
   <nav aria-label="Main navigation">
     <div class="wrap nav-inner">
       <a class="brand" href="#top" aria-label="Pappi Suds and Scents Shop home"><img src="assets/brand/logo.png" width="500" height="500" alt="Pappi Parfum logo" decoding="async"><span class="brand-name">Pappi Suds &amp; Scents Shop</span></a>
@@ -558,15 +564,15 @@
         <div class="section-head"><div><p class="eyebrow">The fragrance wardrobe</p><h2>A scent for every version of you.</h2><p class="lede">Choose your scent, then choose how you want to wear it. All nine signature variants are available in Parfum and concentrated Elixir.</p></div><p class="section-note">Not sure where to begin? Tell us what you usually love—fresh, floral, sweet, warm or bold—and we’ll help you choose.</p></div>
         <div class="formats"><div class="format"><img class="format-image" src="assets/brand/parfum-20-cutout.png" width="381" height="1231" alt="Pappi Parfum 20% oil-base body spray bottle" loading="lazy" decoding="async"><div><h3>Pappi Parfum · 20%</h3><p>A polished 50 ml signature for everyday wear.</p></div><span class="format-badge">Everyday</span></div><div class="format format--dark"><img class="format-image" src="assets/brand/elixir-40-cutout.png" width="377" height="656" alt="Pappi Elixir 40% concentrated fragrance bottle" loading="lazy" decoding="async"><div><h3>Pappi Elixir · 40%</h3><p>Our concentrated 50 ml expression for deeper presence.</p></div><span class="format-badge">Intense</span></div></div>
         <div class="scent-grid">
-          <article class="product-card"><div class="product-image"><img src="assets/fragrances/gg-fantasy.jpg" width="900" height="900" alt="Pappi Fantasy Parfum and Elixir with red berries, jasmine, vanilla and amber" loading="lazy" decoding="async"></div><div class="product-body"><h3>Fantasy</h3><p>Warm, glamorous and sweet—a dressed-up scent with magnetic energy.</p><div class="add-row"><button class="add" data-add="elixir-fantasy" aria-label="Add Fantasy Elixir 40% to bag">Elixir 40%<small>₱600</small></button><button class="add add--light" data-add="parfum-fantasy" aria-label="Add Fantasy Parfum 20% to bag">Parfum 20%<small>₱300</small></button></div></div></article>
-          <article class="product-card"><div class="product-image"><img src="assets/fragrances/jm-english-pear.jpg" width="900" height="900" alt="Pappi English Pear Parfum and Elixir with pear and freesia" loading="lazy" decoding="async"></div><div class="product-body"><h3>English Pear</h3><p>Crisp pear and airy florals for an elegant, freshly gathered feel.</p><div class="add-row"><button class="add" data-add="elixir-english-pear" aria-label="Add English Pear Elixir 40% to bag">Elixir 40%<small>₱600</small></button><button class="add add--light" data-add="parfum-english-pear" aria-label="Add English Pear Parfum 20% to bag">Parfum 20%<small>₱300</small></button></div></div></article>
-          <article class="product-card"><div class="product-image"><img src="assets/fragrances/dr-savage.jpg" width="900" height="900" alt="Pappi Savage Parfum and Elixir with bergamot, lavender and pepper" loading="lazy" decoding="async"></div><div class="product-body"><h3>Savage</h3><p>Fresh spice and confident woods with a clean, commanding trail.</p><div class="add-row"><button class="add" data-add="elixir-savage" aria-label="Add Savage Elixir 40% to bag">Elixir 40%<small>₱600</small></button><button class="add add--light" data-add="parfum-savage" aria-label="Add Savage Parfum 20% to bag">Parfum 20%<small>₱300</small></button></div></div></article>
-          <article class="product-card"><div class="product-image"><img src="assets/fragrances/lv-imagine.jpg" width="900" height="900" alt="Pappi Imagination Parfum and Elixir with lemon, bergamot, ginger and tea" loading="lazy" decoding="async"></div><div class="product-body"><h3>Imagination</h3><p>Bright citrus and cool freshness with a clean, modern finish.</p><div class="add-row"><button class="add" data-add="elixir-imagination" aria-label="Add Imagination Elixir 40% to bag">Elixir 40%<small>₱600</small></button><button class="add add--light" data-add="parfum-imagination" aria-label="Add Imagination Parfum 20% to bag">Parfum 20%<small>₱300</small></button></div></div></article>
-          <article class="product-card"><div class="product-image"><img src="assets/fragrances/vs-vanilla.jpg" width="900" height="900" alt="Pappi Vanilla Lace Parfum and Elixir with vanilla, cotton flower and amber" loading="lazy" decoding="async"></div><div class="product-body"><h3>Vanilla Lace</h3><p>Soft, creamy vanilla warmth made for cozy, close-to-skin days.</p><div class="add-row"><button class="add" data-add="elixir-vanilla-lace" aria-label="Add Vanilla Lace Elixir 40% to bag">Elixir 40%<small>₱600</small></button><button class="add add--light" data-add="parfum-vanilla-lace" aria-label="Add Vanilla Lace Parfum 20% to bag">Parfum 20%<small>₱300</small></button></div></div></article>
-          <article class="product-card"><div class="product-image"><img src="assets/fragrances/jm-sweet-pea.jpg" width="900" height="900" alt="Pappi Sweet Pea Parfum and Elixir with pear and sweet pea" loading="lazy" decoding="async"></div><div class="product-body"><h3>Sweet Pea</h3><p>A tender bouquet with a soft fruity lift—pretty, graceful and light.</p><div class="add-row"><button class="add" data-add="elixir-sweet-pea" aria-label="Add Sweet Pea Elixir 40% to bag">Elixir 40%<small>₱600</small></button><button class="add add--light" data-add="parfum-sweet-pea" aria-label="Add Sweet Pea Parfum 20% to bag">Parfum 20%<small>₱300</small></button></div></div></article>
-          <article class="product-card"><div class="product-image"><img src="assets/fragrances/br-540-red.jpg" width="900" height="900" alt="Pappi 540 Red Parfum and Elixir with saffron, jasmine, amber and cedar" loading="lazy" decoding="async"></div><div class="product-body"><h3>540 Red</h3><p>Luminous amber warmth with a rich, unforgettable sweetness.</p><div class="add-row"><button class="add" data-add="elixir-540-red" aria-label="Add 540 Red Elixir 40% to bag">Elixir 40%<small>₱600</small></button><button class="add add--light" data-add="parfum-540-red" aria-label="Add 540 Red Parfum 20% to bag">Parfum 20%<small>₱300</small></button></div></div></article>
-          <article class="product-card"><div class="product-image"><img src="assets/fragrances/ln-eclat.jpg" width="900" height="900" alt="Pappi Eclat Parfum and Elixir with lilac, peony and peach blossom" loading="lazy" decoding="async"></div><div class="product-body"><h3>Éclat</h3><p>Delicate florals with a serene, polished softness from day to night.</p><div class="add-row"><button class="add" data-add="elixir-eclat" aria-label="Add Eclat Elixir 40% to bag">Elixir 40%<small>₱600</small></button><button class="add add--light" data-add="parfum-eclat" aria-label="Add Eclat Parfum 20% to bag">Parfum 20%<small>₱300</small></button></div></div></article>
-          <article class="product-card"><div class="product-image"><img src="assets/fragrances/ga-acqua.jpg" width="900" height="900" alt="Pappi Acqua DG Parfum and Elixir with bergamot, sea salt and woods" loading="lazy" decoding="async"></div><div class="product-body"><h3>Acqua DG</h3><p>Aquatic freshness, bright citrus and an easy coastal confidence.</p><div class="add-row"><button class="add" data-add="elixir-acqua-dg" aria-label="Add Acqua DG Elixir 40% to bag">Elixir 40%<small>₱600</small></button><button class="add add--light" data-add="parfum-acqua-dg" aria-label="Add Acqua DG Parfum 20% to bag">Parfum 20%<small>₱300</small></button></div></div></article>
+          <article class="product-card"><div class="product-image"><img src="assets/fragrances/gg-fantasy.jpg" width="900" height="900" alt="Pappi Fantasy Parfum and Elixir with red berries, jasmine, vanilla and amber" loading="lazy" decoding="async"></div><div class="product-body"><h3>Fantasy</h3><p>Warm, glamorous and sweet—a dressed-up scent with magnetic energy.</p><div class="buy"><button class="add" data-add="elixir-fantasy" aria-label="Add Fantasy Elixir 40%, 600 pesos, to bag"><span class="add-label"><b>Add to bag</b><small>Elixir 40% · 50 ml</small></span><span class="add-price" data-price>₱600</span></button><button class="add-alt" data-add="parfum-fantasy" aria-label="Add Fantasy Parfum 20%, 300 pesos, to bag">or Parfum 20% · <span data-price>₱300</span></button></div></div></article>
+          <article class="product-card"><div class="product-image"><img src="assets/fragrances/jm-english-pear.jpg" width="900" height="900" alt="Pappi English Pear Parfum and Elixir with pear and freesia" loading="lazy" decoding="async"></div><div class="product-body"><h3>English Pear</h3><p>Crisp pear and airy florals for an elegant, freshly gathered feel.</p><div class="buy"><button class="add" data-add="elixir-english-pear" aria-label="Add English Pear Elixir 40%, 600 pesos, to bag"><span class="add-label"><b>Add to bag</b><small>Elixir 40% · 50 ml</small></span><span class="add-price" data-price>₱600</span></button><button class="add-alt" data-add="parfum-english-pear" aria-label="Add English Pear Parfum 20%, 300 pesos, to bag">or Parfum 20% · <span data-price>₱300</span></button></div></div></article>
+          <article class="product-card"><div class="product-image"><img src="assets/fragrances/dr-savage.jpg" width="900" height="900" alt="Pappi Savage Parfum and Elixir with bergamot, lavender and pepper" loading="lazy" decoding="async"></div><div class="product-body"><h3>Savage</h3><p>Fresh spice and confident woods with a clean, commanding trail.</p><div class="buy"><button class="add" data-add="elixir-savage" aria-label="Add Savage Elixir 40%, 600 pesos, to bag"><span class="add-label"><b>Add to bag</b><small>Elixir 40% · 50 ml</small></span><span class="add-price" data-price>₱600</span></button><button class="add-alt" data-add="parfum-savage" aria-label="Add Savage Parfum 20%, 300 pesos, to bag">or Parfum 20% · <span data-price>₱300</span></button></div></div></article>
+          <article class="product-card"><div class="product-image"><img src="assets/fragrances/lv-imagine.jpg" width="900" height="900" alt="Pappi Imagination Parfum and Elixir with lemon, bergamot, ginger and tea" loading="lazy" decoding="async"></div><div class="product-body"><h3>Imagination</h3><p>Bright citrus and cool freshness with a clean, modern finish.</p><div class="buy"><button class="add" data-add="elixir-imagination" aria-label="Add Imagination Elixir 40%, 600 pesos, to bag"><span class="add-label"><b>Add to bag</b><small>Elixir 40% · 50 ml</small></span><span class="add-price" data-price>₱600</span></button><button class="add-alt" data-add="parfum-imagination" aria-label="Add Imagination Parfum 20%, 300 pesos, to bag">or Parfum 20% · <span data-price>₱300</span></button></div></div></article>
+          <article class="product-card"><div class="product-image"><img src="assets/fragrances/vs-vanilla.jpg" width="900" height="900" alt="Pappi Vanilla Lace Parfum and Elixir with vanilla, cotton flower and amber" loading="lazy" decoding="async"></div><div class="product-body"><h3>Vanilla Lace</h3><p>Soft, creamy vanilla warmth made for cozy, close-to-skin days.</p><div class="buy"><button class="add" data-add="elixir-vanilla-lace" aria-label="Add Vanilla Lace Elixir 40%, 600 pesos, to bag"><span class="add-label"><b>Add to bag</b><small>Elixir 40% · 50 ml</small></span><span class="add-price" data-price>₱600</span></button><button class="add-alt" data-add="parfum-vanilla-lace" aria-label="Add Vanilla Lace Parfum 20%, 300 pesos, to bag">or Parfum 20% · <span data-price>₱300</span></button></div></div></article>
+          <article class="product-card"><div class="product-image"><img src="assets/fragrances/jm-sweet-pea.jpg" width="900" height="900" alt="Pappi Sweet Pea Parfum and Elixir with pear and sweet pea" loading="lazy" decoding="async"></div><div class="product-body"><h3>Sweet Pea</h3><p>A tender bouquet with a soft fruity lift—pretty, graceful and light.</p><div class="buy"><button class="add" data-add="elixir-sweet-pea" aria-label="Add Sweet Pea Elixir 40%, 600 pesos, to bag"><span class="add-label"><b>Add to bag</b><small>Elixir 40% · 50 ml</small></span><span class="add-price" data-price>₱600</span></button><button class="add-alt" data-add="parfum-sweet-pea" aria-label="Add Sweet Pea Parfum 20%, 300 pesos, to bag">or Parfum 20% · <span data-price>₱300</span></button></div></div></article>
+          <article class="product-card"><div class="product-image"><img src="assets/fragrances/br-540-red.jpg" width="900" height="900" alt="Pappi 540 Red Parfum and Elixir with saffron, jasmine, amber and cedar" loading="lazy" decoding="async"></div><div class="product-body"><h3>540 Red</h3><p>Luminous amber warmth with a rich, unforgettable sweetness.</p><div class="buy"><button class="add" data-add="elixir-540-red" aria-label="Add 540 Red Elixir 40%, 600 pesos, to bag"><span class="add-label"><b>Add to bag</b><small>Elixir 40% · 50 ml</small></span><span class="add-price" data-price>₱600</span></button><button class="add-alt" data-add="parfum-540-red" aria-label="Add 540 Red Parfum 20%, 300 pesos, to bag">or Parfum 20% · <span data-price>₱300</span></button></div></div></article>
+          <article class="product-card"><div class="product-image"><img src="assets/fragrances/ln-eclat.jpg" width="900" height="900" alt="Pappi Eclat Parfum and Elixir with lilac, peony and peach blossom" loading="lazy" decoding="async"></div><div class="product-body"><h3>Éclat</h3><p>Delicate florals with a serene, polished softness from day to night.</p><div class="buy"><button class="add" data-add="elixir-eclat" aria-label="Add Éclat Elixir 40%, 600 pesos, to bag"><span class="add-label"><b>Add to bag</b><small>Elixir 40% · 50 ml</small></span><span class="add-price" data-price>₱600</span></button><button class="add-alt" data-add="parfum-eclat" aria-label="Add Éclat Parfum 20%, 300 pesos, to bag">or Parfum 20% · <span data-price>₱300</span></button></div></div></article>
+          <article class="product-card"><div class="product-image"><img src="assets/fragrances/ga-acqua.jpg" width="900" height="900" alt="Pappi Acqua DG Parfum and Elixir with bergamot, sea salt and woods" loading="lazy" decoding="async"></div><div class="product-body"><h3>Acqua DG</h3><p>Aquatic freshness, bright citrus and an easy coastal confidence.</p><div class="buy"><button class="add" data-add="elixir-acqua-dg" aria-label="Add Acqua DG Elixir 40%, 600 pesos, to bag"><span class="add-label"><b>Add to bag</b><small>Elixir 40% · 50 ml</small></span><span class="add-price" data-price>₱600</span></button><button class="add-alt" data-add="parfum-acqua-dg" aria-label="Add Acqua DG Parfum 20%, 300 pesos, to bag">or Parfum 20% · <span data-price>₱300</span></button></div></div></article>
         </div>
       </div>
     </section>
@@ -613,9 +619,9 @@
           </div>
         </div>
         <div class="soap-grid" id="savon-products">
-          <article class="soap-card"><div class="product-image"><img src="assets/savon/coconut-silk.png" width="723" height="760" alt="Pappi Savon Coconut Silk artisan cleansing bar" loading="lazy" decoding="async"></div><div class="product-body"><span class="soap-number">RITUAL 01</span><h3>Coconut Silk</h3><p>A soft, comforting cleanse with creamy lather for normal, dry and combination skin.</p><button class="add" data-add="savon-coconut-silk" aria-label="Add Coconut Silk Savon to bag">Add to bag<small>Coming soon</small></button></div></article>
-          <article class="soap-card"><div class="product-image"><img src="assets/savon/golden-glow.png" width="731" height="760" alt="Pappi Savon Golden Glow artisan cleansing bar" loading="lazy" decoding="async"></div><div class="product-body"><span class="soap-number">RITUAL 02</span><h3>Golden Glow</h3><p>A warm, uplifting cleanse with artisan golden swirls for dull, normal and combination skin.</p><button class="add" data-add="savon-golden-glow" aria-label="Add Golden Glow Savon to bag">Add to bag<small>Coming soon</small></button></div></article>
-          <article class="soap-card"><div class="product-image"><img src="assets/savon/noir-charcoal.png" width="723" height="760" alt="Pappi Savon Noir Charcoal artisan cleansing bar" loading="lazy" decoding="async"></div><div class="product-body"><span class="soap-number">RITUAL 03</span><h3>Noir Charcoal</h3><p>A bold charcoal-inspired bar with a refined black-and-gold finish for a fresh daily cleanse.</p><button class="add" data-add="savon-noir-charcoal" aria-label="Add Noir Charcoal Savon to bag">Add to bag<small>Coming soon</small></button></div></article>
+          <article class="soap-card"><div class="product-image"><img src="assets/savon/coconut-silk.png" width="723" height="760" alt="Pappi Savon Coconut Silk artisan cleansing bar" loading="lazy" decoding="async"></div><div class="product-body"><span class="soap-number">RITUAL 01</span><h3>Coconut Silk</h3><p>A soft, comforting cleanse with creamy lather for normal, dry and combination skin.</p><button class="add" data-add="savon-coconut-silk" aria-label="Add Coconut Silk Savon to bag"><span class="add-label"><b>Add to bag</b><small>Artisan bar</small></span><span class="add-price" data-price>Coming soon</span></button></div></article>
+          <article class="soap-card"><div class="product-image"><img src="assets/savon/golden-glow.png" width="731" height="760" alt="Pappi Savon Golden Glow artisan cleansing bar" loading="lazy" decoding="async"></div><div class="product-body"><span class="soap-number">RITUAL 02</span><h3>Golden Glow</h3><p>A warm, uplifting cleanse with artisan golden swirls for dull, normal and combination skin.</p><button class="add" data-add="savon-golden-glow" aria-label="Add Golden Glow Savon to bag"><span class="add-label"><b>Add to bag</b><small>Artisan bar</small></span><span class="add-price" data-price>Coming soon</span></button></div></article>
+          <article class="soap-card"><div class="product-image"><img src="assets/savon/noir-charcoal.png" width="723" height="760" alt="Pappi Savon Noir Charcoal artisan cleansing bar" loading="lazy" decoding="async"></div><div class="product-body"><span class="soap-number">RITUAL 03</span><h3>Noir Charcoal</h3><p>A bold charcoal-inspired bar with a refined black-and-gold finish for a fresh daily cleanse.</p><button class="add" data-add="savon-noir-charcoal" aria-label="Add Noir Charcoal Savon to bag"><span class="add-label"><b>Add to bag</b><small>Artisan bar</small></span><span class="add-price" data-price>Coming soon</span></button></div></article>
         </div>
       </div>
     </section>
@@ -625,7 +631,7 @@
         <div class="channel-grid">
           <article class="channel channel--shopee"><div><img class="channel-logo" src="assets/brand/shopee-logo.svg" width="64" height="64" alt="Shopee logo" loading="lazy" decoding="async"><h3>Available now on Shopee</h3><p>Prefer checkout in the app? Browse Pappi, place your order and track delivery from your Shopee account.</p></div><a class="button button--light" href="https://shopee.ph/bilyotoy" rel="noopener" target="_blank">Open Shopee →</a></article>
           <article class="channel"><div><img class="channel-logo" src="assets/brand/tiktok-logo.svg" width="64" height="64" alt="TikTok logo" loading="lazy" decoding="async"><span class="coming">Coming soon</span><h3>TikTok Shop</h3><p>Live selling, scent stories and easy TikTok checkout are on the way.</p></div><span aria-hidden="true">TikTok Shop · Pending</span></article>
-          <article class="channel"><div><div class="channel-icon">✦</div><h3>Order here</h3><p>Add scents to your bag and check out as a guest. Pay by QR Ph or GCash—no account needed.</p></div><a class="button button--ghost" href="#fragrances">Shop scents</a></article>
+          <article class="channel"><div><div class="channel-icon">✦</div><h3>Order here</h3><p>Add scents to your bag and check out as a guest. Pay by QR Ph bank transfer or GCash—no account needed.</p></div><a class="button button--ghost" href="#fragrances">Shop scents</a></article>
         </div>
       </div>
     </section>
@@ -765,7 +771,7 @@
     <section class="order" id="contact">
       <div class="wrap order-grid">
         <div id="delivery"><p class="eyebrow">Delivery &amp; contact</p><h2>Questions? Message us.</h2><p class="lede">Ask about scents, gifting, bulk or reseller orders. We reply as soon as we can.</p>
-          <div class="delivery-card"><div class="delivery-row"><span class="delivery-icon">PH</span><div><b>Nationwide delivery</b><p>We aim to ship the next day. Your order should reach you in approximately 3–5 days.</p></div></div><div class="delivery-row"><span class="delivery-icon">CEB</span><div><b>Cebu City express delivery</b><p>We can book Maxim, Grab or Angkas so your Pappi order can reach you in around 1–2 hours, subject to rider availability.</p></div></div><div class="delivery-row"><span class="delivery-icon">✓</span><div><b>Easy payment</b><p>Check out from your bag, then pay by QR Ph with any bank or e-wallet, or GCash. We text you at every step.</p></div></div></div>
+          <div class="delivery-card"><div class="delivery-row"><span class="delivery-icon">PH</span><div><b>Flat ₱80 shipping nationwide</b><p>Free on orders over ₱1,500. We aim to ship the next day, arriving in about 3–5 days.</p></div></div><div class="delivery-row"><span class="delivery-icon">CEB</span><div><b>Cebu City express delivery</b><p>We can book Maxim, Grab or Angkas so your Pappi order can reach you in around 1–2 hours, subject to rider availability.</p></div></div><div class="delivery-row"><span class="delivery-icon">✓</span><div><b>Easy payment</b><p>Check out from your bag, then pay by QR Ph with any bank or e-wallet, or GCash. We text you at every step.</p></div></div></div>
           <div class="contact-links" aria-label="Contact Pappi Suds and Scents Shop">
             <a class="contact-link" href="tel:+639055613013">Call or text <span>+63 905 561 3013 →</span></a>
             <a class="contact-link" href="mailto:verge.gamotan@gmail.com">Email us <span>verge.gamotan@gmail.com →</span></a>
@@ -798,7 +804,7 @@
     <div class="bag-body" id="bag-body"><p class="muted">Loading…</p></div>
     <div class="bag-foot" id="bag-foot"></div>
   </aside>
-  <button class="bag-fab" id="bag-fab" aria-controls="bag">Bag <span id="bag-fab-count">0</span></button>
+  <button class="bag-fab" id="bag-fab" aria-controls="bag" aria-expanded="false">Bag <span class="fab-count" id="bag-fab-count">0</span><span class="fab-total" id="bag-fab-total">₱0</span></button>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
   <script>
 
@@ -811,6 +817,8 @@
     QR_IMAGE: "assets/qr/qrph.png",
     GCASH_NUMBER: "0905 561 3013",
     SITE: "https://pappiscents.shop",
+    SHIPPING_FEE: 80,                       // flat shipping, whole Philippines
+    FREE_SHIPPING_OVER: 1500,               // free shipping when items total more than this
   };
   // ------------------------------------------------------------
   const db = window.supabase.createClient(CFG.SUPABASE_URL, CFG.SUPABASE_KEY);
@@ -823,6 +831,7 @@
     set(k, v) { try { v == null ? localStorage.removeItem(k) : localStorage.setItem(k, JSON.stringify(v)); } catch {} },
   };
   const DELIVERY = { nationwide: "Nationwide delivery", cebu_express: "Cebu City express", pickup: "Pickup" };
+  const PROVINCES = ["Metro Manila","Abra","Agusan del Norte","Agusan del Sur","Aklan","Albay","Antique","Apayao","Aurora","Basilan","Bataan","Batanes","Batangas","Benguet","Biliran","Bohol","Bukidnon","Bulacan","Cagayan","Camarines Norte","Camarines Sur","Camiguin","Capiz","Catanduanes","Cavite","Cebu","Cotabato","Davao de Oro","Davao del Norte","Davao del Sur","Davao Occidental","Davao Oriental","Dinagat Islands","Eastern Samar","Guimaras","Ifugao","Ilocos Norte","Ilocos Sur","Iloilo","Isabela","Kalinga","La Union","Laguna","Lanao del Norte","Lanao del Sur","Leyte","Maguindanao del Norte","Maguindanao del Sur","Marinduque","Masbate","Misamis Occidental","Misamis Oriental","Mountain Province","Negros Occidental","Negros Oriental","Northern Samar","Nueva Ecija","Nueva Vizcaya","Occidental Mindoro","Oriental Mindoro","Palawan","Pampanga","Pangasinan","Quezon","Quirino","Rizal","Romblon","Samar","Sarangani","Siquijor","Sorsogon","South Cotabato","Southern Leyte","Sultan Kudarat","Sulu","Surigao del Norte","Surigao del Sur","Tarlac","Tawi-Tawi","Zambales","Zamboanga del Norte","Zamboanga del Sur","Zamboanga Sibugay"];
 
   // Pictures for bag items, taken from the cards on this page
   const thumbs = {};
@@ -835,7 +844,7 @@
   const S = {
     view: "cart", products: {}, cart: store.get("pappi_cart", {}),
     checkout: store.get("pappi_checkout", null),        // { token, order_no, sig }
-    guest: store.get("pappi_guest", { name: "", phone: "", delivery: "nationwide", address: "", note: "" }),
+    guest: { name: "", phone: "", province: "", city: "", barangay: "", street: "", landmark: "", zip: "", payment: "QR Ph", ...store.get("pappi_guest", {}) },
     order: null, method: "QR Ph", file: null, preview: "", busy: false, error: "",
   };
   const cartSig = () => JSON.stringify(Object.entries(S.cart).sort());
@@ -844,18 +853,24 @@
   const subtotal = () => cartItems().reduce((a, x) => a + x.p.price * x.qty, 0);
   const saveCart = () => store.set("pappi_cart", S.cart);
   const linkFor = t => `${CFG.SITE}/?checkout=${t}`;
+  const shipFor = sub => sub > CFG.FREE_SHIPPING_OVER ? 0 : CFG.SHIPPING_FEE;
+  const shipText = n => n === 0 ? "Free" : peso(n);
+  const freeHint = sub => sub > CFG.FREE_SHIPPING_OVER
+    ? `<p class="bag-note bag-free">You've got free shipping.</p>`
+    : `<p class="bag-note">Free shipping on orders over ${peso(CFG.FREE_SHIPPING_OVER)}. ${sub >= CFG.FREE_SHIPPING_OVER ? "Add one more item to unlock it." : `You're at ${peso(sub)}.`}</p>`;
 
   // ---------- open / close on smaller screens ----------
-  const bag = $("#bag"), shade = $("#bag-shade");
-  const wide = () => matchMedia("(min-width: 1280px)").matches;
-  function openBag() { if (wide()) return; bag.classList.add("open"); shade.classList.add("open"); document.body.classList.add("bag-open"); }
-  function closeBag() { bag.classList.remove("open"); shade.classList.remove("open"); document.body.classList.remove("bag-open"); }
-  $("#bag-fab").onclick = openBag; $("#bag-close").onclick = closeBag; shade.onclick = closeBag;
+  const bag = $("#bag"), shade = $("#bag-shade"), fab = $("#bag-fab");
+  const isOpen = () => bag.classList.contains("open");
+  function openBag() { bag.classList.add("open"); shade.classList.add("open"); document.body.classList.add("bag-open"); fab.setAttribute("aria-expanded", "true"); document.querySelector(".bag-toast")?.remove(); }
+  function closeBag() { bag.classList.remove("open"); shade.classList.remove("open"); document.body.classList.remove("bag-open"); fab.setAttribute("aria-expanded", "false"); }
+  fab.onclick = () => isOpen() ? closeBag() : openBag();
+  $("#bag-close").onclick = closeBag; shade.onclick = closeBag;
   document.querySelectorAll("[data-open-bag]").forEach(b => b.addEventListener("click", e => { e.preventDefault(); openBag(); }));
   document.addEventListener("keydown", e => { if (e.key === "Escape") closeBag(); });
 
   function toast(text) {
-    if (wide()) return;
+    if (isOpen()) return;
     document.querySelector(".bag-toast")?.remove();
     const t = document.createElement("div"); t.className = "bag-toast"; t.setAttribute("role", "status");
     t.innerHTML = `<span>${esc(text)}</span><button>View bag</button>`;
@@ -870,7 +885,7 @@
     if (S.view !== "cart" && S.view !== "status") S.view = "cart";
     if (S.view === "status") S.view = "cart";
     render();
-    const fab = $("#bag-fab"); fab.classList.remove("bump"); void fab.offsetWidth; fab.classList.add("bump");
+    fab.classList.remove("bump"); void fab.offsetWidth; fab.classList.add("bump");
     toast(`Added ${p.name} ${p.line.split(" ")[0]}`);
   }
   document.addEventListener("click", e => {
@@ -894,27 +909,40 @@
         <div class="bag-price">${peso(p.price * qty)}</div>
       </div>`).join("")
       : banner + `<div class="bag-empty"><b>Your bag is empty</b>Add a scent from the collection to get started.</div>`;
-    const foot = `<div class="bag-row"><span>Subtotal</span><b>${peso(subtotal())}</b></div>
-      <p class="bag-note">Shipping is texted to you after checkout. Cebu express riders are paid on delivery.</p>
+    const sub = subtotal(), ship = items.length ? shipFor(sub) : 0;
+    const foot = `<div class="bag-sum"><div><span>Subtotal</span><span>${peso(sub)}</span></div>
+        <div><span>Shipping fee</span><span>${items.length ? shipText(ship) : "—"}</span></div>
+        <div class="tot"><span>Total</span><span>${peso(sub + ship)}</span></div></div>
+      ${items.length ? freeHint(sub) : `<p class="bag-note">Flat ${peso(CFG.SHIPPING_FEE)} shipping nationwide. Free on orders over ${peso(CFG.FREE_SHIPPING_OVER)}.</p>`}
       <button class="bag-cta" data-go="${pendingSame ? "pay" : "details"}" ${items.length ? "" : "disabled"}>${pendingSame ? "Continue to payment" : "Check out as guest"}</button>`;
     return [body, foot];
   }
 
   function viewDetails() {
     const g = S.guest;
-    const opt = (v, t, s) => `<label><input type="radio" name="bag-del" value="${v}" ${g.delivery === v ? "checked" : ""}><span>${t}<small>${s}</small></span></label>`;
-    const body = `<h3>Delivery details</h3><p class="muted">No account needed. We'll text you updates.</p>
-      <label for="bag-name">Full name</label><input id="bag-name" autocomplete="name" value="${esc(g.name)}">
-      <label for="bag-phone">Mobile number</label><input id="bag-phone" type="tel" inputmode="tel" autocomplete="tel" placeholder="09XX XXX XXXX" value="${esc(g.phone)}">
-      <label>Delivery</label><div class="bag-opts">
-        ${opt("nationwide", "Nationwide", "Ships next day, about 3–5 days")}
-        ${opt("cebu_express", "Cebu City express", "About 1–2 hours by Maxim, Grab or Angkas")}
-        ${opt("pickup", "Pickup", "We'll text you the pickup time")}</div>
-      ${g.delivery !== "pickup" ? `<label for="bag-addr">Complete address</label><textarea id="bag-addr" autocomplete="street-address" placeholder="House no., street, barangay, city, province, landmark">${esc(g.address)}</textarea>` : ""}
-      <label for="bag-note">Note (optional)</label><input id="bag-note" placeholder="Gift message, preferred time" value="${esc(g.note)}">
+    const f = (id, label, val, extra = "") => `<div><label for="bag-${id}">${label}</label><input id="bag-${id}" value="${esc(val)}" ${extra}></div>`;
+    const pay = (v, t, sub, soon) => `<label class="${soon ? "soon" : ""}"><input type="radio" name="bag-pay" value="${v}" ${g.payment === v && !soon ? "checked" : ""} ${soon ? "disabled" : ""}><span>${t}${soon ? `<span class="tag">Coming soon</span>` : ""}<small>${sub}</small></span></label>`;
+    const body = `<h3>Checkout</h3><p class="muted">No account needed. We'll text updates to your number.</p>
+      <div class="bag-sec">Receiver</div>
+      ${f("name", "Full name", g.name, 'autocomplete="name"')}
+      ${f("phone", "Mobile number", g.phone, 'type="tel" inputmode="numeric" autocomplete="tel" placeholder="09XXXXXXXXX"')}
+      <div class="bag-sec">Delivery address</div>
+      ${f("province", "Province", g.province, 'list="bag-provinces" autocomplete="address-level1" placeholder="e.g. Cebu"')}
+      <datalist id="bag-provinces">${PROVINCES.map(p => `<option value="${p}">`).join("")}</datalist>
+      <div class="bag-grid2">${f("city", "City / Municipality", g.city, 'autocomplete="address-level2" placeholder="e.g. Cebu City"')}${f("barangay", "Barangay", g.barangay, 'placeholder="e.g. Lahug"')}</div>
+      ${f("street", "House no., street, building", g.street, 'autocomplete="address-line1" placeholder="e.g. 12 Mango Ave, Unit 3B"')}
+      <div class="bag-grid2">${f("landmark", "Landmark (optional)", g.landmark, 'placeholder="e.g. near JY Square"')}${f("zip", "ZIP code (optional)", g.zip, 'inputmode="numeric" autocomplete="postal-code" maxlength="4"')}</div>
+      <div class="bag-sec">Payment</div>
+      <div class="bag-opts">
+        ${pay("QR Ph", "QR Ph bank transfer", "Scan with any bank or e-wallet: GCash, Maya, BPI, MariBank")}
+        ${pay("GCash", "GCash Send Money", `Send to ${CFG.GCASH_NUMBER}`)}
+        ${pay("online", "Card or e-wallet checkout", "Pay online in one tap", true)}
+      </div>
       ${S.error ? `<p class="bag-err" role="alert">${esc(S.error)}</p>` : ""}`;
-    const foot = `<div class="bag-row"><span>${count()} item${count() === 1 ? "" : "s"}</span><b>${peso(subtotal())}</b></div>
-      <button class="bag-cta" data-go="create" ${S.busy ? "disabled" : ""}>${S.busy ? "Saving your order…" : "Continue to payment"}</button>
+    const foot = `<div class="bag-sum"><div><span>${count()} item${count() === 1 ? "" : "s"}</span><span>${peso(subtotal())}</span></div>
+        <div><span>Shipping fee</span><span>${shipText(shipFor(subtotal()))}</span></div>
+        <div class="tot"><span>Total to pay</span><span>${peso(subtotal() + shipFor(subtotal()))}</span></div></div>
+      <button class="bag-cta" data-go="create" ${S.busy ? "disabled" : ""}>${S.busy ? "Saving your order…" : "Place order"}</button>
       <button class="bag-back" data-go="cart">Back to bag</button>`;
     return [body, foot];
   }
@@ -929,8 +957,8 @@
     const body = `<h3>Order ${esc(o.order_no)}</h3><p class="muted">Saved. Pay now or come back later with your order link.</p>
       <div class="bag-link"><code>${esc(linkFor(S.checkout.token).replace("https://", ""))}</code><button data-copy="${esc(linkFor(S.checkout.token))}">Copy link</button></div>
       <p class="muted">Keep this link to finish paying or track your order. Anyone with it can see this order.</p>
-      <ul class="bag-lines">${lines}</ul>
-      <div class="bag-row"><span>Send exactly</span><span class="bag-amount">${peso(o.subtotal)}</span></div>
+      <ul class="bag-lines">${lines}<li><span>Shipping fee</span><span>${shipText(Number(o.shipping_fee))}</span></li></ul>
+      <div class="bag-row"><span>Send exactly</span><span class="bag-amount">${peso(o.total)}</span></div>
       <div class="bag-tabs" role="group" aria-label="Payment method">
         <button data-method="QR Ph" aria-pressed="${S.method === "QR Ph"}">QR Ph</button>
         <button data-method="GCash" aria-pressed="${S.method === "GCash"}">GCash</button></div>
@@ -955,7 +983,7 @@
       : `<h3>Order ${esc(o.order_no)}</h3><p class="muted">Salamat, ${esc(o.name.split(" ")[0])}! We'll text you at each step.</p>
         <ol class="bag-steps">${steps.map(([t, i]) => `<li class="${at >= i ? "on" : ""}">${t}</li>`).join("")}</ol>
         ${o.tracking_no ? `<p><b>Tracking number:</b> ${esc(o.tracking_no)}</p>` : ""}
-        <ul class="bag-lines">${lines}${Number(o.shipping_fee) ? `<li><span>Shipping</span><span>${peso(o.shipping_fee)}</span></li>` : ""}<li><b>Total</b><b>${peso(o.total)}</b></li></ul>
+        <ul class="bag-lines">${lines}<li><span>Shipping fee</span><span>${shipText(Number(o.shipping_fee))}</span></li><li><b>Total</b><b>${peso(o.total)}</b></li></ul>
         <p class="muted">${DELIVERY[o.delivery]}${o.address ? ` · ${esc(o.address)}` : ""}</p>`;
     const foot = `<button class="bag-cta" data-go="fresh">Start a new order</button>`;
     return [body, foot];
@@ -967,17 +995,16 @@
     const n = count();
     $("#bag-count").textContent = n ? `(${n})` : "";
     $("#bag-fab-count").textContent = n;
+    $("#bag-fab-total").textContent = peso(subtotal());
     document.querySelectorAll("[data-bag-count]").forEach(el => el.textContent = n);
   }
 
   // ---------- actions ----------
   function saveGuest() {
-    const v = id => document.getElementById(id)?.value?.trim();
-    if ($("#bag-name")) S.guest.name = v("bag-name");
-    if ($("#bag-phone")) S.guest.phone = v("bag-phone");
-    if ($("#bag-addr")) S.guest.address = v("bag-addr");
-    if ($("#bag-note")) S.guest.note = v("bag-note");
-    store.set("pappi_guest", { ...S.guest, note: "" });
+    ["name", "phone", "province", "city", "barangay", "street", "landmark", "zip"].forEach(k => {
+      const el = document.getElementById("bag-" + k); if (el) S.guest[k] = el.value.trim();
+    });
+    store.set("pappi_guest", S.guest);
   }
 
   function setUrl(token) {
@@ -994,15 +1021,19 @@
 
   async function createCheckout() {
     saveGuest(); S.error = "";
-    const g = S.guest;
-    if (g.name.length < 2) S.error = "Enter your full name.";
-    else if (g.phone.replace(/\D/g, "").length < 10) S.error = "Enter a mobile number we can text, like 0917 123 4567.";
-    else if (g.delivery !== "pickup" && (g.address || "").length < 8) S.error = "Enter your complete delivery address.";
-    if (S.error) return render();
+    const g = S.guest, digits = g.phone.replace(/\D/g, "");
+    if (g.name.length < 2) S.error = "Enter the receiver's full name.";
+    else if (!/^(09\d{9}|639\d{9})$/.test(digits)) S.error = "Enter an 11-digit mobile number, like 09171234567.";
+    else if (g.province.length < 3) S.error = "Enter your province.";
+    else if (g.city.length < 2) S.error = "Enter your city or municipality.";
+    else if (g.barangay.length < 2) S.error = "Enter your barangay.";
+    else if (g.street.length < 3) S.error = "Enter your house number, street or building.";
+    else if (!["QR Ph", "GCash"].includes(g.payment)) S.error = "Choose a payment method.";
+    if (S.error) { render(); $("#bag-body").scrollTop = 1e6; return; }
     S.busy = true; render();
     const { data, error } = await db.rpc("create_checkout", {
-      p_name: g.name, p_phone: g.phone, p_address: g.delivery === "pickup" ? null : g.address,
-      p_delivery: g.delivery, p_note: g.note || null,
+      p_name: g.name, p_phone: g.phone, p_payment_method: g.payment,
+      p_address_parts: { province: g.province, city: g.city, barangay: g.barangay, street: g.street, landmark: g.landmark, zip: g.zip },
       p_items: Object.entries(S.cart).map(([product_id, qty]) => ({ product_id, qty })),
       p_replace_token: S.checkout?.token || null,
     });
@@ -1012,6 +1043,7 @@
     S.checkout = { token: row.access_token, order_no: row.order_no, sig: cartSig() };
     store.set("pappi_checkout", S.checkout); setUrl(row.access_token);
     S.order = await loadOrder(row.access_token);
+    S.method = S.order?.payment_method || g.payment;
     S.view = "pay"; render();
     $("#bag-body").scrollTop = 0;
   }
@@ -1060,8 +1092,9 @@
     else if (d.go === "submit") { submitPayment(); }
     else if (d.go === "fresh") { S.order = null; S.view = "cart"; setUrl(null); render(); }
   });
+  bag.addEventListener("input", () => { if (S.error) { S.error = ""; bag.querySelector(".bag-err")?.remove(); } });
   bag.addEventListener("change", e => {
-    if (e.target.name === "bag-del") { saveGuest(); S.guest.delivery = e.target.value; store.set("pappi_guest", S.guest); render(); }
+    if (e.target.name === "bag-pay") { saveGuest(); S.guest.payment = e.target.value; store.set("pappi_guest", S.guest); }
     if (e.target.id === "bag-file" && e.target.files[0]) { S.file = e.target.files[0]; S.preview = URL.createObjectURL(S.file); S.error = ""; render(); }
   });
 
@@ -1074,7 +1107,7 @@
     // Show real prices on card buttons; disable anything not on sale yet
     document.querySelectorAll("[data-add]").forEach(b => {
       const p = S.products[b.dataset.add];
-      const price = b.querySelector("small");
+      const price = b.querySelector("[data-price]");
       if (p) { if (price) price.textContent = peso(p.price); }
       else { b.disabled = true; if (price) price.textContent = error ? "Offline" : "Coming soon"; }
     });
@@ -1090,6 +1123,7 @@
           // Returning to an unpaid order: bring its items back into the bag
           S.cart = {}; o.items.forEach(i => { if (S.products[i.product_id]) S.cart[i.product_id] = i.qty; }); saveCart();
           S.checkout = { token, order_no: o.order_no, sig: cartSig() }; store.set("pappi_checkout", S.checkout);
+          S.method = o.payment_method || S.method;
           S.view = "pay";
         } else {
           if (S.checkout?.token === token) { S.checkout = null; store.set("pappi_checkout", null); S.cart = {}; saveCart(); }
