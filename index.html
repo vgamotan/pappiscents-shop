@@ -26,7 +26,7 @@
   <link rel="icon" href="assets/brand/logo.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700&amp;family=Jost:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&amp;display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif:ital,wght@0,500;0,600;0,700;1,500;1,600&amp;family=Noto+Sans:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
@@ -536,7 +536,7 @@
       --ink: #17140f; --black: #0b0a08; --onyx: #15130f; --cream: #f1e7d3; --paper: #f7f1e4;
       --gold: #c9a24a; --gold-light: #ecd9a8; --gold-deep: #94722c;
       --line: rgba(23,20,15,.13); --line-dark: rgba(236,217,168,.16); --muted: #6a6153;
-      --serif: "Cinzel", "Trajan Pro", Georgia, serif; --sans: "Jost", "Segoe UI", system-ui, sans-serif;
+      --serif: "Noto Serif", Georgia, "Times New Roman", serif; --sans: "Noto Sans", "Segoe UI", system-ui, -apple-system, sans-serif;
       --shadow: 0 14px 36px rgba(0,0,0,.16);
     }
     body { background: radial-gradient(ellipse at 50% -10%, #2a2215 0, #0b0a08 55%) fixed #0b0a08; font-size: 15px; line-height: 1.55; }
@@ -714,6 +714,89 @@
       .format { grid-template-columns: 96px 1fr; min-height: 120px; }
       .format-image { height: 116px; }
       .savon-gallery-tile img { height: auto; }
+    }
+
+    /* =================== Readability pass: Noto Serif + Noto Sans =================== */
+    body { font-size: 16px; line-height: 1.6; color: var(--ink); }
+    :root { --muted: #5c5448; }
+    h1, h2, h3, h4, .serif, .format h3, .product-body h3, .channel h3, .story-era h4, .about-milestone strong,
+    .about-timeline-head h3, .trust-item strong, .form-title, .footer-brand strong, .brand-name, .bag-head h2, .bag h3, .bag-empty b {
+      font-family: var(--serif); letter-spacing: -.005em; text-transform: none;
+    }
+    h2 { font-size: clamp(1.65rem, 2.7vw, 2.35rem); font-weight: 700; line-height: 1.2; letter-spacing: -.015em; }
+    .hero h1 { font-size: clamp(2.5rem, 4.8vw, 4.1rem); font-weight: 700; line-height: 1.05; letter-spacing: -.025em; }
+    .hero h1 em { font-style: italic; font-weight: 600; }
+    .hero-copy > p:not(.eyebrow) { font-size: 1.05rem; color: #ddd5c6; }
+    .eyebrow { font-family: var(--sans); font-size: .74rem; font-weight: 700; letter-spacing: .14em; }
+    .lede { font-size: 1.02rem; color: var(--muted); }
+    .announcement { font-size: .74rem; letter-spacing: .08em; font-weight: 700; }
+    .brand-name { font-size: 1rem; font-weight: 600; letter-spacing: 0; }
+    .nav-links a { font-size: .9rem; font-weight: 500; letter-spacing: 0; }
+    .button { font-size: .92rem; letter-spacing: 0; }
+    .microproof { font-size: .82rem; }
+    .trust-item strong { font-size: 1rem; font-weight: 600; letter-spacing: 0; }
+    .trust-item span { font-size: .8rem; color: #b3a992; }
+    .section-note { font-size: .88rem; color: var(--muted); }
+    .format h3 { font-size: 1.15rem; font-weight: 700; letter-spacing: -.01em; }
+    .format p { font-size: .88rem; }
+    .format-badge { font-size: .68rem; letter-spacing: .08em; }
+    .product-body h3 { font-size: 1.12rem; font-weight: 700; letter-spacing: -.01em; }
+    .product-body p { font-size: .88rem; line-height: 1.5; color: var(--muted); }
+    .add-label b { font-size: .9rem; }
+    .add-label small { font-size: .76rem; color: #c9bfa9; }
+    .add-price { font-size: 1.1rem; }
+    .add-alt { font-size: .84rem; }
+    .soap-number { font-size: .72rem; letter-spacing: .12em; }
+    .soap-card .product-body p { color: #c4baa6; }
+    .campaign-hint, .carousel-caption { font-size: .8rem; letter-spacing: .02em; }
+    .channel h3 { font-size: 1.2rem; font-weight: 700; letter-spacing: -.01em; }
+    .channel p { font-size: .9rem; }
+    .about-copy .lede { font-size: 1.05rem; }
+    .about-more summary { font-size: .92rem; }
+    .about-more p { font-size: .95rem; line-height: 1.65; }
+    .about-milestone strong { font-size: 1.05rem; font-weight: 700; letter-spacing: 0; }
+    .about-milestone span { font-size: .8rem; color: var(--muted); }
+    .about-timeline-head h3 { font-size: 1.4rem; font-weight: 700; letter-spacing: -.01em; }
+    .about-timeline-head p { font-size: .92rem; }
+    .story-era h4 { font-size: 1.02rem; font-weight: 700; letter-spacing: 0; }
+    .story-era h4 span { font-size: .72rem; letter-spacing: .1em; }
+    .story-when { font-size: .75rem; }
+    .story-era b { font-size: .88rem; line-height: 1.35; }
+    .story-era p { font-size: .8rem; line-height: 1.5; color: var(--muted); }
+    .memory blockquote { font-family: var(--serif); font-weight: 600; letter-spacing: -.015em; line-height: 1.2; }
+    .memory blockquote em { font-style: italic; }
+    .memory p { font-size: .95rem; color: #c9c0af; }
+    .memory-quotes q { font-family: var(--serif); font-size: .95rem; }
+    .testimonial blockquote { font-family: var(--serif); font-size: 1rem; line-height: 1.6; font-weight: 500; }
+    .testimonial-person strong { font-size: .9rem; }
+    .testimonial-person span { font-size: .8rem; }
+    .delivery-row b { font-size: .95rem; }
+    .delivery-row p { font-size: .88rem; color: var(--muted); }
+    .contact-link { font-size: .88rem; }
+    label { font-size: .84rem; letter-spacing: 0; }
+    .form-title { font-size: 1.3rem; font-weight: 700; letter-spacing: -.01em; }
+    .form-help { font-size: .82rem; }
+    .promise blockquote { font-family: var(--serif); font-weight: 600; font-style: italic; letter-spacing: -.01em; }
+    .promise p { font-size: .76rem; letter-spacing: .1em; }
+    .footer-brand strong { font-size: 1.05rem; font-weight: 700; letter-spacing: 0; }
+    .footer-brand span, .footer-meta { font-size: .8rem; color: #a39a88; }
+    .nav-bag { gap: 0; }
+    /* Bag */
+    .bag-head h2 { font-size: 1.25rem; font-weight: 700; letter-spacing: -.01em; }
+    .bag h3 { font-size: 1.15rem; font-weight: 700; letter-spacing: -.01em; }
+    .bag .muted, .bag-note { font-size: .84rem; color: var(--muted); }
+    .bag-item b { font-size: .92rem; }
+    .bag-item small { font-size: .8rem; }
+    .bag-sum { font-size: .9rem; }
+    .bag label { font-size: .82rem; }
+    .bag input, .bag textarea { font-size: .95rem; }
+    .bag-opts label { font-size: .9rem; }
+    .bag-opts label small { font-size: .8rem; }
+    .bag-lines { font-size: .88rem; }
+    @media (max-width: 620px) {
+      body { font-size: 16px; }
+      .hero h1 { font-size: clamp(2.3rem, 10vw, 3rem); }
+      h2 { font-size: 1.6rem; }
     }
   </style>
 </head>
