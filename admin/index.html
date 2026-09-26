@@ -56,6 +56,13 @@
   .stat{padding:14px;background:var(--panel);border:1px solid var(--line);border-radius:12px}
   .stat .v{font-size:1.6rem;font-weight:700}
   .stat .l{color:var(--mute);font-size:.9rem}
+  .stat.hl{border-color:var(--gold)}
+  .stat.hl .v{color:var(--gold-hi)}
+  .mbars{display:grid;grid-template-columns:repeat(12,1fr);gap:6px;height:180px;padding:12px;background:var(--panel);border:1px solid var(--line);border-radius:12px;margin-bottom:18px}
+  .mbar{display:flex;flex-direction:column;justify-content:flex-end;align-items:center;gap:4px;min-width:0}
+  .mbar div{width:100%;background:var(--gold);border-radius:4px 4px 0 0;min-height:2px}
+  .mv{font-size:.68rem;color:var(--gold-hi);white-space:nowrap}
+  .ml{font-size:.72rem;color:var(--mute)}
   .bars{display:flex;align-items:flex-end;gap:3px;height:140px;padding:12px;background:var(--panel);border:1px solid var(--line);border-radius:12px;margin-bottom:18px}
   .bars div{flex:1;background:var(--gold);border-radius:3px 3px 0 0;min-height:2px}
   table{width:100%;border-collapse:collapse}
@@ -100,8 +107,9 @@ const SITE = "https://pappiscents.shop";
 const LABEL = { new:"To check", awaiting_payment:"Unpaid", paid:"Paid", packed:"Packed", shipped:"Shipped", completed:"Completed", cancelled:"Cancelled" };
 const DELIVERY = { nationwide:"Nationwide", cebu_express:"Cebu express", pickup:"Pickup" };
 const REVENUE_STATUSES = ["paid","packed","shipped","completed"];
-const CHANNELS = { website:"Website", manual:"Manual", messenger:"Messenger", facebook:"Facebook", instagram:"Instagram", tiktok:"TikTok", "walk-in":"Walk-in", reseller:"Reseller", shopee:"Shopee", other:"Other" };
+const CHANNELS = { website:"Website", zoho:"Zoho import", manual:"Manual", messenger:"Messenger", facebook:"Facebook", instagram:"Instagram", tiktok:"TikTok", "walk-in":"Walk-in", reseller:"Reseller", shopee:"Shopee", other:"Other" };
 const PAYMENTS = ["QR Ph","GCash","Maya","Bank transfer","Cash","COD","Other"];
+const realPhone = ph => ph && !/^(zoho|shopee):/.test(String(ph));
 const peso2 = n => "₱" + Number(n || 0).toLocaleString("en-PH", { maximumFractionDigits: 2 });
 
 const S = { tab:"orders", filter:"new", orders:[], customers:[], products:[], settings:{ shipping_fee:80, free_shipping_over:1500 }, open:null, edit:null, proofUrl:"", q:"" };
@@ -158,7 +166,7 @@ function viewOrders(){
         <span class="dot s-${o.status}" title="${LABEL[o.status]}"></span>
         <span><b>${esc(o.order_no)}</b> · ${esc(o.customers?.name)}${o.channel && o.channel!=="website" ? ` <span class="tag">${esc(CHANNELS[o.channel] || o.channel)}</span>` : ""}
           <small>${o.order_items.map(i=>`${i.qty}× ${esc(i.name)} ${i.line.split(" ")[0]}`).join(", ")} · ${DELIVERY[o.delivery]} · ${fmtDate(o.created_at)}</small></span>
-        <span class="amt">${peso(o.total)}<small>${esc(o.payment_method || "Not paid yet")}</small></span>
+        <span class="amt">${peso(o.total)}<small>${o.channel==="shopee" && Number(o.platform_fees) ? `net ${peso2(o.total - o.platform_fees)}` : esc(o.payment_method || "Not paid yet")}</small></span>
       </button>`).join("") : `<p class="muted">No ${S.filter==="all"?"":LABEL[S.filter].toLowerCase()+" "}orders. Paid website orders appear under To check and on Telegram.</p>`}</div>`;
 }
 
@@ -173,19 +181,22 @@ function viewOrder(){
     <div class="pipeline">${pipe.map(s=>`<button data-status="${s}" aria-pressed="${o.status===s}">${LABEL[s]}</button>`).join("")}</div>
     <ul class="items">${o.order_items.map(i=>`<li><span>${i.qty} × ${esc(i.name)} <span class="muted">${esc(i.line)}</span></span><span>${peso(i.qty*i.unit_price)}</span></li>`).join("")}
       <li><span>Shipping</span><span>${peso(o.shipping_fee)}</span></li>
-      <li><b>Total</b><b>${peso(o.total)}</b></li></ul>
+      ${Number(o.discount)?`<li><span>Discount</span><span>− ${peso2(o.discount)}</span></li>`:""}
+      <li><b>Total</b><b>${peso2(o.total)}</b></li>
+      ${Number(o.platform_fees)?`<li><span>Shopee fees</span><span>− ${peso2(o.platform_fees)}</span></li><li><b>You receive</b><b style="color:var(--gold-hi)">${peso2(o.payout_amount ?? (o.total - o.platform_fees))}</b></li>`:""}</ul>
     <dl class="kv">
       <dt>Customer</dt><dd>${esc(o.customers?.name)}${repeat>1?` <span style="color:var(--gold-hi)">· ${repeat} orders</span>`:""}</dd>
-      <dt>Mobile</dt><dd><a style="color:var(--gold-hi)" href="tel:${esc(o.customers?.phone)}">${esc(o.customers?.phone)}</a> · <a style="color:var(--gold-hi)" href="sms:${esc(o.customers?.phone)}">Text</a></dd>
+      <dt>Mobile</dt><dd>${realPhone(o.customers?.phone) ? `<a style="color:var(--gold-hi)" href="tel:${esc(o.customers?.phone)}">${esc(o.customers?.phone)}</a> · <a style="color:var(--gold-hi)" href="sms:${esc(o.customers?.phone)}">Text</a>` : `<span class="muted">No number yet — tap Edit order to add it</span>`}</dd>
       <dt>Delivery</dt><dd>${DELIVERY[o.delivery]}</dd>
       ${o.address?`<dt>Address</dt><dd>${esc(o.address)}${o.address_parts ? `<br><button class="btn ghost" style="padding:6px 12px;margin-top:6px" data-jnt="${o.id}">Copy for J&amp;T</button>` : ""}</dd>`:""}
-      <dt>Payment</dt><dd>${esc(o.payment_method || "—")} · ${o.status === "awaiting_payment" ? "not paid yet" : "should be"} ${peso(o.total)}</dd>
-      <dt>Order link</dt><dd><button class="btn ghost" style="padding:6px 12px" data-copylink="${esc(SITE + "/?checkout=" + o.access_token)}">Copy link</button> <span class="muted" style="font-size:.85rem">Send it if they need to finish paying or track the order.</span></dd>
+      <dt>Payment</dt><dd>${o.channel==="shopee" ? "Paid through Shopee" : esc(o.payment_method || "—")} · ${o.status === "awaiting_payment" ? "not paid yet" : o.status === "new" ? "should be" : o.status === "cancelled" ? "cancelled" : "paid"} ${peso2(o.total)}</dd>
+      ${o.channel === "shopee" ? `<dt>Shopee order</dt><dd>${esc(o.external_ref||"—")}${o.payout_date?` · paid out ${esc(o.payout_date)}`:""}${o.platform_fee_details?`<br><span class="muted" style="font-size:.85rem">${Object.entries(o.platform_fee_details).filter(([k,v])=>typeof v==="number").map(([k,v])=>`${esc(k)} ${peso2(Math.abs(v))}`).join(" · ")}</span>`:""}</dd>` : ""}
+      ${o.channel === "zoho" ? `<dt>Source</dt><dd>Imported from Zoho</dd>` : o.channel === "shopee" ? "" : `<dt>Order link</dt><dd><button class="btn ghost" style="padding:6px 12px" data-copylink="${esc(SITE + "/?checkout=" + o.access_token)}">Copy link</button> <span class="muted" style="font-size:.85rem">Send it if they need to finish paying or track the order.</span></dd>`}
       ${o.customer_note?`<dt>Their note</dt><dd>${esc(o.customer_note)}</dd>`:""}
     </dl>
     <div class="muted">Payment screenshot</div>
     ${S.proofUrl?`<a href="${S.proofUrl}" target="_blank" rel="noopener"><img class="proof" src="${S.proofUrl}" alt="Payment screenshot for ${esc(o.order_no)}"></a>`:`<p class="muted">${o.proof_path?"Loading…":"No screenshot"}</p>`}
-    <div class="field"><label for="f-ship">Shipping fee (₱)</label><input id="f-ship" type="number" min="0" step="1" value="${Number(o.shipping_fee)}"></div>
+    <div class="field"><label for="f-ship">Delivery fee (₱) <span class="muted" style="font-size:.8rem">· overrides the flat rate for this order</span></label><input id="f-ship" type="number" min="0" step="1" value="${Number(o.shipping_fee)}"></div>
     <div class="field"><label for="f-track">Tracking number</label><input id="f-track" value="${esc(o.tracking_no)}"></div>
     <div class="field"><label for="f-note">Private note</label><textarea id="f-note" rows="2">${esc(o.admin_note)}</textarea></div>
     <div class="actions"><button class="btn" data-save>Save details</button>
@@ -219,41 +230,64 @@ function viewCustomers(){
       <div class="stat"><div class="v">${S.customers.length?Math.round(repeaters/S.customers.length*100):0}%</div><div class="l">Repeat rate</div></div></div>
     <input id="q" placeholder="Search name or number" value="${esc(S.q)}" style="margin-bottom:12px">
     <div class="wrap"><table><thead><tr><th>Name</th><th>Mobile</th><th class="n">Orders</th><th class="n">Spent</th><th>Favorite</th><th>Last order</th></tr></thead>
-    <tbody>${rows.map(r=>`<tr><td>${esc(r.name)}</td><td><a style="color:var(--gold-hi)" href="sms:${esc(r.phone)}">${esc(r.phone)}</a></td>
+    <tbody>${rows.map(r=>`<tr><td>${esc(r.name)}</td><td>${realPhone(r.phone) ? `<a style="color:var(--gold-hi)" href="sms:${esc(r.phone)}">${esc(r.phone)}</a>` : `<span class="muted">—</span>`}</td>
       <td class="n">${r.orders}</td><td class="n">${peso(r.spent)}</td><td>${esc(fav(r.scents))}</td><td>${r.last?fmtDate(r.last):"—"}</td></tr>`).join("") || `<tr><td colspan="6" class="muted">Customers are added automatically when they order.</td></tr>`}</tbody></table></div>`;
 }
 
 function viewSales(){
   const paid = S.orders.filter(o=>REVENUE_STATUSES.includes(o.status));
-  const now = new Date(); const today = now.toDateString();
-  const ym = `${now.getFullYear()}-${now.getMonth()}`;
-  const sum = arr => arr.reduce((s,o)=>s+Number(o.subtotal),0);
-  const tOrders = paid.filter(o=>new Date(o.paid_at||o.created_at).toDateString()===today);
-  const mOrders = paid.filter(o=>{const d=new Date(o.paid_at||o.created_at);return `${d.getFullYear()}-${d.getMonth()}`===ym;});
-  const units = {}; let elixir=0, parfum=0, savon=0;
-  for (const o of mOrders) for (const i of o.order_items){
+  const when = o => new Date(o.paid_at||o.created_at);
+  const now = new Date();
+  const startOfMonth = (y,m) => new Date(y, m, 1);
+  const P = {
+    month: { label:"This month", from: startOfMonth(now.getFullYear(), now.getMonth()), to: null },
+    last:  { label:"Last month", from: startOfMonth(now.getFullYear(), now.getMonth()-1), to: startOfMonth(now.getFullYear(), now.getMonth()) },
+    d90:   { label:"Last 90 days", from: new Date(now - 90*864e5), to: null },
+    all:   { label:"All time", from: new Date(0), to: null },
+  };
+  const per = P[S.period] || P.month;
+  const inPer = o => when(o) >= per.from && (!per.to || when(o) < per.to);
+  const list = paid.filter(inPer);
+  const items = arr => arr.reduce((s,o)=>s+Number(o.subtotal)-Number(o.discount||0),0);
+  const deliv = arr => arr.reduce((s,o)=>s+Number(o.shipping_fee||0),0);
+  const gross = arr => arr.reduce((s,o)=>s+Number(o.total),0);
+  const fees  = arr => arr.reduce((s,o)=>s+Number(o.platform_fees||0),0);
+  const net   = arr => gross(arr) - fees(arr);
+  const units = {}; let elixir=0, parfum=0, savon=0, unknown=0;
+  for (const o of list) for (const i of o.order_items){
     const k = i.name + " · " + i.line; units[k] = units[k] || { name:i.name, line:i.line, qty:0, rev:0 };
     units[k].qty += i.qty; units[k].rev += i.qty*i.unit_price;
-    if (i.line.startsWith("Elixir")) elixir+=i.qty; else if (i.line.startsWith("Parfum")) parfum+=i.qty; else savon+=i.qty;
+    if (i.line.startsWith("Elixir")) elixir+=i.qty; else if (i.line.startsWith("Parfum")) parfum+=i.qty; else if (i.line==="Savon") savon+=i.qty; else unknown+=i.qty;
   }
-  const days = [...Array(30)].map((_,k)=>{ const d=new Date(now); d.setDate(d.getDate()-29+k); return d.toDateString(); });
-  const perDay = days.map(d=>sum(paid.filter(o=>new Date(o.paid_at||o.created_at).toDateString()===d)));
-  const max = Math.max(1,...perDay);
+  const bottles = elixir + parfum;
+  const chan = {}; for (const o of list){ const k = o.channel==="shopee" ? "Shopee" : "Direct (website, Zoho, manual)"; (chan[k] ||= []).push(o); }
+  // Monthly bars (last 12 months)
+  const months = [...Array(12)].map((_,k)=>{ const d=new Date(now.getFullYear(), now.getMonth()-11+k, 1); return d; });
+  const perMonth = months.map(m=>net(paid.filter(o=>{const d=when(o); return d.getFullYear()===m.getFullYear() && d.getMonth()===m.getMonth();})));
+  const maxM = Math.max(1,...perMonth);
+  const mLabel = d => d.toLocaleString("en-PH",{month:"short"});
   const waiting = S.orders.filter(o=>o.status==="new").length;
   const toShip = S.orders.filter(o=>o.status==="paid"||o.status==="packed").length;
-  return `<div class="stats">
-      <div class="stat"><div class="v">${peso(sum(tOrders))}</div><div class="l">Sales today · ${tOrders.length} orders</div></div>
-      <div class="stat"><div class="v">${peso(sum(mOrders))}</div><div class="l">Sales this month · ${mOrders.length} orders</div></div>
-      <div class="stat"><div class="v">${mOrders.length?peso(Math.round(sum(mOrders)/mOrders.length)):"₱0"}</div><div class="l">Average order this month</div></div>
-      <div class="stat"><div class="v">${elixir} / ${parfum}</div><div class="l">Elixir vs Parfum bottles this month</div></div>
-      <div class="stat"><div class="v">${waiting}</div><div class="l">Waiting for payment check</div></div>
-      <div class="stat"><div class="v">${toShip}</div><div class="l">Paid, not yet shipped</div></div></div>
-    <h3>Daily sales, last 30 days</h3>
-    <div class="bars" role="img" aria-label="Daily sales for the last 30 days">${perDay.map((v,k)=>`<div style="height:${v/max*100}%" title="${days[k]}: ${peso(v)}"></div>`).join("")}</div>
-    <h3>Best sellers this month</h3>
+  const unpaid = S.orders.filter(o=>o.status==="awaiting_payment");
+  return `<div class="filters">${Object.entries(P).map(([k,v])=>`<button class="chip" data-period="${k}" aria-pressed="${(S.period||"month")===k}">${v.label}</button>`).join("")}</div>
+    <div class="stats">
+      <div class="stat"><div class="v">${peso(gross(list))}</div><div class="l">Gross sales · items ${peso(items(list))} + delivery ${peso(deliv(list))}</div></div>
+      <div class="stat"><div class="v">− ${peso2(fees(list))}</div><div class="l">Platform fees (Shopee)</div></div>
+      <div class="stat hl"><div class="v">${peso2(net(list))}</div><div class="l">Net income after fees</div></div>
+      <div class="stat"><div class="v">${list.length}</div><div class="l">Paid orders · avg ${list.length?peso(Math.round(gross(list)/list.length)):"₱0"}</div></div>
+      <div class="stat"><div class="v">${bottles}</div><div class="l">Bottles · ${elixir} Elixir / ${parfum} Parfum${unknown?` · ${unknown} Shopee item${unknown===1?"":"s"} to label`:""}</div></div>
+      <div class="stat"><div class="v">${waiting} / ${toShip}</div><div class="l">To check / to ship now</div></div>
+    </div>
+    ${unpaid.length?`<p class="muted" style="margin:-6px 0 14px">${unpaid.length} unpaid checkout${unpaid.length===1?"":"s"} worth ${peso(gross(unpaid))} — see Orders › Unpaid.</p>`:""}
+    <h3>Monthly net income, last 12 months</h3>
+    <div class="mbars" role="img" aria-label="Monthly net income">${perMonth.map((v,k)=>`<div class="mbar"><span class="mv">${v?peso(Math.round(v/100)/10+"").replace("₱","₱")+"k":""}</span><div style="height:${v/maxM*100}%" title="${mLabel(months[k])} ${months[k].getFullYear()}: ${peso(v)}"></div><span class="ml">${mLabel(months[k])}</span></div>`).join("")}</div>
+    <h3>Best sellers · ${per.label.toLowerCase()}</h3>
     <div class="wrap"><table><thead><tr><th>Scent</th><th>Line</th><th class="n">Units</th><th class="n">Sales</th></tr></thead>
-    <tbody>${Object.values(units).sort((a,b)=>b.qty-a.qty).map(u=>`<tr><td>${esc(u.name)}</td><td>${esc(u.line)}</td><td class="n">${u.qty}</td><td class="n">${peso(u.rev)}</td></tr>`).join("") || `<tr><td colspan="4" class="muted">Paid orders this month will show here.</td></tr>`}</tbody></table></div>
-    <p class="muted" style="margin-top:10px">Sales count orders marked Paid or later. Shipping fees are not included.</p>`;
+    <tbody>${Object.values(units).sort((a,b)=>b.qty-a.qty||b.rev-a.rev).map(u=>`<tr><td>${esc(u.name)}</td><td>${esc(u.line)}</td><td class="n">${u.qty}</td><td class="n">${peso(u.rev)}</td></tr>`).join("") || `<tr><td colspan="4" class="muted">No paid orders in this period.</td></tr>`}</tbody></table></div>
+    <h3>Where sales came from</h3>
+    <div class="wrap"><table><thead><tr><th>Channel</th><th class="n">Orders</th><th class="n">Items</th><th class="n">Delivery</th><th class="n">Platform fees</th><th class="n">Net income</th></tr></thead>
+    <tbody>${Object.entries(chan).map(([k,v])=>`<tr><td>${esc(k)}</td><td class="n">${v.length}</td><td class="n">${peso(items(v))}</td><td class="n">${peso(deliv(v))}</td><td class="n">${fees(v)?"− "+peso2(fees(v)):"—"}</td><td class="n"><b>${peso2(net(v))}</b></td></tr>`).join("") || `<tr><td colspan="6" class="muted">No paid orders in this period.</td></tr>`}</tbody></table></div>
+    <p class="muted" style="margin-top:10px">Gross = items (after discounts) + delivery fees you charged. Shopee orders use the figures from Shopee's income report; Shopee covers their shipping, and its fees are shown separately. Net = what you keep.</p>`;
 }
 
 function viewProducts(){
@@ -283,13 +317,13 @@ function render(){
 // ---------------- Create / edit order ----------------
 function blankDraft(){
   return { name:"", phone:"", address_parts:{ province:"", city:"", barangay:"", street:"", landmark:"", zip:"" },
-    delivery:"nationwide", payment_method:"GCash", status:"paid", shipping_fee:Number(S.settings.shipping_fee), shipAuto:true,
+    delivery:"nationwide", payment_method:"GCash", status:"paid", shipping_fee:Number(S.settings.shipping_fee), discount:0, shipAuto:true,
     channel:"messenger", customer_note:"", admin_note:"", tracking_no:"", items:[] };
 }
 function draftFrom(o){
-  return { name:o.customers?.name||"", phone:o.customers?.phone||"",
+  return { name:o.customers?.name||"", phone:realPhone(o.customers?.phone) ? o.customers.phone : "",
     address_parts:{ province:"", city:"", barangay:"", street:"", landmark:"", zip:"", ...(o.address_parts||{}), ...(o.address_parts?{}:{ street:o.address||"" }) },
-    delivery:o.delivery||"nationwide", payment_method:o.payment_method||"", status:o.status, shipping_fee:Number(o.shipping_fee), shipAuto:false,
+    delivery:o.delivery||"nationwide", payment_method:o.payment_method||"", status:o.status, shipping_fee:Number(o.shipping_fee), discount:Number(o.discount||0), shipAuto:false,
     channel:o.channel||"website", customer_note:o.customer_note||"", admin_note:o.admin_note||"", tracking_no:o.tracking_no||"",
     items:o.order_items.map(i=>({ product_id:i.product_id, qty:i.qty, unit_price:Number(i.unit_price) })) };
 }
@@ -301,7 +335,7 @@ function viewEditor(){
   const E = S.edit, d = E.draft, isNew = !E.id;
   const o = isNew ? null : S.orders.find(x=>x.id===E.id);
   const opt = (list, val) => list.map(([v,l])=>`<option value="${esc(v)}" ${v===val?"selected":""}>${esc(l)}</option>`).join("");
-  const prodOpts = sel => `<option value="">Choose product…</option>` + ["Elixir 40%","Parfum 20%","Savon"].map(line=>
+  const prodOpts = sel => `<option value="">Choose product…</option>` + ["Elixir 40%","Parfum 20%","Savon","Shopee"].filter(l=>l!=="Shopee"||S.products.some(p=>p.line==="Shopee")).map(line=>
     `<optgroup label="${line}">${S.products.filter(p=>p.line===line).map(p=>`<option value="${p.id}" ${p.id===sel?"selected":""}>${esc(p.name)} · ${esc(p.line.split(" ")[0])} — ${peso2(p.price)}${p.active?"":" (hidden)"}</option>`).join("")}</optgroup>`).join("");
   const f = (key, label, val, extra="") => `<div class="field"><label>${label}</label><input data-f="${key}" value="${esc(val)}" ${extra}></div>`;
   const a = d.address_parts, sub = draftSub(d);
@@ -316,7 +350,7 @@ function viewEditor(){
       ${f("name","Full name", d.name)}
     </div>
     <datalist id="cust-phones">${S.customers.map(c=>`<option value="${esc(c.phone)}">${esc(c.name)}</option>`).join("")}</datalist>
-    <p class="muted" style="margin:4px 0 0;font-size:.85rem">Pick an existing number to fill their name and last address.</p>
+    <p class="muted" style="margin:4px 0 0;font-size:.85rem">${!isNew && o && !realPhone(o.customers?.phone) ? "Imported from Zoho without a number. Add it here when you have it." : "Pick an existing number to fill their name and last address."}</p>
 
     <h3>Items</h3>
     <div class="items-edit"><div class="item-head muted"><span>Product</span><span>Qty</span><span>Price each (₱)</span><span></span></div>${d.items.map((it,k)=>`
@@ -345,9 +379,10 @@ function viewEditor(){
       <div class="field"><label>Payment method</label><select data-f="payment_method"><option value="">Not set</option>${opt(PAYMENTS.map(x=>[x,x]), d.payment_method)}</select></div>
       <div class="field"><label>Status</label><select data-f="status">${opt(STATUSES.map(x=>[x,LABEL[x]]), d.status)}</select></div>
       <div class="field"><label>Channel</label><select data-f="channel">${opt(Object.entries(CHANNELS), d.channel)}</select></div>
-      <div class="field"><label>Shipping fee (₱) <span class="muted" style="font-size:.8rem">${d.shipAuto?"· auto":""}</span></label><input data-f="shipping_fee" type="number" min="0" step="1" value="${d.shipping_fee}"></div>
+      <div class="field"><label>Delivery fee (₱) <span class="muted" style="font-size:.8rem">${d.shipAuto?"· flat rate":"· custom"}</span></label><input data-f="shipping_fee" type="number" min="0" step="1" value="${d.shipping_fee}"></div>
+      <div class="field"><label>Discount (₱)</label><input data-f="discount" type="number" min="0" step="1" value="${d.discount||0}"></div>
     </div>
-    <p class="muted" style="margin:4px 0 0;font-size:.85rem">Shipping rule: ${peso2(S.settings.shipping_fee)}, free over ${peso2(S.settings.free_shipping_over)}, pickup free. <button class="linkbtn" data-shipauto>Use rule</button></p>
+    <p class="muted" style="margin:4px 0 0;font-size:.85rem">Flat rate: ${peso2(S.settings.shipping_fee)}, free over ${peso2(S.settings.free_shipping_over)}, pickup free. Type any amount to override. <button class="linkbtn" data-shipauto>Back to flat rate</button></p>
     <div class="field"><label>Customer note</label><input data-f="customer_note" value="${esc(d.customer_note)}"></div>
     <div class="field"><label>Private note</label><textarea data-f="admin_note" rows="2">${esc(d.admin_note)}</textarea></div>
 
@@ -357,8 +392,8 @@ function viewEditor(){
       <button class="btn ghost" data-canceledit>Cancel</button></div>
   </div></div>`;
 }
-function totalsHtml(d){ const sub = draftSub(d), ship = Number(d.shipping_fee)||0;
-  return `<li><span>Subtotal</span><span>${peso2(sub)}</span></li><li><span>Shipping fee</span><span>${ship?peso2(ship):"Free"}</span></li><li><b>Total</b><b>${peso2(sub+ship)}</b></li>`; }
+function totalsHtml(d){ const sub = draftSub(d), ship = Number(d.shipping_fee)||0, disc = Number(d.discount)||0;
+  return `<li><span>Subtotal</span><span>${peso2(sub)}</span></li><li><span>Shipping fee</span><span>${ship?peso2(ship):"Free"}</span></li>${disc?`<li><span>Discount</span><span>− ${peso2(disc)}</span></li>`:""}<li><b>Total</b><b>${peso2(sub+ship-disc)}</b></li>`; }
 function refreshTotals(){ const d=S.edit.draft; syncShip(d); const t=document.getElementById("ed-totals"); if(t) t.innerHTML=totalsHtml(d);
   const sf=document.querySelector('[data-f="shipping_fee"]'); if(sf && d.shipAuto && document.activeElement!==sf) sf.value=d.shipping_fee; }
 
@@ -379,6 +414,8 @@ function fillFromCustomer(phone){
 async function saveDraft(){
   const E = S.edit, d = E.draft;
   d.items = d.items.filter(i=>i.product_id);
+  const orig = E.id ? S.orders.find(x=>x.id===E.id) : null;
+  if (!d.phone && orig && !realPhone(orig.customers?.phone)) d.phone = orig.customers.phone;   // Zoho customer without a number yet
   const payload = { ...d, items: d.items.map(i=>({ product_id:i.product_id, qty:Number(i.qty)||1, unit_price:Number(i.unit_price)||0 })) };
   delete payload.shipAuto;
   E.busy = true; E.error = ""; render();
@@ -427,6 +464,7 @@ app.addEventListener("click", async e => {
     S.settings = { ...S.settings, shipping_fee, free_shipping_over }; toast("Shipping saved. Website updated");
   }
   else if (d.filter){ S.filter=d.filter; render(); }
+  else if (d.period){ S.period=d.period; render(); }
   else if (d.jnt){
     const o = S.orders.find(x=>x.id===d.jnt); const a = o.address_parts || {};
     const text = [`Receiver: ${o.customers?.name}`, `Phone: ${o.customers?.phone}`, `Province: ${a.province||""}`, `City/Municipality: ${a.city||""}`,
@@ -459,6 +497,7 @@ app.addEventListener("input", e => {
     const d = S.edit.draft, k = t.dataset.f;
     if (k.startsWith("a.")) d.address_parts[k.slice(2)] = t.value;
     else if (k === "shipping_fee") { d.shipping_fee = Number(t.value)||0; d.shipAuto = false; }
+    else if (k === "discount") { d.discount = Math.max(0, Number(t.value)||0); }
     else d[k] = t.value;
     if (k === "phone" && fillFromCustomer(t.value)) { render(); const el=document.querySelector('[data-f="phone"]'); el.focus(); el.setSelectionRange(el.value.length, el.value.length); return; }
     if (k === "delivery") syncShip(d);
