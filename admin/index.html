@@ -57,6 +57,8 @@
   .stat .v{font-size:1.6rem;font-weight:700}
   .stat .l{color:var(--mute);font-size:.9rem}
   .stat.hl{border-color:var(--gold)}
+  .sheet.wide>div{width:min(860px,100%)}
+  .tag.st-paid{color:var(--paid);border-color:var(--paid);font-weight:700} .tag.st-partial{color:var(--packed);border-color:var(--packed);font-weight:700} .tag.st-unpaid{color:var(--new);border-color:var(--new);font-weight:700} .tag.st-overdue{color:#fff;background:var(--cancel);border-color:var(--cancel);font-weight:700}
   .stat.hl .v{color:var(--gold-hi)}
   .mbars{display:grid;grid-template-columns:repeat(12,1fr);gap:6px;height:180px;padding:12px;background:var(--panel);border:1px solid var(--line);border-radius:12px;margin-bottom:18px}
   .mbar{display:flex;flex-direction:column;justify-content:flex-end;align-items:center;gap:4px;min-width:0}
@@ -107,12 +109,12 @@ const SITE = "https://pappiscents.shop";
 const LABEL = { new:"To check", awaiting_payment:"Unpaid", paid:"Paid", packed:"Packed", shipped:"Shipped", completed:"Completed", cancelled:"Cancelled" };
 const DELIVERY = { nationwide:"Nationwide", cebu_express:"Cebu express", pickup:"Pickup" };
 const REVENUE_STATUSES = ["paid","packed","shipped","completed"];
-const CHANNELS = { website:"Website", zoho:"Zoho import", manual:"Manual", messenger:"Messenger", facebook:"Facebook", instagram:"Instagram", tiktok:"TikTok", "walk-in":"Walk-in", reseller:"Reseller", shopee:"Shopee", other:"Other" };
+const CHANNELS = { website:"Website", distributor:"Distributor", zoho:"Zoho import", manual:"Manual", messenger:"Messenger", facebook:"Facebook", instagram:"Instagram", tiktok:"TikTok", "walk-in":"Walk-in", reseller:"Reseller", shopee:"Shopee", other:"Other" };
 const PAYMENTS = ["QR Ph","GCash","Maya","Bank transfer","Cash","COD","Other"];
 const realPhone = ph => ph && !/^(zoho|shopee):/.test(String(ph));
 const peso2 = n => "₱" + Number(n || 0).toLocaleString("en-PH", { maximumFractionDigits: 2 });
 
-const S = { tab:"orders", filter:"new", orders:[], customers:[], products:[], settings:{ shipping_fee:80, free_shipping_over:1500 }, open:null, edit:null, proofUrl:"", q:"" };
+const S = { tab:"orders", filter:"new", orders:[], customers:[], products:[], settings:{ shipping_fee:80, free_shipping_over:1500 }, open:null, edit:null, dist:null, distForm:null, payments:[], moves:[], proofUrl:"", q:"" };
 
 function toast(msg){ const t=document.createElement("div"); t.className="toast"; t.textContent=msg; document.body.append(t); setTimeout(()=>t.remove(),2200); }
 
@@ -135,24 +137,27 @@ function viewLogin(err=""){
 // ---------------- Data ----------------
 async function load(){
   const since = new Date(Date.now() - 1000*60*60*24*365).toISOString();
-  const [o, c, p, st] = await Promise.all([
+  const [o, c, p, st, pay, mv] = await Promise.all([
     db.from("orders").select("*, customers(id,name,phone,address), order_items(product_id,name,line,qty,unit_price)").gte("created_at", since).order("created_at",{ascending:false}),
     db.from("customers").select("*").order("created_at",{ascending:false}),
     db.from("products").select("*").order("sort"),
     db.from("shop_settings").select("*").eq("id",1).maybeSingle(),
+    db.from("payments").select("*").order("paid_on",{ascending:false}),
+    db.from("stock_moves").select("*").order("moved_on",{ascending:false}),
   ]);
   if (o.error) throw o.error;
   S.orders = o.data; S.customers = c.data || []; S.products = p.data || [];
   S.settings = st.data || { shipping_fee: 80, free_shipping_over: 1500 };
+  S.payments = pay.data || []; S.moves = mv.data || [];
 }
 
 // ---------------- Views ----------------
 function shell(body){
-  const tabs = [["orders","Orders"],["customers","Customers"],["sales","Sales"],["products","Products"]];
+  const tabs = [["orders","Orders"],["distributors","Distributors"],["customers","Customers"],["sales","Sales"],["products","Products"]];
   app.innerHTML = `<header><div class="top"><div class="brand">Pappi <span>Orders</span></div>
       <div><button class="btn ghost" id="refresh">Refresh</button> <button class="btn ghost" id="logout">Sign out</button></div></div>
     <nav>${tabs.map(([k,l])=>`<button data-tab="${k}" ${S.tab===k?'aria-current="page"':""}>${l}</button>`).join("")}</nav></header>
-    <main>${body}</main>${S.edit ? viewEditor() : S.open ? viewOrder() : ""}`;
+    <main>${body}</main>${S.edit ? viewEditor() : S.distForm ? viewDistForm() : S.dist ? viewDistributor() : S.open ? viewOrder() : ""}`;
 }
 
 function viewOrders(){
@@ -200,7 +205,7 @@ function viewOrder(){
     <div class="field"><label for="f-track">Tracking number</label><input id="f-track" value="${esc(o.tracking_no)}"></div>
     <div class="field"><label for="f-note">Private note</label><textarea id="f-note" rows="2">${esc(o.admin_note)}</textarea></div>
     <div class="actions"><button class="btn" data-save>Save details</button>
-      <button class="btn ghost" data-editorder="${o.id}">Edit order</button>
+      ${o.channel==="distributor" ? `<button class="btn ghost" data-dist="${o.customer_id}">Open distributor</button> <button class="btn ghost" data-printreceipt="${o.id}">Print receipt</button>` : `<button class="btn ghost" data-editorder="${o.id}">Edit order</button>`}
       ${o.status!=="cancelled"?`<button class="btn ghost" data-status="cancelled">Cancel order</button>`:`<button class="btn ghost" data-status="new">Reopen order</button>`}</div>
   </div></div>`;
 }
@@ -260,7 +265,7 @@ function viewSales(){
     if (i.line.startsWith("Elixir")) elixir+=i.qty; else if (i.line.startsWith("Parfum")) parfum+=i.qty; else if (i.line==="Savon") savon+=i.qty; else unknown+=i.qty;
   }
   const bottles = elixir + parfum;
-  const chan = {}; for (const o of list){ const k = o.channel==="shopee" ? "Shopee" : "Direct (website, Zoho, manual)"; (chan[k] ||= []).push(o); }
+  const chan = {}; for (const o of list){ const k = o.channel==="shopee" ? "Shopee" : o.channel==="distributor" ? "Distributors" : "Direct (website, Zoho, manual)"; (chan[k] ||= []).push(o); }
   // Monthly bars (last 12 months)
   const months = [...Array(12)].map((_,k)=>{ const d=new Date(now.getFullYear(), now.getMonth()-11+k, 1); return d; });
   const perMonth = months.map(m=>net(paid.filter(o=>{const d=when(o); return d.getFullYear()===m.getFullYear() && d.getMonth()===m.getMonth();})));
@@ -278,6 +283,7 @@ function viewSales(){
       <div class="stat"><div class="v">${bottles}</div><div class="l">Bottles · ${elixir} Elixir / ${parfum} Parfum${unknown?` · ${unknown} Shopee item${unknown===1?"":"s"} to label`:""}</div></div>
       <div class="stat"><div class="v">${waiting} / ${toShip}</div><div class="l">To check / to ship now</div></div>
     </div>
+    ${(()=>{ const owed = distributorsList().reduce((a,x)=>a+Math.max(0,x.balance),0); return owed ? `<p class="muted" style="margin:-6px 0 8px">Distributors still owe <b style="color:var(--gold-hi)">${peso2(owed)}</b> — see the Distributors tab.</p>` : ""; })()}
     ${unpaid.length?`<p class="muted" style="margin:-6px 0 14px">${unpaid.length} unpaid checkout${unpaid.length===1?"":"s"} worth ${peso(gross(unpaid))} — see Orders › Unpaid.</p>`:""}
     <h3>Monthly net income, last 12 months</h3>
     <div class="mbars" role="img" aria-label="Monthly net income">${perMonth.map((v,k)=>`<div class="mbar"><span class="mv">${v?peso(Math.round(v/100)/10+"").replace("₱","₱")+"k":""}</span><div style="height:${v/maxM*100}%" title="${mLabel(months[k])} ${months[k].getFullYear()}: ${peso(v)}"></div><span class="ml">${mLabel(months[k])}</span></div>`).join("")}</div>
@@ -309,7 +315,7 @@ function viewProducts(){
 }
 
 function render(){
-  const body = { orders:viewOrders, customers:viewCustomers, sales:viewSales, products:viewProducts }[S.tab]();
+  const body = { orders:viewOrders, distributors:viewDistributors, customers:viewCustomers, sales:viewSales, products:viewProducts }[S.tab]();
   shell(body);
 }
 
@@ -341,9 +347,13 @@ function viewEditor(){
   const a = d.address_parts, sub = draftSub(d);
   return `<div class="sheet" data-close><div role="dialog" aria-label="${isNew?"New order":"Edit order"}">
     <div style="display:flex;justify-content:space-between;align-items:start">
-      <div><h2>${isNew ? "New order" : "Edit " + esc(o.order_no)}</h2><span class="muted">${isNew ? "For Messenger, walk-in or reseller orders. No customer alerts are sent." : "Changes save to the order and the customer's order link."}</span></div>
+      <div><h2>${E.receipt ? (isNew ? "New receipt" : "Edit " + esc(o.order_no)) : isNew ? "New order" : "Edit " + esc(o.order_no)}</h2><span class="muted">${E.receipt ? `For ${esc(E.receipt.name)} · distributor prices fill in automatically` : isNew ? "For Messenger, walk-in or reseller orders. No customer alerts are sent." : "Changes save to the order and the customer's order link."}</span></div>
       <button class="btn ghost" data-canceledit>Close</button></div>
-
+    ${E.receipt ? `<div class="grid2" style="margin-top:12px">
+      <div class="field"><label>Receipt date</label><input data-f="date" type="date" value="${esc(d.date||"")}"></div>
+      <div class="field"><label>Due date <span class="muted" style="font-size:.8rem">· blank = ${E.receipt.credit_days} days</span></label><input data-f="due_date" type="date" value="${esc(d.due_date||"")}"></div>
+    </div>` : ""}
+    <div ${E.receipt ? 'hidden' : ""}>
     <h3>Customer</h3>
     <div class="grid2">
       ${f("phone","Mobile number", d.phone, 'list="cust-phones" inputmode="tel" placeholder="09XXXXXXXXX"')}
@@ -351,6 +361,7 @@ function viewEditor(){
     </div>
     <datalist id="cust-phones">${S.customers.map(c=>`<option value="${esc(c.phone)}">${esc(c.name)}</option>`).join("")}</datalist>
     <p class="muted" style="margin:4px 0 0;font-size:.85rem">${!isNew && o && !realPhone(o.customers?.phone) ? "Imported from Zoho without a number. Add it here when you have it." : "Pick an existing number to fill their name and last address."}</p>
+    </div>
 
     <h3>Items</h3>
     <div class="items-edit"><div class="item-head muted"><span>Product</span><span>Qty</span><span>Price each (₱)</span><span></span></div>${d.items.map((it,k)=>`
@@ -374,11 +385,11 @@ function viewEditor(){
       ${f("a.landmark","Landmark", a.landmark)}${f("a.zip","ZIP", a.zip, 'inputmode="numeric"')}
     </div>
 
-    <h3>Payment & status</h3>
+    <h3>${E.receipt ? "Delivery fee & discount" : "Payment & status"}</h3>
     <div class="grid2">
-      <div class="field"><label>Payment method</label><select data-f="payment_method"><option value="">Not set</option>${opt(PAYMENTS.map(x=>[x,x]), d.payment_method)}</select></div>
-      <div class="field"><label>Status</label><select data-f="status">${opt(STATUSES.map(x=>[x,LABEL[x]]), d.status)}</select></div>
-      <div class="field"><label>Channel</label><select data-f="channel">${opt(Object.entries(CHANNELS), d.channel)}</select></div>
+      <div class="field" ${E.receipt?"hidden":""}><label>Payment method</label><select data-f="payment_method"><option value="">Not set</option>${opt(PAYMENTS.map(x=>[x,x]), d.payment_method)}</select></div>
+      <div class="field" ${E.receipt?"hidden":""}><label>Status</label><select data-f="status">${opt(STATUSES.map(x=>[x,LABEL[x]]), d.status)}</select></div>
+      <div class="field" ${E.receipt?"hidden":""}><label>Channel</label><select data-f="channel">${opt(Object.entries(CHANNELS), d.channel)}</select></div>
       <div class="field"><label>Delivery fee (₱) <span class="muted" style="font-size:.8rem">${d.shipAuto?"· flat rate":"· custom"}</span></label><input data-f="shipping_fee" type="number" min="0" step="1" value="${d.shipping_fee}"></div>
       <div class="field"><label>Discount (₱)</label><input data-f="discount" type="number" min="0" step="1" value="${d.discount||0}"></div>
     </div>
@@ -388,7 +399,7 @@ function viewEditor(){
 
     <ul class="items" style="margin-top:16px" id="ed-totals">${totalsHtml(d)}</ul>
     <p class="err" id="ed-err">${esc(E.error||"")}</p>
-    <div class="actions"><button class="btn" data-saveorder ${E.busy?"disabled":""}>${E.busy?"Saving…":(isNew?"Create order":"Save changes")}</button>
+    <div class="actions"><button class="btn" data-saveorder ${E.busy?"disabled":""}>${E.busy?"Saving…":E.receipt?(isNew?"Create receipt":"Save receipt"):(isNew?"Create order":"Save changes")}</button>
       <button class="btn ghost" data-canceledit>Cancel</button></div>
   </div></div>`;
 }
@@ -419,12 +430,264 @@ async function saveDraft(){
   const payload = { ...d, items: d.items.map(i=>({ product_id:i.product_id, qty:Number(i.qty)||1, unit_price:Number(i.unit_price)||0 })) };
   delete payload.shipAuto;
   E.busy = true; E.error = ""; render();
-  const { data, error } = await db.rpc("admin_save_order", { p_order_id: E.id, p: payload });
+  if (E.receipt) { payload.customer_id = E.receipt.id; }
+  const { data, error } = E.receipt
+    ? await db.rpc("admin_save_receipt", { p_order_id: E.id, p: payload })
+    : await db.rpc("admin_save_order", { p_order_id: E.id, p: payload });
   E.busy = false;
   if (error) { E.error = error.message; if (!d.items.length) d.items.push({ product_id:"", qty:1, unit_price:0 }); return render(); }
   const row = data[0]; const wasNew = !E.id;
+  if (E.receipt) { S.edit = null; await load(); S.dist = E.receipt.id; render(); toast(wasNew ? `Receipt ${row.order_no} created` : `Receipt ${row.order_no} saved`); return; }
   S.edit = null; await load(); S.open = row.order_id; S.proofUrl = ""; render();
   toast(wasNew ? `Order ${row.order_no} created` : `Order ${row.order_no} updated`);
+}
+
+
+// ================= Distributors =================
+const SHOP = { name:"Pappi Suds & Scents Shop", addr:["20 Mancono Street, La Paloma Subd","Cebu City, Cebu 6000, Philippines"], phone:"+63 905 561 3013", email:"pappi.artisan@gmail.com",
+  pay:"GCash 0905 561 3013 · Vergilio Jr Gamotan · QR Ph available on request" };
+const today = () => new Date(Date.now() + 8*3600e3).toISOString().slice(0,10);   // Manila date
+const fmtD = d => d ? new Date(d.length===10 ? d+"T12:00:00+08:00" : d).toLocaleDateString("en-PH",{ year:"numeric", month:"short", day:"numeric" }) : "—";
+const ymd = d => new Date(new Date(d).getTime() + 8*3600e3).toISOString().slice(0,10);
+function distPrice(dist, prod){ const pr = dist.distributor_prices || {}; const v = pr[prod.line]; return v != null && v !== "" ? Number(v) : Number(prod.price); }
+
+function receiptsOf(cid){ return S.orders.filter(o=>o.customer_id===cid && o.channel==="distributor" && o.status!=="cancelled").sort((a,b)=>new Date(a.created_at)-new Date(b.created_at)); }
+function paidOn(oid){ return S.payments.filter(p=>p.order_id===oid).reduce((a,p)=>a+Number(p.amount),0); }
+function receiptState(o){
+  const paid = paidOn(o.id), bal = Number(o.total) - paid;
+  const overdue = bal > 0.005 && o.due_date && o.due_date < today();
+  return { paid, bal, label: bal <= 0.005 ? "Paid" : overdue ? "Overdue" : paid > 0 ? "Partial" : "Unpaid", overdue };
+}
+function stockOf(cid){
+  const map = {};
+  const row = pid => map[pid] ||= { product: S.products.find(p=>p.id===pid) || { id:pid, name:pid, line:"" }, delivered:0, consumed:0, returned:0, adjust:0 };
+  for (const o of receiptsOf(cid)) for (const i of o.order_items) row(i.product_id).delivered += i.qty;
+  for (const m of S.moves.filter(m=>m.customer_id===cid)) { const r = row(m.product_id); if (m.kind==="consumed") r.consumed += m.qty; else if (m.kind==="returned") r.returned += m.qty; else r.adjust += m.qty; }
+  return Object.values(map).map(r=>({ ...r, onhand: r.delivered - r.consumed - r.returned + r.adjust })).sort((a,b)=>(a.product.sort??99)-(b.product.sort??99));
+}
+function distributorsList(){
+  return S.customers.filter(c=>c.is_distributor).map(c=>{
+    const rs = receiptsOf(c.id), billed = rs.reduce((a,o)=>a+Number(o.total),0);
+    const paid = S.payments.filter(p=>p.customer_id===c.id).reduce((a,p)=>a+Number(p.amount),0);
+    const overdue = rs.map(receiptState).filter(x=>x.overdue).reduce((a,x)=>a+x.bal,0);
+    const st = stockOf(c.id);
+    return { ...c, receipts: rs, billed, paid, balance: billed - paid, overdue, onhand: st.reduce((a,r)=>a+r.onhand,0), consumed: st.reduce((a,r)=>a+r.consumed,0),
+             last: rs.length ? rs[rs.length-1].created_at : null };
+  }).sort((a,b)=>b.balance-a.balance);
+}
+const stateTag = l => `<span class="tag st-${l.toLowerCase()}">${l}</span>`;
+
+function viewDistributors(){
+  const L = distributorsList();
+  const owed = L.reduce((a,x)=>a+Math.max(0,x.balance),0), overdue = L.reduce((a,x)=>a+x.overdue,0);
+  return `<div style="display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:12px"><h3 style="margin:0">Distributors</h3><button class="btn" data-newdist>+ Add distributor</button></div>
+    <div class="stats">
+      <div class="stat"><div class="v">${L.length}</div><div class="l">Distributors</div></div>
+      <div class="stat hl"><div class="v">${peso2(owed)}</div><div class="l">Total balance owed to you</div></div>
+      <div class="stat"><div class="v" style="${overdue?"color:var(--cancel)":""}">${peso2(overdue)}</div><div class="l">Overdue</div></div>
+      <div class="stat"><div class="v">${L.reduce((a,x)=>a+x.onhand,0)}</div><div class="l">Bottles on hand at distributors</div></div>
+    </div>
+    <div class="list">${L.map(x=>`
+      <button class="row" data-dist="${x.id}">
+        <span class="dot" style="background:${x.overdue?"var(--cancel)":x.balance>0?"var(--new)":"var(--paid)"}"></span>
+        <span><b>${esc(x.name)}</b>${x.overdue?` <span class="tag st-overdue">Overdue</span>`:""}
+          <small>${x.receipts.length} receipt${x.receipts.length===1?"":"s"} · billed ${peso2(x.billed)} · paid ${peso2(x.paid)} · ${x.onhand} on hand · ${x.consumed} consumed</small></span>
+        <span class="amt">${x.balance>0?peso2(x.balance):x.balance<0?"Credit "+peso2(-x.balance):"Settled"}<small>${x.balance>0?"balance":""}</small></span>
+      </button>`).join("") || `<p class="muted">No distributors yet. Add one, or turn an existing customer into a distributor.</p>`}</div>`;
+}
+
+function viewDistributor(){
+  const x = distributorsList().find(d=>d.id===S.dist); if (!x) return "";
+  const st = stockOf(x.id), pays = S.payments.filter(p=>p.customer_id===x.id).sort((a,b)=>b.paid_on.localeCompare(a.paid_on));
+  const moves = S.moves.filter(m=>m.customer_id===x.id);
+  const pr = x.distributor_prices || {};
+  const rno = id => S.orders.find(o=>o.id===id)?.order_no || "—";
+  return `<div class="sheet wide" data-close><div role="dialog" aria-label="Distributor ${esc(x.name)}">
+    <div style="display:flex;justify-content:space-between;align-items:start;gap:10px">
+      <div><h2>${esc(x.name)}</h2><span class="muted">${realPhone(x.phone)?esc(x.phone):"No number"}${x.address?" · "+esc(x.address):""}<br>Terms ${x.credit_days} days · Prices: ${["Elixir 40%","Parfum 20%","Savon"].filter(l=>pr[l]!=null&&pr[l]!=="").map(l=>`${l.split(" ")[0]} ${peso2(pr[l])}`).join(" · ") || "retail"}</span></div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end"><button class="btn ghost" data-editdist="${x.id}">Edit</button><button class="btn ghost" data-printstatement="${x.id}">Print statement</button><button class="btn ghost" data-distclose>Close</button></div></div>
+    <div class="stats" style="margin-top:14px">
+      <div class="stat"><div class="v">${peso2(x.billed)}</div><div class="l">Billed</div></div>
+      <div class="stat"><div class="v">${peso2(x.paid)}</div><div class="l">Paid</div></div>
+      <div class="stat hl"><div class="v">${x.balance>=0?peso2(x.balance):"Credit "+peso2(-x.balance)}</div><div class="l">${x.balance>=0?"Balance":"Overpaid, kept as credit"}</div></div>
+      <div class="stat"><div class="v" style="${x.overdue?"color:var(--cancel)":""}">${peso2(x.overdue)}</div><div class="l">Overdue</div></div>
+    </div>
+    <div class="actions"><button class="btn" data-newreceipt="${x.id}">+ New receipt</button><button class="btn" data-paydist="${x.id}">+ Record payment</button><button class="btn ghost" data-consume="${x.id}">+ Record consumption</button></div>
+
+    <h3>Receipts</h3>
+    <div class="wrap"><table><thead><tr><th>Receipt</th><th>Date</th><th>Due</th><th class="n">Total</th><th class="n">Paid</th><th class="n">Balance</th><th>Status</th><th></th></tr></thead><tbody>
+    ${x.receipts.slice().reverse().map(o=>{ const r = receiptState(o); return `<tr><td><b>${esc(o.order_no)}</b></td><td>${fmtD(o.created_at)}</td><td>${fmtD(o.due_date)}</td><td class="n">${peso2(o.total)}</td><td class="n">${peso2(r.paid)}</td><td class="n">${r.bal>0.005?peso2(r.bal):"—"}</td><td>${stateTag(r.label)}</td>
+      <td style="white-space:nowrap"><button class="linkbtn" data-printreceipt="${o.id}">Print</button> · <button class="linkbtn" data-editreceipt="${o.id}">Edit</button>${r.bal>0.005?` · <button class="linkbtn" data-paydist="${x.id}" data-payorder="${o.id}">Pay</button>`:""}</td></tr>`; }).join("") || `<tr><td colspan="8" class="muted">No receipts yet.</td></tr>`}
+    </tbody></table></div>
+
+    <h3>Payments</h3>
+    <div class="wrap"><table><thead><tr><th>Date</th><th class="n">Amount</th><th>Method</th><th>Applied to</th><th>Note</th><th></th></tr></thead><tbody>
+    ${pays.map(p=>`<tr><td>${fmtD(p.paid_on)}</td><td class="n">${peso2(p.amount)}</td><td>${esc(p.method||"—")}${p.reference?` · ${esc(p.reference)}`:""}</td><td>${p.order_id?esc(rno(p.order_id)):"Credit on account"}</td><td>${esc(p.note||"")}</td><td><button class="linkbtn" data-delpay="${p.id}">Delete</button></td></tr>`).join("") || `<tr><td colspan="6" class="muted">No payments yet.</td></tr>`}
+    </tbody></table></div>
+
+    <h3>Stock & consumption</h3>
+    <div class="wrap"><table><thead><tr><th>Product</th><th class="n">Delivered</th><th class="n">Consumed</th><th class="n">Returned</th><th class="n">On hand</th></tr></thead><tbody>
+    ${st.map(r=>`<tr><td>${esc(r.product.name)} <span class="muted">${esc((r.product.line||"").split(" ")[0])}</span></td><td class="n">${r.delivered}</td><td class="n">${r.consumed}</td><td class="n">${r.returned}</td><td class="n"><b>${r.onhand}</b>${r.adjust?` <span class="muted" style="font-size:.8rem">(adj ${r.adjust>0?"+":""}${r.adjust})</span>`:""}</td></tr>`).join("") || `<tr><td colspan="5" class="muted">Nothing delivered yet.</td></tr>`}
+    ${st.length?`<tr><td><b>Total</b></td><td class="n"><b>${st.reduce((a,r)=>a+r.delivered,0)}</b></td><td class="n"><b>${st.reduce((a,r)=>a+r.consumed,0)}</b></td><td class="n"><b>${st.reduce((a,r)=>a+r.returned,0)}</b></td><td class="n"><b>${st.reduce((a,r)=>a+r.onhand,0)}</b></td></tr>`:""}
+    </tbody></table></div>
+    ${moves.length?`<details style="margin-top:10px"><summary class="muted" style="cursor:pointer">Consumption log (${moves.length})</summary>
+      <div class="wrap" style="margin-top:8px"><table><thead><tr><th>Date</th><th>Product</th><th>Type</th><th class="n">Qty</th><th>Note</th><th></th></tr></thead><tbody>
+      ${moves.map(m=>{ const pr = S.products.find(p=>p.id===m.product_id); return `<tr><td>${fmtD(m.moved_on)}</td><td>${esc(pr?.name||m.product_id)} <span class="muted">${esc((pr?.line||"").split(" ")[0])}</span></td><td>${{consumed:"Consumed / sold",returned:"Returned to you",adjustment:"Adjustment"}[m.kind]}</td><td class="n">${m.qty}</td><td>${esc(m.note||"")}</td><td><button class="linkbtn" data-delmove="${m.id}">Delete</button></td></tr>`; }).join("")}
+      </tbody></table></div></details>`:""}
+  </div></div>`;
+}
+
+// ---------- forms: distributor / payment / consumption ----------
+function openDistForm(type, extra={}){
+  const x = extra.id ? S.customers.find(c=>c.id===extra.id) : null;
+  let draft;
+  if (type==="distributor") {
+    const pr = x?.distributor_prices || {};
+    draft = { id:x?.id||"", name:x?.name||"", phone:realPhone(x?.phone)?x.phone:"", address:x?.address||"", credit_days:x?.credit_days??30,
+              elixir:pr["Elixir 40%"]??"", parfum:pr["Parfum 20%"]??"", savon:pr["Savon"]??"", notes:x?.notes||"" };
+  } else if (type==="payment") {
+    draft = { customer_id:extra.id, amount:"", paid_on:today(), method:"GCash", reference:"", note:"", order_id:extra.order||"" };
+    if (extra.order) { const o = S.orders.find(o=>o.id===extra.order); draft.amount = Math.max(0, receiptState(o).bal).toFixed(2).replace(/\.00$/,""); }
+  } else {
+    draft = { customer_id:extra.id, moved_on:today(), kind:"consumed", note:"", lines:[{ product_id:"", qty:1 }] };
+  }
+  S.distForm = { type, draft, error:"", busy:false }; render();
+}
+function viewDistForm(){
+  const F = S.distForm, d = F.draft;
+  const inp = (k, label, extra="") => `<div class="field"><label>${label}</label><input data-df="${k}" value="${esc(d[k])}" ${extra}></div>`;
+  let title, body;
+  if (F.type==="distributor") {
+    title = d.id ? "Edit distributor" : "Add distributor";
+    const others = S.customers.filter(c=>!c.is_distributor);
+    body = `${d.id?"":`<div class="field"><label>Or make an existing customer a distributor</label><select data-df="convert"><option value="">— New person —</option>${others.map(c=>`<option value="${c.id}">${esc(c.name)}${realPhone(c.phone)?" · "+esc(c.phone):""}</option>`).join("")}</select></div>`}
+      <div class="grid2">${inp("name","Name / business name")}${inp("phone","Mobile number",'inputmode="tel" placeholder="09XXXXXXXXX"')}</div>
+      ${inp("address","Address")}
+      <h3>Distributor prices (₱ each)</h3>
+      <div class="grid2">${inp("elixir","Elixir 40% · retail ₱600",'type="number" min="0" step="1" placeholder="e.g. 450"')}${inp("parfum","Parfum 20% · retail ₱300",'type="number" min="0" step="1" placeholder="e.g. 220"')}
+      ${inp("savon","Savon bar",'type="number" min="0" step="1" placeholder="optional"')}${inp("credit_days","Payment terms (days)",'type="number" min="0" step="1"')}</div>
+      <p class="muted" style="font-size:.85rem;margin:4px 0 0">Leave a price blank to use the retail price.</p>
+      ${inp("notes","Notes")}`;
+  } else if (F.type==="payment") {
+    const x = distributorsList().find(z=>z.id===d.customer_id);
+    const open = x.receipts.filter(o=>receiptState(o).bal>0.005);
+    title = "Record payment";
+    body = `<p class="muted">${esc(x.name)} · balance ${peso2(Math.max(0,x.balance))}</p>
+      <div class="grid2">${inp("amount","Amount received (₱)",'type="number" min="0" step="0.01" inputmode="decimal"')}${inp("paid_on","Date received",'type="date"')}
+      <div class="field"><label>Method</label><select data-df="method">${["GCash","QR Ph","Maya","Bank transfer","Cash","Other"].map(m=>`<option ${m===d.method?"selected":""}>${m}</option>`).join("")}</select></div>
+      ${inp("reference","Reference no. (optional)")}</div>
+      <div class="field"><label>Apply to</label><select data-df="order_id"><option value="">Oldest unpaid receipts first (automatic)</option>${open.map(o=>`<option value="${o.id}" ${o.id===d.order_id?"selected":""}>${esc(o.order_no)} · balance ${peso2(receiptState(o).bal)}</option>`).join("")}</select></div>
+      ${inp("note","Note (optional)")}
+      <p class="muted" style="font-size:.85rem">Partial payments are fine. Anything above what's owed is kept as credit.</p>`;
+  } else {
+    const x = S.customers.find(z=>z.id===d.customer_id), st = stockOf(d.customer_id);
+    title = "Record consumption";
+    const prodOpts = sel => `<option value="">Choose product…</option>` + (st.length ? st.map(r=>r.product) : S.products).map(p=>`<option value="${p.id}" ${p.id===sel?"selected":""}>${esc(p.name)} · ${esc((p.line||"").split(" ")[0])}${st.length?` — ${st.find(r=>r.product.id===p.id)?.onhand ?? 0} on hand`:""}</option>`).join("");
+    body = `<p class="muted">${esc(x.name)} · what they've sold or used, or returned to you</p>
+      <div class="grid2"><div class="field"><label>Type</label><select data-df="kind">${[["consumed","Consumed / sold"],["returned","Returned to you"],["adjustment","Stock count adjustment (+/−)"]].map(([v,l])=>`<option value="${v}" ${v===d.kind?"selected":""}>${l}</option>`).join("")}</select></div>${inp("moved_on","Date",'type="date"')}</div>
+      <div class="items-edit" style="margin-top:10px"><div class="item-head muted" style="grid-template-columns:1fr 80px 40px"><span>Product</span><span>Qty</span><span></span></div>
+      ${d.lines.map((l,k)=>`<div class="item-row" style="grid-template-columns:1fr 80px 40px"><select data-ml="${k}" data-mk="product_id">${prodOpts(l.product_id)}</select><input data-ml="${k}" data-mk="qty" type="number" step="1" value="${l.qty}"><button class="btn ghost" data-delmoveline="${k}" aria-label="Remove line">×</button></div>`).join("")}</div>
+      <button class="btn ghost" data-addmoveline>+ Add product</button>
+      ${inp("note","Note (optional)")}`;
+  }
+  return `<div class="sheet" data-close><div role="dialog" aria-label="${title}">
+    <div style="display:flex;justify-content:space-between;align-items:start"><h2>${title}</h2><button class="btn ghost" data-canceldistform>Close</button></div>
+    ${body}
+    <p class="err">${esc(F.error||"")}</p>
+    <div class="actions"><button class="btn" data-savedistform ${F.busy?"disabled":""}>${F.busy?"Saving…":"Save"}</button><button class="btn ghost" data-canceldistform>Cancel</button></div>
+  </div></div>`;
+}
+async function saveDistForm(){
+  const F = S.distForm, d = F.draft; F.error = ""; let res;
+  F.busy = true; render();
+  if (F.type==="distributor") {
+    const prices = {}; if (d.elixir!=="") prices["Elixir 40%"]=Number(d.elixir); if (d.parfum!=="") prices["Parfum 20%"]=Number(d.parfum); if (d.savon!=="") prices["Savon"]=Number(d.savon);
+    res = await db.rpc("admin_save_distributor", { p: { id:d.id||null, name:d.name, phone:d.phone, address:d.address, credit_days:d.credit_days, prices, notes:d.notes } });
+    if (!res.error) { await load(); S.distForm = null; S.dist = res.data; render(); return toast("Distributor saved"); }
+  } else if (F.type==="payment") {
+    res = await db.rpc("admin_record_payment", { p_customer_id:d.customer_id, p_amount:Number(d.amount), p_paid_on:d.paid_on||null, p_method:d.method, p_reference:d.reference||null, p_note:d.note||null, p_order_id:d.order_id||null });
+    if (!res.error) { await load(); S.distForm = null; render(); return toast(`Payment of ${peso2(d.amount)} recorded`); }
+  } else {
+    const rows = d.lines.filter(l=>l.product_id && Number(l.qty)).map(l=>({ customer_id:d.customer_id, product_id:l.product_id, kind:d.kind, qty:Math.round(Number(l.qty)), moved_on:d.moved_on||today(), note:d.note||null }));
+    if (!rows.length) res = { error:{ message:"Add at least one product with a quantity." } };
+    else if (d.kind!=="adjustment" && rows.some(r=>r.qty<0)) res = { error:{ message:"Use positive quantities. For corrections, choose Stock count adjustment." } };
+    else res = await db.from("stock_moves").insert(rows);
+    if (!res.error) { await load(); S.distForm = null; render(); return toast("Consumption recorded"); }
+  }
+  F.busy = false; F.error = res.error.message; render();
+}
+function openReceiptEditor(distId, orderId){
+  const x = S.customers.find(c=>c.id===distId);
+  if (orderId) { openEditor(orderId); const o = S.orders.find(z=>z.id===orderId); S.edit.draft.date = ymd(o.created_at); S.edit.draft.due_date = o.due_date||""; }
+  else { openEditor(null); Object.assign(S.edit.draft, { channel:"distributor", status:"completed", delivery:"pickup", shipping_fee:0, shipAuto:false, date:today(), due_date:"" }); }
+  S.edit.receipt = x; render();
+}
+
+// ---------- printing ----------
+function printDoc(title, inner){
+  const w = window.open("", "_blank"); if (!w) return toast("Allow pop-ups to print");
+  w.document.write(`<!doctype html><html><head><meta charset="utf-8"><title>${esc(title)}</title>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif:wght@600;700&family=Noto+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    *{box-sizing:border-box} body{margin:0;background:#eee;font:13px/1.5 "Noto Sans",Arial,sans-serif;color:#17140f}
+    .page{width:210mm;min-height:297mm;margin:12px auto;padding:16mm 16mm 14mm;background:#fff}
+    .top{display:flex;justify-content:space-between;align-items:flex-start;gap:20px;padding-bottom:12px;border-bottom:3px solid #c9a24a}
+    .brand{display:flex;gap:12px;align-items:center}.brand img{width:62px;height:62px;object-fit:contain;background:#0b0a08;border-radius:8px;padding:4px}
+    .brand b{display:block;font:700 17px "Noto Serif",Georgia,serif}.brand span{display:block;color:#6a6153;font-size:11.5px}
+    h1{margin:0;font:700 22px "Noto Serif",Georgia,serif;text-align:right}.meta{text-align:right;color:#6a6153;font-size:12px}.meta b{color:#17140f}
+    .two{display:flex;justify-content:space-between;gap:20px;margin:16px 0}.box h4{margin:0 0 4px;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:#94722c}
+    table{width:100%;border-collapse:collapse;margin-top:6px}th{background:#0b0a08;color:#ecd9a8;font-weight:600;text-align:left;padding:7px 8px;font-size:12px}
+    td{padding:7px 8px;border-bottom:1px solid #e6dcc6}.n{text-align:right;white-space:nowrap}
+    .tot{width:300px;margin:10px 0 0 auto}.tot td{border:0;padding:4px 8px}.tot .big td{border-top:2px solid #17140f;font-weight:700;font-size:15px}
+    .bal td{background:#fbf5e7;font-weight:700;font-size:15px;color:#94722c}
+    .note{margin-top:18px;padding:10px 12px;border:1px solid #e6dcc6;border-radius:8px;background:#fffdf8;font-size:12px}
+    .sign{display:flex;gap:40px;margin-top:44px}.sign div{flex:1;border-top:1px solid #17140f;padding-top:4px;text-align:center;font-size:11.5px;color:#6a6153}
+    .foot{margin-top:24px;text-align:center;color:#94722c;font:600 12px "Noto Serif",Georgia,serif}
+    .bar{position:sticky;top:0;background:#17140f;padding:8px;text-align:center}.bar button{font:600 14px "Noto Sans",sans-serif;padding:8px 18px;border:0;border-radius:999px;background:#c9a24a;cursor:pointer}
+    @media print{body{background:#fff}.page{margin:0;width:auto;min-height:0;padding:10mm}.bar{display:none}@page{size:A4;margin:8mm}}
+  </style></head><body><div class="bar"><button onclick="print()">Print / Save as PDF</button></div><div class="page">${inner}</div></body></html>`);
+  w.document.close();
+}
+const shopHead = (title, meta) => `<div class="top"><div class="brand"><img src="${location.origin}/assets/brand/logo.png" alt=""><div><b>${SHOP.name}</b><span>${SHOP.addr.join("<br>")}</span><span>${SHOP.phone} · ${SHOP.email}</span></div></div><div><h1>${title}</h1><div class="meta">${meta}</div></div></div>`;
+function printReceipt(id){
+  const o = S.orders.find(z=>z.id===id), c = S.customers.find(z=>z.id===o.customer_id) || o.customers, r = receiptState(o);
+  const pays = S.payments.filter(p=>p.order_id===id).sort((a,b)=>a.paid_on.localeCompare(b.paid_on));
+  const inner = shopHead(o.channel==="distributor" ? "Delivery Receipt" : "Receipt", `No. <b>${esc(o.order_no)}</b><br>Date: <b>${fmtD(o.created_at)}</b>${o.due_date?`<br>Due: <b>${fmtD(o.due_date)}</b>`:""}`) + `
+    <div class="two"><div class="box"><h4>Bill to</h4><b>${esc(c?.name)}</b><br>${realPhone(c?.phone)?esc(c.phone)+"<br>":""}${esc(o.address||c?.address||"")}</div>
+      <div class="box" style="text-align:right"><h4>Status</h4><b>${r.label}</b>${c?.credit_days!=null && o.channel==="distributor"?`<br>Terms: ${c.credit_days} days`:""}</div></div>
+    <table><thead><tr><th>#</th><th>Item</th><th class="n">Qty</th><th class="n">Unit price</th><th class="n">Amount</th></tr></thead><tbody>
+      ${o.order_items.map((i,k)=>`<tr><td>${k+1}</td><td>${esc(i.name)} · ${esc(i.line)}${/Elixir|Parfum/.test(i.line)?" · 50 ml":""}</td><td class="n">${i.qty}</td><td class="n">${peso2(i.unit_price)}</td><td class="n">${peso2(i.qty*i.unit_price)}</td></tr>`).join("")}
+    </tbody></table>
+    <table class="tot"><tr><td>Subtotal</td><td class="n">${peso2(o.subtotal)}</td></tr>
+      ${Number(o.shipping_fee)?`<tr><td>Delivery fee</td><td class="n">${peso2(o.shipping_fee)}</td></tr>`:""}
+      ${Number(o.discount)?`<tr><td>Discount</td><td class="n">− ${peso2(o.discount)}</td></tr>`:""}
+      <tr class="big"><td>Total</td><td class="n">${peso2(o.total)}</td></tr>
+      ${pays.map(p=>`<tr><td>Paid ${fmtD(p.paid_on)}${p.method?` · ${esc(p.method)}`:""}</td><td class="n">− ${peso2(p.amount)}</td></tr>`).join("")}
+      <tr class="bal"><td>Balance due</td><td class="n">${peso2(Math.max(0,r.bal))}</td></tr></table>
+    <div class="note"><b>Payment:</b> ${SHOP.pay}. Please send a screenshot after paying.${o.admin_note && o.channel!=="distributor" ? "" : ""}</div>
+    <div class="sign"><div>Received by (name, signature, date)</div><div>Released by · Pappi Suds &amp; Scents</div></div>
+    <div class="foot">Salamat! Your ritual, bottled.</div>`;
+  printDoc(o.order_no, inner);
+}
+function printStatement(cid){
+  const x = distributorsList().find(d=>d.id===cid);
+  const ev = [...x.receipts.map(o=>({ d:ymd(o.created_at), t:"r", o })), ...S.payments.filter(p=>p.customer_id===cid).map(p=>({ d:p.paid_on, t:"p", p }))].sort((a,b)=>a.d.localeCompare(b.d) || (a.t==="r"?-1:1));
+  let run = 0; const rf = v => v < -0.005 ? `Credit ${peso2(-v)}` : peso2(Math.max(0,v));
+  const rows = ev.map(e=>{ if (e.t==="r"){ run += Number(e.o.total); return `<tr><td>${fmtD(e.d)}</td><td>Receipt ${esc(e.o.order_no)}${e.o.due_date?` · due ${fmtD(e.o.due_date)}`:""}</td><td class="n">${peso2(e.o.total)}</td><td class="n"></td><td class="n">${rf(run)}</td></tr>`; }
+    run -= Number(e.p.amount); const rn = e.p.order_id ? (S.orders.find(o=>o.id===e.p.order_id)?.order_no||"") : "credit";
+    return `<tr><td>${fmtD(e.d)}</td><td>Payment${e.p.method?` · ${esc(e.p.method)}`:""}${e.p.reference?` · ${esc(e.p.reference)}`:""} <span style="color:#6a6153">(${esc(rn)})</span></td><td class="n"></td><td class="n">${peso2(e.p.amount)}</td><td class="n">${rf(run)}</td></tr>`; }).join("");
+  const st = stockOf(cid);
+  const inner = shopHead("Statement of Account", `As of <b>${fmtD(today())}</b>`) + `
+    <div class="two"><div class="box"><h4>Distributor</h4><b>${esc(x.name)}</b><br>${realPhone(x.phone)?esc(x.phone)+"<br>":""}${esc(x.address||"")}</div>
+      <div class="box" style="text-align:right"><h4>Balance</h4><b style="font-size:18px;color:#94722c">${x.balance>=0?peso2(x.balance):"Credit "+peso2(-x.balance)}</b>${x.overdue?`<br><span style="color:#b3261e">Overdue ${peso2(x.overdue)}</span>`:""}</div></div>
+    <table><thead><tr><th>Date</th><th>Details</th><th class="n">Charges</th><th class="n">Payments</th><th class="n">Balance</th></tr></thead><tbody>${rows || `<tr><td colspan="5">No activity yet.</td></tr>`}</tbody></table>
+    <table class="tot"><tr><td>Total billed</td><td class="n">${peso2(x.billed)}</td></tr><tr><td>Total paid</td><td class="n">− ${peso2(x.paid)}</td></tr><tr class="bal"><td>${x.balance>=0?"Balance due":"Credit"}</td><td class="n">${peso2(Math.abs(x.balance))}</td></tr></table>
+    ${st.length?`<h4 style="margin:22px 0 4px;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:#94722c">Stock summary</h4>
+    <table><thead><tr><th>Product</th><th class="n">Delivered</th><th class="n">Consumed</th><th class="n">Returned</th><th class="n">On hand</th></tr></thead><tbody>
+    ${st.map(r=>`<tr><td>${esc(r.product.name)} · ${esc(r.product.line||"")}</td><td class="n">${r.delivered}</td><td class="n">${r.consumed}</td><td class="n">${r.returned}</td><td class="n"><b>${r.onhand}</b></td></tr>`).join("")}</tbody></table>`:""}
+    <div class="note"><b>Payment:</b> ${SHOP.pay}.</div>
+    <div class="foot">Thank you for growing Pappi with us.</div>`;
+  printDoc(`Statement ${x.name}`, inner);
 }
 
 // ---------------- Actions ----------------
@@ -445,11 +708,27 @@ async function updateOrder(id, patch, msg){
 }
 
 app.addEventListener("click", async e => {
-  if (e.target.matches(".sheet[data-close]")) { if (S.edit) return; S.open=null; return render(); }
+  if (e.target.matches(".sheet[data-close]")) { if (S.edit || S.distForm) return; if (S.dist) { S.dist=null; return render(); } S.open=null; return render(); }
   const b = e.target.closest("button"); if(!b) return;
   const d = b.dataset;
-  if (d.tab){ S.tab=d.tab; S.open=null; S.edit=null; render(); }
+  if (d.tab){ S.tab=d.tab; S.open=null; S.edit=null; S.dist=null; S.distForm=null; render(); }
   else if ("neworder" in d){ S.open=null; openEditor(null); }
+  else if (d.dist){ S.open=null; S.dist=d.dist; render(); }
+  else if ("distclose" in d){ S.dist=null; render(); }
+  else if ("newdist" in d){ openDistForm("distributor"); }
+  else if (d.editdist){ openDistForm("distributor", { id:d.editdist }); }
+  else if (d.paydist){ openDistForm("payment", { id:d.paydist, order:d.payorder||"" }); }
+  else if (d.consume){ openDistForm("consumption", { id:d.consume }); }
+  else if ("canceldistform" in d){ S.distForm=null; render(); }
+  else if ("savedistform" in d){ saveDistForm(); }
+  else if ("addmoveline" in d){ S.distForm.draft.lines.push({ product_id:"", qty:1 }); render(); }
+  else if (d.delmoveline){ S.distForm.draft.lines.splice(Number(d.delmoveline),1); if(!S.distForm.draft.lines.length) S.distForm.draft.lines.push({ product_id:"", qty:1 }); render(); }
+  else if (d.newreceipt){ openReceiptEditor(d.newreceipt, null); }
+  else if (d.editreceipt){ const o = S.orders.find(z=>z.id===d.editreceipt); openReceiptEditor(o.customer_id, o.id); }
+  else if (d.printreceipt){ printReceipt(d.printreceipt); }
+  else if (d.printstatement){ printStatement(d.printstatement); }
+  else if (d.delpay){ if (!confirm("Delete this payment? The balance will go back up.")) return; const { error } = await db.from("payments").delete().eq("id", d.delpay); if (error) return toast("Didn't delete: "+error.message); await load(); render(); toast("Payment deleted"); }
+  else if (d.delmove){ if (!confirm("Delete this entry?")) return; const { error } = await db.from("stock_moves").delete().eq("id", d.delmove); if (error) return toast("Didn't delete: "+error.message); await load(); render(); toast("Entry deleted"); }
   else if (d.editorder){ openEditor(d.editorder); }
   else if ("canceledit" in d){ S.edit=null; render(); }
   else if ("additem" in d){ S.edit.draft.items.push({ product_id:"", qty:1, unit_price:0 }); render(); }
@@ -493,6 +772,8 @@ app.addEventListener("click", async e => {
 });
 app.addEventListener("input", e => {
   const t = e.target;
+  if (S.distForm && t.dataset.df && t.dataset.df!=="convert") { S.distForm.draft[t.dataset.df] = t.value; return; }
+  if (S.distForm && t.dataset.ml) { const l = S.distForm.draft.lines[Number(t.dataset.ml)]; l[t.dataset.mk] = t.dataset.mk==="qty" ? t.value : t.value; return; }
   if (S.edit && t.dataset.f) {
     const d = S.edit.draft, k = t.dataset.f;
     if (k.startsWith("a.")) d.address_parts[k.slice(2)] = t.value;
@@ -511,9 +792,15 @@ app.addEventListener("input", e => {
 });
 app.addEventListener("change", e => {
   const t = e.target;
+  if (S.distForm && t.dataset.df === "convert") {
+    const c = S.customers.find(z=>z.id===t.value), d = S.distForm.draft;
+    if (c) Object.assign(d, { id:c.id, name:c.name, phone:realPhone(c.phone)?c.phone:"", address:c.address||"" }); else Object.assign(d, { id:"", name:"", phone:"", address:"" });
+    render(); return;
+  }
+  if (S.distForm && (t.dataset.df || t.dataset.ml)) { if (t.dataset.df) S.distForm.draft[t.dataset.df] = t.value; else S.distForm.draft.lines[Number(t.dataset.ml)][t.dataset.mk] = t.value; return; }
   if (S.edit && t.dataset.item && t.dataset.k === "product_id") {
     const it = S.edit.draft.items[Number(t.dataset.item)], p = S.products.find(x=>x.id===t.value);
-    it.product_id = t.value; if (p) it.unit_price = Number(p.price); syncShip(S.edit.draft); render();
+    it.product_id = t.value; if (p) it.unit_price = S.edit.receipt ? distPrice(S.edit.receipt, p) : Number(p.price); syncShip(S.edit.draft); render();
   } else if (S.edit && (t.dataset.f === "delivery" || t.dataset.f === "status" || t.dataset.f === "payment_method" || t.dataset.f === "channel")) {
     S.edit.draft[t.dataset.f] = t.value; syncShip(S.edit.draft); refreshTotals();
   }
