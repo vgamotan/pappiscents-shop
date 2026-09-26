@@ -719,7 +719,7 @@
 </head>
 <body>
 <div class="site">
-  <div class="announcement">Free shipping on orders over ₱1,500 · Flat ₱80 nationwide</div>
+  <div class="announcement">Free shipping on orders over <span data-free-over>₱1,500</span> · Flat <span data-ship-fee>₱80</span> nationwide</div>
   <nav aria-label="Main navigation">
     <div class="wrap nav-inner">
       <a class="brand" href="#top" aria-label="Pappi Suds and Scents Shop home"><img src="assets/brand/logo.png" width="500" height="500" alt="Pappi Parfum logo" decoding="async"><span class="brand-name">Pappi Suds &amp; Scents Shop</span></a>
@@ -886,7 +886,7 @@
     <section class="order" id="contact">
       <div class="wrap order-grid">
         <div id="delivery"><p class="eyebrow">Delivery &amp; contact</p><h2>Questions? Message us.</h2><p class="lede">Ask about scents, gifting, bulk or reseller orders. We reply as soon as we can.</p>
-          <div class="delivery-card"><div class="delivery-row"><span class="delivery-icon">PH</span><div><b>Flat ₱80 shipping nationwide</b><p>Free on orders over ₱1,500. We aim to ship the next day, arriving in about 3–5 days.</p></div></div><div class="delivery-row"><span class="delivery-icon">CEB</span><div><b>Cebu City express delivery</b><p>We can book Maxim, Grab or Angkas so your Pappi order can reach you in around 1–2 hours, subject to rider availability.</p></div></div><div class="delivery-row"><span class="delivery-icon">✓</span><div><b>Easy payment</b><p>Check out from your bag, then pay by QR Ph with any bank or e-wallet, or GCash. We text you at every step.</p></div></div></div>
+          <div class="delivery-card"><div class="delivery-row"><span class="delivery-icon">PH</span><div><b>Flat <span data-ship-fee>₱80</span> shipping nationwide</b><p>Free on orders over <span data-free-over>₱1,500</span>. We aim to ship the next day, arriving in about 3–5 days.</p></div></div><div class="delivery-row"><span class="delivery-icon">CEB</span><div><b>Cebu City express delivery</b><p>We can book Maxim, Grab or Angkas so your Pappi order can reach you in around 1–2 hours, subject to rider availability.</p></div></div><div class="delivery-row"><span class="delivery-icon">✓</span><div><b>Easy payment</b><p>Check out from your bag, then pay by QR Ph with any bank or e-wallet, or GCash. We text you at every step.</p></div></div></div>
           <div class="contact-links" aria-label="Contact Pappi Suds and Scents Shop">
             <a class="contact-link" href="tel:+639055613013">Call or text <span>+63 905 561 3013 →</span></a>
             <a class="contact-link" href="mailto:verge.gamotan@gmail.com">Email us <span>verge.gamotan@gmail.com →</span></a>
@@ -1214,19 +1214,33 @@
     if (e.target.id === "bag-file" && e.target.files[0]) { S.file = e.target.files[0]; S.preview = URL.createObjectURL(S.file); S.error = ""; render(); }
   });
 
+  // ---------- prices & shipping from the dashboard ----------
+  async function loadCatalog() {
+    const [pr, st] = await Promise.all([
+      db.from("products").select("id,line,name,price").eq("active", true).order("sort"),
+      db.from("shop_settings").select("shipping_fee,free_shipping_over").eq("id", 1).maybeSingle(),
+    ]);
+    if (st.data) { CFG.SHIPPING_FEE = Number(st.data.shipping_fee); CFG.FREE_SHIPPING_OVER = Number(st.data.free_shipping_over); }
+    document.querySelectorAll("[data-ship-fee]").forEach(el => el.textContent = peso(CFG.SHIPPING_FEE));
+    document.querySelectorAll("[data-free-over]").forEach(el => el.textContent = peso(CFG.FREE_SHIPPING_OVER));
+    if (!pr.error && pr.data) { S.products = {}; pr.data.forEach(p => S.products[p.id] = { ...p, price: Number(p.price) }); }
+    document.querySelectorAll("[data-add]").forEach(b => {
+      const p = S.products[b.dataset.add];
+      b.querySelectorAll("[data-price]").forEach(el => el.textContent = p ? peso(p.price) : (pr.error ? "Offline" : "Coming soon"));
+      b.disabled = !p;
+      if (p) b.setAttribute("aria-label", `Add ${p.name} ${p.line}, ${p.price} pesos, to bag`);
+    });
+    render();
+  }
+
   // ---------- start ----------
   (async () => {
     render();
-    const { data, error } = await db.from("products").select("id,line,name,price").eq("active", true).order("sort");
-    if (!error && data) data.forEach(p => S.products[p.id] = { ...p, price: Number(p.price) });
-
-    // Show real prices on card buttons; disable anything not on sale yet
-    document.querySelectorAll("[data-add]").forEach(b => {
-      const p = S.products[b.dataset.add];
-      const price = b.querySelector("[data-price]");
-      if (p) { if (price) price.textContent = peso(p.price); }
-      else { b.disabled = true; if (price) price.textContent = error ? "Offline" : "Coming soon"; }
-    });
+    await loadCatalog();
+    db.channel("catalog")
+      .on("postgres_changes", { event: "*", schema: "public", table: "products" }, () => loadCatalog())
+      .on("postgres_changes", { event: "*", schema: "public", table: "shop_settings" }, () => loadCatalog())
+      .subscribe();
     // Drop bag items that are no longer sold
     Object.keys(S.cart).forEach(id => { if (!S.products[id]) delete S.cart[id]; }); saveCart();
 
