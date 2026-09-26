@@ -362,78 +362,178 @@
       footer { padding-bottom: 120px; }
     }
     @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } * { transition: none !important; } }
-  /* ---- Pappi order widget ---- */
-  .mobile-order.is-hidden{opacity:0;pointer-events:none;transform:translateY(20px)}
 
-  .pw{--pw-bg:#fff;--pw-panel:#fdfbf6;--pw-line:rgba(17,16,14,.15);--pw-gold:#c89b3c;--pw-gold-hi:#8b651b;--pw-text:#11100e;--pw-mute:#6f6a61;--pw-err:#b3261e;
-      font-family:inherit;color:var(--pw-text);background:var(--pw-bg);border:1px solid var(--pw-line);border-radius:24px;padding:clamp(20px,4vw,36px);max-width:none;margin:0;box-shadow:var(--shadow);box-sizing:border-box}
-  .pw *{box-sizing:border-box}
-  .pw h3{font-family:var(--serif);font-size:2rem;margin:0 0 6px;font-weight:400}
-  .pw p{margin:0;color:var(--pw-mute);line-height:1.55}
-  .pw .pw-steps{display:flex;gap:6px;margin:0 0 22px}
-  .pw .pw-steps span{flex:1;height:3px;border-radius:3px;background:var(--pw-line)}
-  .pw .pw-steps span.on{background:var(--pw-gold)}
-  .pw .pw-seg{display:inline-flex;border:1px solid var(--pw-line);border-radius:999px;padding:3px;margin:18px 0 14px}
-  .pw .pw-seg button{border:0;background:none;color:var(--pw-mute);padding:8px 16px;border-radius:999px;font:inherit;cursor:pointer}
-  .pw .pw-seg button[aria-pressed="true"]{background:var(--pw-gold);color:#1a1409;font-weight:600}
-  .pw .pw-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:10px}
-  .pw .pw-item{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:12px 14px;border:1px solid var(--pw-line);border-radius:12px;background:var(--pw-panel)}
-  .pw .pw-item.has{border-color:var(--pw-gold)}
-  .pw .pw-item b{display:block;font-weight:600}
-  .pw .pw-item small{color:var(--pw-mute)}
-  .pw .pw-qty{display:flex;align-items:center;gap:8px}
-  .pw .pw-qty button{width:32px;height:32px;border-radius:50%;border:1px solid var(--pw-line);background:transparent;color:var(--pw-text);font-size:1.1rem;cursor:pointer;line-height:1}
-  .pw .pw-qty button:hover{border-color:var(--pw-gold)}
-  .pw .pw-qty output{min-width:1ch;text-align:center}
-  .pw .pw-group{margin-top:22px;color:var(--pw-mute);font-size:.95rem}
-  .pw label{display:block;margin:14px 0 6px;font-size:.95rem}
-  .pw input,.pw textarea,.pw select{width:100%;padding:12px 14px;border-radius:10px;border:1px solid var(--pw-line);background:var(--pw-panel);color:var(--pw-text);font:inherit}
-  .pw textarea{min-height:84px;resize:vertical}
-  .pw input:focus,.pw textarea:focus,.pw button:focus-visible{outline:2px solid var(--pw-gold);outline-offset:2px}
-  .pw .pw-radio{display:grid;gap:8px}
-  .pw .pw-radio label{display:flex;gap:10px;align-items:flex-start;margin:0;padding:12px 14px;border:1px solid var(--pw-line);border-radius:10px;background:var(--pw-panel);cursor:pointer}
-  .pw .pw-radio input{width:auto;margin-top:4px;accent-color:var(--pw-gold)}
-  .pw .pw-radio label:has(input:checked){border-color:var(--pw-gold)}
-  .pw .pw-radio small{display:block;color:var(--pw-mute)}
-  .pw .pw-bar{position:sticky;bottom:0;display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:22px;padding-top:16px;border-top:1px solid var(--pw-line);background:var(--pw-bg)}
-  .pw .pw-total{font-size:1.15rem}
-  .pw .pw-total small{display:block;color:var(--pw-mute);font-size:.8rem}
-  .pw .pw-btn{border:0;border-radius:999px;padding:13px 24px;background:var(--pw-gold);color:#1a1409;font:inherit;font-weight:700;cursor:pointer}
-  .pw .pw-btn:hover{filter:brightness(1.08)}
-  .pw .pw-btn[disabled]{opacity:.45;cursor:not-allowed}
-  .pw .pw-link{background:none;border:0;color:var(--pw-mute);font:inherit;cursor:pointer;text-decoration:underline;padding:0}
-  .pw .pw-methods{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:8px;margin-top:14px}
-  .pw .pw-methods button{padding:12px;border-radius:10px;border:1px solid var(--pw-line);background:var(--pw-panel);color:var(--pw-text);font:inherit;cursor:pointer}
-  .pw .pw-methods button[aria-pressed="true"]{border-color:var(--pw-gold);color:var(--pw-gold-hi)}
-  .pw .pw-qr{display:grid;grid-template-columns:minmax(0,220px) 1fr;gap:20px;align-items:center;margin-top:18px;padding:16px;border:1px solid var(--pw-line);border-radius:14px;background:var(--pw-panel)}
-  .pw .pw-qr img{width:100%;border-radius:10px;background:#fff}
-  .pw .pw-noqr{grid-template-columns:1fr}
-  .pw .pw-num{font-size:1.8rem;font-weight:700;letter-spacing:.04em;color:var(--pw-text)}
-  .pw .pw-amount{font-size:2rem;font-weight:700;color:var(--pw-gold-hi);margin:4px 0}
-  .pw .pw-drop{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;min-height:120px;margin-top:8px;border:1.5px dashed var(--pw-line);border-radius:12px;cursor:pointer;text-align:center;padding:16px}
-  .pw .pw-drop.ok{border-color:var(--pw-gold);border-style:solid}
-  .pw .pw-drop img{max-height:160px;border-radius:8px}
-  .pw .pw-err{color:var(--pw-err);margin-top:12px;min-height:1.2em}
-  .pw .pw-summary{margin:14px 0 0;padding:0;list-style:none;border-top:1px solid var(--pw-line)}
-  .pw .pw-summary li{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--pw-line)}
-  .pw .pw-done{text-align:center;padding:12px 0}
-  .pw .pw-done .pw-no{font-size:2.2rem;font-weight:700;color:var(--pw-gold-hi);margin:10px 0}
-  @media (max-width:560px){.pw .pw-qr{grid-template-columns:1fr}.pw .pw-qr img{max-width:260px;margin:0 auto;display:block}}
-  @media (prefers-reduced-motion:no-preference){.pw .pw-view{animation:pw-in .25s ease-out}@keyframes pw-in{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}}
-  .pw label{font-size:.85rem;letter-spacing:.02em}
-  .pw .pw-radio label{font-size:.92rem;font-weight:500;letter-spacing:0}
-  .pw .pw-radio input{min-height:0;height:auto}
-  .pw input,.pw textarea{min-height:48px}
-  .pw .pw-qty button,.pw .pw-seg button,.pw .pw-methods button{min-height:0}
-  .pw .pw-qr img{border:1px solid var(--pw-line)}
+    /* =================== Boxed layout =================== */
+    body { background: #ebe4d6; }
+    .site { position: relative; max-width: 1120px; margin: 16px auto; overflow: hidden; border-radius: 28px; background: var(--paper); box-shadow: 0 30px 80px rgba(40,30,12,.10); }
+    .wrap { width: min(100% - 56px, 980px); }
+    section { padding: 76px 0; scroll-margin-top: 16px; }
+    h2 { font-size: clamp(2rem, 3.4vw, 3.1rem); margin-bottom: 14px; }
+    .lede { font-size: 1rem; }
+    .button { min-height: 46px; padding: 0 20px; font-size: .88rem; }
+    .announcement { font-size: .7rem; padding: 8px 16px; }
+    .nav-inner { height: 72px; }
+    .brand img { width: 52px; height: 52px; }
+    .nav-links { gap: 22px; }
+    .nav-links .button { min-height: 38px; padding-inline: 16px; }
+    .hero, .hero-inner { min-height: 600px; }
+    .hero-inner { padding-top: 72px; }
+    .hero-copy { padding: 56px 0; }
+    .hero h1 { font-size: clamp(3.2rem, 6vw, 5.4rem); }
+    .hero-copy > p:not(.eyebrow) { font-size: 1rem; }
+    .hero::after { top: 110px; right: -120px; width: 480px; height: 480px; }
+    .hero-bottle-1 { height: min(80%, 480px); }
+    .hero-bottle-2 { height: min(62%, 380px); }
+    .microproof { margin-top: 30px; }
+    .trust-item { padding: 18px 22px; }
+    .trust-item strong { font-size: 1.1rem; }
+    .section-head { margin-bottom: 38px; gap: 36px; }
+    .formats { gap: 14px; margin-bottom: 32px; }
+    .format { min-height: 170px; grid-template-columns: 130px 1fr auto; gap: 18px; }
+    .format-image { height: 160px; }
+    .format h3 { font-size: 1.4rem; }
+    .scent-grid, .soap-grid { gap: 14px; }
+    .product-image { height: 250px; }
+    .product-body { padding: 16px 18px 18px; }
+    .product-body h3 { font-size: 1.3rem; margin-bottom: 4px; }
+    .product-body p { min-height: 40px; margin-bottom: 14px; font-size: .82rem; }
+    .soap-card .product-image { height: 270px; padding: 20px 20px 0; }
+    .savon-gallery { gap: 14px; margin-bottom: 36px; }
+    .savon-gallery-secondary { gap: 14px; }
+    .savon-gallery-tile img { height: 300px; }
+    .campaign { padding: 64px 0; }
+    .campaign-head { margin-bottom: 32px; }
+    .channel { min-height: 230px; padding: 26px; }
+    .channel h3 { font-size: 1.6rem; }
+    .about-grid { gap: 48px; }
+    .about-visual { min-height: 480px; }
+    .about-timeline { margin-top: 56px; padding-top: 48px; }
+    .memory { padding: 68px 0; }
+    .memory blockquote { font-size: clamp(2rem, 4.4vw, 3.8rem); }
+    .testimonial { min-height: 230px; padding: 22px; }
+    .testimonial blockquote { font-size: 1.15rem; margin-bottom: 20px; }
+    .order-grid { gap: 52px; }
+    form { padding: 28px; }
+    .form-title { font-size: 1.7rem; margin-bottom: 18px; }
+    .promise { padding: 56px 0; }
+    .promise blockquote { font-size: clamp(1.7rem, 3vw, 2.8rem); }
+    footer { padding: 40px 0 44px; }
+
+    /* Add-to-bag buttons on cards */
+    .add-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+    .add { display: flex; min-height: 40px; flex-direction: column; align-items: center; justify-content: center; padding: 6px 8px; border: 1px solid var(--black); border-radius: 12px; background: var(--black); color: white; font-size: .76rem; font-weight: 700; line-height: 1.2; cursor: pointer; transition: transform .15s, background .15s; }
+    .add small { font-weight: 500; opacity: .75; font-size: .7rem; }
+    .add:hover { transform: translateY(-1px); background: #29251f; }
+    .add--light { background: white; color: var(--ink); border-color: var(--line); }
+    .add--light:hover { background: var(--cream); }
+    .add.is-added { background: var(--gold); border-color: var(--gold); color: var(--black); }
+    .add[disabled] { opacity: .5; cursor: not-allowed; transform: none; }
+    .soap-card .add { background: var(--gold); border-color: var(--gold); color: var(--black); width: 100%; }
+    .soap-card .add[disabled] { background: transparent; border-color: rgba(255,255,255,.25); color: #bcb5ab; }
+
+    /* =================== The bag =================== */
+    .bag { position: fixed; z-index: 40; top: 16px; right: 16px; bottom: 16px; display: flex; width: 330px; flex-direction: column; overflow: hidden; border: 1px solid var(--line); border-radius: 24px; background: white; box-shadow: 0 24px 70px rgba(24,18,8,.14); }
+    .bag-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 18px 20px 14px; border-bottom: 1px solid var(--line); }
+    .bag-head h2 { margin: 0; font-size: 1.55rem; letter-spacing: 0; }
+    .bag-head h2 span { color: var(--muted); font-family: var(--sans); font-size: .85rem; }
+    .bag-close { display: none; width: 36px; height: 36px; border: 1px solid var(--line); border-radius: 50%; background: none; font-size: 1.2rem; cursor: pointer; }
+    .bag-body { flex: 1; overflow-y: auto; padding: 14px 20px; overscroll-behavior: contain; }
+    .bag-foot { padding: 14px 20px 18px; border-top: 1px solid var(--line); background: #fdfbf6; }
+    .bag-row { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 10px; }
+    .bag-row b { font-size: 1.15rem; }
+    .bag-note { margin: 0 0 12px; color: var(--muted); font-size: .76rem; line-height: 1.45; }
+    .bag-cta { width: 100%; min-height: 48px; border: 0; border-radius: 999px; background: var(--gold); color: var(--black); font-weight: 700; font-size: .92rem; cursor: pointer; }
+    .bag-cta:hover { filter: brightness(1.06); }
+    .bag-cta[disabled] { opacity: .45; cursor: not-allowed; }
+    .bag-back { display: block; margin: 10px auto 0; border: 0; background: none; color: var(--muted); font-size: .8rem; text-decoration: underline; cursor: pointer; }
+    .bag-empty { padding: 40px 6px; text-align: center; color: var(--muted); font-size: .88rem; }
+    .bag-empty b { display: block; margin-bottom: 6px; color: var(--ink); font-family: var(--serif); font-size: 1.4rem; font-weight: 400; }
+    .bag-item { display: grid; grid-template-columns: 52px 1fr auto; gap: 12px; align-items: center; padding: 10px 0; border-bottom: 1px solid var(--line); }
+    .bag-item:last-child { border-bottom: 0; }
+    .bag-item img, .bag-thumb { width: 52px; height: 52px; border-radius: 10px; object-fit: cover; background: var(--cream); }
+    .bag-item b { display: block; font-size: .88rem; line-height: 1.25; }
+    .bag-item small { color: var(--muted); font-size: .74rem; }
+    .bag-qty { display: flex; align-items: center; gap: 6px; margin-top: 4px; }
+    .bag-qty button { width: 26px; height: 26px; border: 1px solid var(--line); border-radius: 50%; background: none; font-size: .95rem; line-height: 1; cursor: pointer; }
+    .bag-qty span { min-width: 16px; text-align: center; font-size: .82rem; }
+    .bag-price { font-size: .86rem; font-weight: 700; }
+    .bag-banner { margin-bottom: 12px; padding: 12px 14px; border: 1px solid var(--gold); border-radius: 14px; background: #fbf5e7; font-size: .8rem; line-height: 1.45; }
+    .bag-banner b { display: block; font-size: .86rem; }
+    .bag-banner button { margin-top: 6px; border: 0; background: none; padding: 0; color: #8b651b; font-weight: 700; text-decoration: underline; cursor: pointer; }
+    .bag h3 { margin: 0 0 4px; font-family: var(--serif); font-size: 1.35rem; font-weight: 400; }
+    .bag .muted { color: var(--muted); font-size: .8rem; }
+    .bag label { display: block; margin: 12px 0 5px; font-size: .74rem; }
+    .bag input, .bag textarea { min-height: 42px; padding: 9px 12px; font-size: .88rem; }
+    .bag textarea { min-height: 72px; }
+    .bag-opts { display: grid; gap: 6px; }
+    .bag-opts label { display: flex; gap: 10px; align-items: flex-start; margin: 0; padding: 10px 12px; border: 1px solid var(--line); border-radius: 12px; cursor: pointer; font-size: .84rem; font-weight: 600; letter-spacing: 0; }
+    .bag-opts label small { display: block; color: var(--muted); font-weight: 400; font-size: .74rem; }
+    .bag-opts input { width: auto; min-height: 0; margin-top: 3px; accent-color: var(--gold); }
+    .bag-opts label:has(input:checked) { border-color: var(--gold); background: #fbf5e7; }
+    .bag-err { margin: 10px 0 0; color: #b3261e; font-size: .8rem; }
+    .bag-link { display: flex; gap: 8px; align-items: center; margin: 10px 0 4px; padding: 8px 8px 8px 12px; border: 1px dashed var(--gold); border-radius: 12px; background: #fdfbf6; }
+    .bag-link code { flex: 1; overflow: hidden; font-size: .72rem; text-overflow: ellipsis; white-space: nowrap; }
+    .bag-link button { flex: 0 0 auto; padding: 6px 12px; border: 0; border-radius: 999px; background: var(--black); color: white; font-size: .74rem; font-weight: 700; cursor: pointer; }
+    .bag-tabs { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin: 14px 0 12px; }
+    .bag-tabs button { min-height: 40px; border: 1px solid var(--line); border-radius: 12px; background: white; font-size: .84rem; font-weight: 600; cursor: pointer; }
+    .bag-tabs button[aria-pressed="true"] { border-color: var(--gold); background: #fbf5e7; color: #8b651b; }
+    .bag-qr { display: block; width: 100%; max-width: 230px; margin: 0 auto 10px; border: 1px solid var(--line); border-radius: 14px; }
+    .bag-gcash { margin: 4px 0 10px; padding: 16px; border: 1px solid var(--line); border-radius: 14px; text-align: center; }
+    .bag-gcash b { display: block; font-size: 1.5rem; letter-spacing: .04em; }
+    .bag-amount { margin: 2px 0 8px; color: #8b651b; font-size: 1.7rem; font-weight: 700; }
+    .bag-drop { display: flex; min-height: 92px; flex-direction: column; align-items: center; justify-content: center; gap: 6px; margin-top: 6px; padding: 12px; border: 1.5px dashed var(--line); border-radius: 14px; text-align: center; font-size: .82rem; cursor: pointer; }
+    .bag-drop.ok { border: 1.5px solid var(--gold); }
+    .bag-drop img { max-height: 120px; border-radius: 8px; }
+    .bag-lines { margin: 10px 0; padding: 0; list-style: none; font-size: .82rem; }
+    .bag-lines li { display: flex; justify-content: space-between; gap: 10px; padding: 6px 0; border-bottom: 1px solid var(--line); }
+    .bag-steps { margin: 16px 0 6px; padding: 0; list-style: none; }
+    .bag-steps li { position: relative; padding: 0 0 16px 26px; color: var(--muted); font-size: .84rem; }
+    .bag-steps li::before { position: absolute; top: 3px; left: 0; width: 12px; height: 12px; border: 2px solid var(--line); border-radius: 50%; content: ""; }
+    .bag-steps li.on { color: var(--ink); font-weight: 600; }
+    .bag-steps li.on::before { border-color: var(--gold); background: var(--gold); }
+    .bag-fab { position: fixed; z-index: 35; right: 16px; bottom: 16px; display: none; align-items: center; gap: 10px; min-height: 52px; padding: 0 20px; border: 0; border-radius: 999px; background: var(--black); color: white; font-weight: 700; box-shadow: 0 12px 34px rgba(0,0,0,.28); cursor: pointer; }
+    .bag-fab span { display: grid; min-width: 24px; height: 24px; place-items: center; padding: 0 6px; border-radius: 999px; background: var(--gold); color: var(--black); font-size: .78rem; }
+    .bag-fab.bump { animation: bagbump .35s ease-out; }
+    @keyframes bagbump { 50% { transform: scale(1.08); } }
+    .bag-shade { position: fixed; z-index: 39; inset: 0; display: none; background: rgba(12,11,9,.45); }
+    .bag-toast { position: fixed; z-index: 45; left: 50%; bottom: 84px; display: flex; white-space: nowrap; max-width: calc(100vw - 24px); gap: 12px; align-items: center; padding: 10px 12px 10px 18px; border-radius: 999px; background: var(--black); color: white; font-size: .84rem; transform: translateX(-50%); box-shadow: 0 12px 34px rgba(0,0,0,.3); }
+    .bag-toast button { padding: 6px 12px; border: 0; border-radius: 999px; background: var(--gold); color: var(--black); font-weight: 700; font-size: .78rem; cursor: pointer; }
+    .nav-bag { display: none; }
+
+    /* Wide screens: bag sits beside the page */
+    @media (min-width: 1280px) {
+      body { padding-right: 346px; }
+      .site { margin: 16px auto 16px max(16px, calc((100vw - 346px - 1120px) / 2)); }
+    }
+    /* Smaller screens: bag slides in from the right */
+    @media (max-width: 1279px) {
+      .bag { top: 0; right: 0; bottom: 0; width: min(400px, 100vw); border-radius: 22px 0 0 22px; transform: translateX(105%); transition: transform .28s ease; }
+      .bag.open { transform: none; }
+      .bag-close { display: grid; place-items: center; }
+      .bag-shade.open { display: block; }
+      .bag-fab { display: flex; }
+      .nav-bag { display: inline-flex; }
+      .site { margin: 14px; }
+      body.bag-open { overflow: hidden; }
+    }
+    @media (max-width: 620px) {
+      .site { margin: 0; border-radius: 0; }
+      .wrap { width: min(100% - 32px, 980px); }
+      section { padding: 60px 0; }
+      .bag { width: 100vw; border-radius: 0; }
+      .bag-fab { right: 12px; bottom: 12px; left: 12px; justify-content: center; }
+      .product-image, .soap-card .product-image { height: 300px; }
+    }
+    @media (prefers-reduced-motion: reduce) { .bag { transition: none; } .bag-fab.bump { animation: none; } }
   </style>
 </head>
 <body>
+<div class="site">
   <div class="announcement">Now available on Shopee · Next-day dispatch across the Philippines</div>
   <nav aria-label="Main navigation">
     <div class="wrap nav-inner">
       <a class="brand" href="#top" aria-label="Pappi Suds and Scents Shop home"><img src="assets/brand/logo.png" width="500" height="500" alt="Pappi Parfum logo" decoding="async"><span class="brand-name">Pappi Suds &amp; Scents Shop</span></a>
-      <div class="nav-links"><a href="#fragrances">Fragrances</a><a href="#savon">Savon</a><a href="#about">About</a><a href="#delivery">Delivery</a><a class="button button--gold" href="#order">Order direct</a></div>
+      <div class="nav-links"><a href="#fragrances">Fragrances</a><a href="#savon">Savon</a><a href="#about">About</a><a href="#contact">Contact</a><a class="button button--gold nav-bag" href="#" data-open-bag>Bag (<span data-bag-count>0</span>)</a></div>
     </div>
   </nav>
 
@@ -458,15 +558,15 @@
         <div class="section-head"><div><p class="eyebrow">The fragrance wardrobe</p><h2>A scent for every version of you.</h2><p class="lede">Choose your scent, then choose how you want to wear it. All nine signature variants are available in Parfum and concentrated Elixir.</p></div><p class="section-note">Not sure where to begin? Tell us what you usually love—fresh, floral, sweet, warm or bold—and we’ll help you choose.</p></div>
         <div class="formats"><div class="format"><img class="format-image" src="assets/brand/parfum-20-cutout.png" width="381" height="1231" alt="Pappi Parfum 20% oil-base body spray bottle" loading="lazy" decoding="async"><div><h3>Pappi Parfum · 20%</h3><p>A polished 50 ml signature for everyday wear.</p></div><span class="format-badge">Everyday</span></div><div class="format format--dark"><img class="format-image" src="assets/brand/elixir-40-cutout.png" width="377" height="656" alt="Pappi Elixir 40% concentrated fragrance bottle" loading="lazy" decoding="async"><div><h3>Pappi Elixir · 40%</h3><p>Our concentrated 50 ml expression for deeper presence.</p></div><span class="format-badge">Intense</span></div></div>
         <div class="scent-grid">
-          <article class="product-card"><div class="product-image"><img src="assets/fragrances/gg-fantasy.jpg" width="900" height="900" alt="Pappi Fantasy Parfum and Elixir with red berries, jasmine, vanilla and amber" loading="lazy" decoding="async"></div><div class="product-body"><h3>Fantasy</h3><p>Warm, glamorous and sweet—a dressed-up scent with magnetic energy.</p><div class="product-meta"><div class="chips"><span class="chip">Parfum</span><span class="chip">Elixir</span></div><button class="pick" data-product="Fantasy">Choose</button></div></div></article>
-          <article class="product-card"><div class="product-image"><img src="assets/fragrances/jm-english-pear.jpg" width="900" height="900" alt="Pappi English Pear Parfum and Elixir with pear and freesia" loading="lazy" decoding="async"></div><div class="product-body"><h3>English Pear</h3><p>Crisp pear and airy florals for an elegant, freshly gathered feel.</p><div class="product-meta"><div class="chips"><span class="chip">Parfum</span><span class="chip">Elixir</span></div><button class="pick" data-product="English Pear">Choose</button></div></div></article>
-          <article class="product-card"><div class="product-image"><img src="assets/fragrances/dr-savage.jpg" width="900" height="900" alt="Pappi Savage Parfum and Elixir with bergamot, lavender and pepper" loading="lazy" decoding="async"></div><div class="product-body"><h3>Savage</h3><p>Fresh spice and confident woods with a clean, commanding trail.</p><div class="product-meta"><div class="chips"><span class="chip">Parfum</span><span class="chip">Elixir</span></div><button class="pick" data-product="Savage">Choose</button></div></div></article>
-          <article class="product-card"><div class="product-image"><img src="assets/fragrances/lv-imagine.jpg" width="900" height="900" alt="Pappi Imagination Parfum and Elixir with lemon, bergamot, ginger and tea" loading="lazy" decoding="async"></div><div class="product-body"><h3>Imagination</h3><p>Bright citrus and cool freshness with a clean, modern finish.</p><div class="product-meta"><div class="chips"><span class="chip">Parfum</span><span class="chip">Elixir</span></div><button class="pick" data-product="Imagination">Choose</button></div></div></article>
-          <article class="product-card"><div class="product-image"><img src="assets/fragrances/vs-vanilla.jpg" width="900" height="900" alt="Pappi Vanilla Lace Parfum and Elixir with vanilla, cotton flower and amber" loading="lazy" decoding="async"></div><div class="product-body"><h3>Vanilla Lace</h3><p>Soft, creamy vanilla warmth made for cozy, close-to-skin days.</p><div class="product-meta"><div class="chips"><span class="chip">Parfum</span><span class="chip">Elixir</span></div><button class="pick" data-product="Vanilla Lace">Choose</button></div></div></article>
-          <article class="product-card"><div class="product-image"><img src="assets/fragrances/jm-sweet-pea.jpg" width="900" height="900" alt="Pappi Sweet Pea Parfum and Elixir with pear and sweet pea" loading="lazy" decoding="async"></div><div class="product-body"><h3>Sweet Pea</h3><p>A tender bouquet with a soft fruity lift—pretty, graceful and light.</p><div class="product-meta"><div class="chips"><span class="chip">Parfum</span><span class="chip">Elixir</span></div><button class="pick" data-product="Sweet Pea">Choose</button></div></div></article>
-          <article class="product-card"><div class="product-image"><img src="assets/fragrances/br-540-red.jpg" width="900" height="900" alt="Pappi 540 Red Parfum and Elixir with saffron, jasmine, amber and cedar" loading="lazy" decoding="async"></div><div class="product-body"><h3>540 Red</h3><p>Luminous amber warmth with a rich, unforgettable sweetness.</p><div class="product-meta"><div class="chips"><span class="chip">Parfum</span><span class="chip">Elixir</span></div><button class="pick" data-product="540 Red">Choose</button></div></div></article>
-          <article class="product-card"><div class="product-image"><img src="assets/fragrances/ln-eclat.jpg" width="900" height="900" alt="Pappi Eclat Parfum and Elixir with lilac, peony and peach blossom" loading="lazy" decoding="async"></div><div class="product-body"><h3>Éclat</h3><p>Delicate florals with a serene, polished softness from day to night.</p><div class="product-meta"><div class="chips"><span class="chip">Parfum</span><span class="chip">Elixir</span></div><button class="pick" data-product="Eclat">Choose</button></div></div></article>
-          <article class="product-card"><div class="product-image"><img src="assets/fragrances/ga-acqua.jpg" width="900" height="900" alt="Pappi Acqua DG Parfum and Elixir with bergamot, sea salt and woods" loading="lazy" decoding="async"></div><div class="product-body"><h3>Acqua DG</h3><p>Aquatic freshness, bright citrus and an easy coastal confidence.</p><div class="product-meta"><div class="chips"><span class="chip">Parfum</span><span class="chip">Elixir</span></div><button class="pick" data-product="Acqua DG">Choose</button></div></div></article>
+          <article class="product-card"><div class="product-image"><img src="assets/fragrances/gg-fantasy.jpg" width="900" height="900" alt="Pappi Fantasy Parfum and Elixir with red berries, jasmine, vanilla and amber" loading="lazy" decoding="async"></div><div class="product-body"><h3>Fantasy</h3><p>Warm, glamorous and sweet—a dressed-up scent with magnetic energy.</p><div class="add-row"><button class="add" data-add="elixir-fantasy" aria-label="Add Fantasy Elixir 40% to bag">Elixir 40%<small>₱600</small></button><button class="add add--light" data-add="parfum-fantasy" aria-label="Add Fantasy Parfum 20% to bag">Parfum 20%<small>₱300</small></button></div></div></article>
+          <article class="product-card"><div class="product-image"><img src="assets/fragrances/jm-english-pear.jpg" width="900" height="900" alt="Pappi English Pear Parfum and Elixir with pear and freesia" loading="lazy" decoding="async"></div><div class="product-body"><h3>English Pear</h3><p>Crisp pear and airy florals for an elegant, freshly gathered feel.</p><div class="add-row"><button class="add" data-add="elixir-english-pear" aria-label="Add English Pear Elixir 40% to bag">Elixir 40%<small>₱600</small></button><button class="add add--light" data-add="parfum-english-pear" aria-label="Add English Pear Parfum 20% to bag">Parfum 20%<small>₱300</small></button></div></div></article>
+          <article class="product-card"><div class="product-image"><img src="assets/fragrances/dr-savage.jpg" width="900" height="900" alt="Pappi Savage Parfum and Elixir with bergamot, lavender and pepper" loading="lazy" decoding="async"></div><div class="product-body"><h3>Savage</h3><p>Fresh spice and confident woods with a clean, commanding trail.</p><div class="add-row"><button class="add" data-add="elixir-savage" aria-label="Add Savage Elixir 40% to bag">Elixir 40%<small>₱600</small></button><button class="add add--light" data-add="parfum-savage" aria-label="Add Savage Parfum 20% to bag">Parfum 20%<small>₱300</small></button></div></div></article>
+          <article class="product-card"><div class="product-image"><img src="assets/fragrances/lv-imagine.jpg" width="900" height="900" alt="Pappi Imagination Parfum and Elixir with lemon, bergamot, ginger and tea" loading="lazy" decoding="async"></div><div class="product-body"><h3>Imagination</h3><p>Bright citrus and cool freshness with a clean, modern finish.</p><div class="add-row"><button class="add" data-add="elixir-imagination" aria-label="Add Imagination Elixir 40% to bag">Elixir 40%<small>₱600</small></button><button class="add add--light" data-add="parfum-imagination" aria-label="Add Imagination Parfum 20% to bag">Parfum 20%<small>₱300</small></button></div></div></article>
+          <article class="product-card"><div class="product-image"><img src="assets/fragrances/vs-vanilla.jpg" width="900" height="900" alt="Pappi Vanilla Lace Parfum and Elixir with vanilla, cotton flower and amber" loading="lazy" decoding="async"></div><div class="product-body"><h3>Vanilla Lace</h3><p>Soft, creamy vanilla warmth made for cozy, close-to-skin days.</p><div class="add-row"><button class="add" data-add="elixir-vanilla-lace" aria-label="Add Vanilla Lace Elixir 40% to bag">Elixir 40%<small>₱600</small></button><button class="add add--light" data-add="parfum-vanilla-lace" aria-label="Add Vanilla Lace Parfum 20% to bag">Parfum 20%<small>₱300</small></button></div></div></article>
+          <article class="product-card"><div class="product-image"><img src="assets/fragrances/jm-sweet-pea.jpg" width="900" height="900" alt="Pappi Sweet Pea Parfum and Elixir with pear and sweet pea" loading="lazy" decoding="async"></div><div class="product-body"><h3>Sweet Pea</h3><p>A tender bouquet with a soft fruity lift—pretty, graceful and light.</p><div class="add-row"><button class="add" data-add="elixir-sweet-pea" aria-label="Add Sweet Pea Elixir 40% to bag">Elixir 40%<small>₱600</small></button><button class="add add--light" data-add="parfum-sweet-pea" aria-label="Add Sweet Pea Parfum 20% to bag">Parfum 20%<small>₱300</small></button></div></div></article>
+          <article class="product-card"><div class="product-image"><img src="assets/fragrances/br-540-red.jpg" width="900" height="900" alt="Pappi 540 Red Parfum and Elixir with saffron, jasmine, amber and cedar" loading="lazy" decoding="async"></div><div class="product-body"><h3>540 Red</h3><p>Luminous amber warmth with a rich, unforgettable sweetness.</p><div class="add-row"><button class="add" data-add="elixir-540-red" aria-label="Add 540 Red Elixir 40% to bag">Elixir 40%<small>₱600</small></button><button class="add add--light" data-add="parfum-540-red" aria-label="Add 540 Red Parfum 20% to bag">Parfum 20%<small>₱300</small></button></div></div></article>
+          <article class="product-card"><div class="product-image"><img src="assets/fragrances/ln-eclat.jpg" width="900" height="900" alt="Pappi Eclat Parfum and Elixir with lilac, peony and peach blossom" loading="lazy" decoding="async"></div><div class="product-body"><h3>Éclat</h3><p>Delicate florals with a serene, polished softness from day to night.</p><div class="add-row"><button class="add" data-add="elixir-eclat" aria-label="Add Eclat Elixir 40% to bag">Elixir 40%<small>₱600</small></button><button class="add add--light" data-add="parfum-eclat" aria-label="Add Eclat Parfum 20% to bag">Parfum 20%<small>₱300</small></button></div></div></article>
+          <article class="product-card"><div class="product-image"><img src="assets/fragrances/ga-acqua.jpg" width="900" height="900" alt="Pappi Acqua DG Parfum and Elixir with bergamot, sea salt and woods" loading="lazy" decoding="async"></div><div class="product-body"><h3>Acqua DG</h3><p>Aquatic freshness, bright citrus and an easy coastal confidence.</p><div class="add-row"><button class="add" data-add="elixir-acqua-dg" aria-label="Add Acqua DG Elixir 40% to bag">Elixir 40%<small>₱600</small></button><button class="add add--light" data-add="parfum-acqua-dg" aria-label="Add Acqua DG Parfum 20% to bag">Parfum 20%<small>₱300</small></button></div></div></article>
         </div>
       </div>
     </section>
@@ -513,9 +613,9 @@
           </div>
         </div>
         <div class="soap-grid" id="savon-products">
-          <article class="soap-card"><div class="product-image"><img src="assets/savon/coconut-silk.png" width="723" height="760" alt="Pappi Savon Coconut Silk artisan cleansing bar" loading="lazy" decoding="async"></div><div class="product-body"><span class="soap-number">RITUAL 01</span><h3>Coconut Silk</h3><p>A soft, comforting cleanse with creamy lather for normal, dry and combination skin.</p><button class="pick" data-product="Coconut Silk Savon">Add to order →</button></div></article>
-          <article class="soap-card"><div class="product-image"><img src="assets/savon/golden-glow.png" width="731" height="760" alt="Pappi Savon Golden Glow artisan cleansing bar" loading="lazy" decoding="async"></div><div class="product-body"><span class="soap-number">RITUAL 02</span><h3>Golden Glow</h3><p>A warm, uplifting cleanse with artisan golden swirls for dull, normal and combination skin.</p><button class="pick" data-product="Golden Glow Savon">Add to order →</button></div></article>
-          <article class="soap-card"><div class="product-image"><img src="assets/savon/noir-charcoal.png" width="723" height="760" alt="Pappi Savon Noir Charcoal artisan cleansing bar" loading="lazy" decoding="async"></div><div class="product-body"><span class="soap-number">RITUAL 03</span><h3>Noir Charcoal</h3><p>A bold charcoal-inspired bar with a refined black-and-gold finish for a fresh daily cleanse.</p><button class="pick" data-product="Noir Charcoal Savon">Add to order →</button></div></article>
+          <article class="soap-card"><div class="product-image"><img src="assets/savon/coconut-silk.png" width="723" height="760" alt="Pappi Savon Coconut Silk artisan cleansing bar" loading="lazy" decoding="async"></div><div class="product-body"><span class="soap-number">RITUAL 01</span><h3>Coconut Silk</h3><p>A soft, comforting cleanse with creamy lather for normal, dry and combination skin.</p><button class="add" data-add="savon-coconut-silk" aria-label="Add Coconut Silk Savon to bag">Add to bag<small>Coming soon</small></button></div></article>
+          <article class="soap-card"><div class="product-image"><img src="assets/savon/golden-glow.png" width="731" height="760" alt="Pappi Savon Golden Glow artisan cleansing bar" loading="lazy" decoding="async"></div><div class="product-body"><span class="soap-number">RITUAL 02</span><h3>Golden Glow</h3><p>A warm, uplifting cleanse with artisan golden swirls for dull, normal and combination skin.</p><button class="add" data-add="savon-golden-glow" aria-label="Add Golden Glow Savon to bag">Add to bag<small>Coming soon</small></button></div></article>
+          <article class="soap-card"><div class="product-image"><img src="assets/savon/noir-charcoal.png" width="723" height="760" alt="Pappi Savon Noir Charcoal artisan cleansing bar" loading="lazy" decoding="async"></div><div class="product-body"><span class="soap-number">RITUAL 03</span><h3>Noir Charcoal</h3><p>A bold charcoal-inspired bar with a refined black-and-gold finish for a fresh daily cleanse.</p><button class="add" data-add="savon-noir-charcoal" aria-label="Add Noir Charcoal Savon to bag">Add to bag<small>Coming soon</small></button></div></article>
         </div>
       </div>
     </section>
@@ -525,7 +625,7 @@
         <div class="channel-grid">
           <article class="channel channel--shopee"><div><img class="channel-logo" src="assets/brand/shopee-logo.svg" width="64" height="64" alt="Shopee logo" loading="lazy" decoding="async"><h3>Available now on Shopee</h3><p>Prefer checkout in the app? Browse Pappi, place your order and track delivery from your Shopee account.</p></div><a class="button button--light" href="https://shopee.ph/bilyotoy" rel="noopener" target="_blank">Open Shopee →</a></article>
           <article class="channel"><div><img class="channel-logo" src="assets/brand/tiktok-logo.svg" width="64" height="64" alt="TikTok logo" loading="lazy" decoding="async"><span class="coming">Coming soon</span><h3>TikTok Shop</h3><p>Live selling, scent stories and easy TikTok checkout are on the way.</p></div><span aria-hidden="true">TikTok Shop · Pending</span></article>
-          <article class="channel"><div><div class="channel-icon">✦</div><h3>Order direct</h3><p>Tell us exactly what you want. We’ll confirm availability and get back to you as soon as possible.</p></div><a class="button button--ghost" href="#order">Start an order →</a></article>
+          <article class="channel"><div><div class="channel-icon">✦</div><h3>Order here</h3><p>Add scents to your bag and check out as a guest. Pay by QR Ph or GCash—no account needed.</p></div><a class="button button--ghost" href="#fragrances">Shop scents</a></article>
         </div>
       </div>
     </section>
@@ -662,17 +762,27 @@
       </div>
     </section>
 
-    <section class="order" id="order">
+    <section class="order" id="contact">
       <div class="wrap order-grid">
-        <div id="delivery"><p class="eyebrow">Direct order</p><h2>Order your signature.</h2><p class="lede">Pick your scents, pay by QR Ph or GCash, and upload your receipt. We confirm every order by text.</p>
-          <div class="delivery-card"><div class="delivery-row"><span class="delivery-icon">PH</span><div><b>Nationwide delivery</b><p>We aim to ship the next day. Your order should reach you in approximately 3–5 days.</p></div></div><div class="delivery-row"><span class="delivery-icon">CEB</span><div><b>Cebu City express delivery</b><p>We can book Maxim, Grab or Angkas so your Pappi order can reach you in around 1–2 hours, subject to rider availability.</p></div></div><div class="delivery-row"><span class="delivery-icon">✓</span><div><b>Easy payment</b><p>Scan our QR Ph with any bank or e-wallet, or send to GCash 0905 561 3013. We text you once payment is confirmed.</p></div></div></div>
+        <div id="delivery"><p class="eyebrow">Delivery &amp; contact</p><h2>Questions? Message us.</h2><p class="lede">Ask about scents, gifting, bulk or reseller orders. We reply as soon as we can.</p>
+          <div class="delivery-card"><div class="delivery-row"><span class="delivery-icon">PH</span><div><b>Nationwide delivery</b><p>We aim to ship the next day. Your order should reach you in approximately 3–5 days.</p></div></div><div class="delivery-row"><span class="delivery-icon">CEB</span><div><b>Cebu City express delivery</b><p>We can book Maxim, Grab or Angkas so your Pappi order can reach you in around 1–2 hours, subject to rider availability.</p></div></div><div class="delivery-row"><span class="delivery-icon">✓</span><div><b>Easy payment</b><p>Check out from your bag, then pay by QR Ph with any bank or e-wallet, or GCash. We text you at every step.</p></div></div></div>
           <div class="contact-links" aria-label="Contact Pappi Suds and Scents Shop">
             <a class="contact-link" href="tel:+639055613013">Call or text <span>+63 905 561 3013 →</span></a>
             <a class="contact-link" href="mailto:verge.gamotan@gmail.com">Email us <span>verge.gamotan@gmail.com →</span></a>
             <a class="contact-link" href="https://maps.app.goo.gl/wPRMuWsfBQyrzJ5r5" target="_blank" rel="noopener">Our location <span>Open Google Maps →</span></a>
           </div>
         </div>
-        <div id="pappi-order" class="pw" aria-live="polite"></div>
+        <form id="contact-form">
+          <div class="form-title">Send us a message</div>
+          <div class="form-grid">
+            <div class="field"><label for="c-name">Name</label><input id="c-name" name="name" autocomplete="name" required placeholder="Your name"></div>
+            <div class="field"><label for="c-contact">Mobile or email</label><input id="c-contact" name="contact" autocomplete="tel" required placeholder="09XX XXX XXXX"></div>
+            <div class="field field--wide"><label for="c-message">Message</label><textarea id="c-message" name="message" required placeholder="How can we help?"></textarea></div>
+          </div>
+          <p class="form-help">This opens your email app with your message ready to send to verge.gamotan@gmail.com.</p>
+          <button class="button button--gold" type="submit">Send message</button>
+          <div class="success" id="success" role="status">Your message is ready. Press send in your email app.</div>
+        </form>
       </div>
     </section>
 
@@ -680,247 +790,329 @@
   </main>
 
   <footer><div class="wrap footer-inner"><div class="footer-brand"><img src="assets/brand/logo.png" width="500" height="500" alt="Pappi Parfum logo" loading="lazy" decoding="async"><div><strong>Pappi Suds &amp; Scents Shop</strong><span>Fragrance &amp; artisan savon</span></div></div><div class="footer-meta">© <span id="year"></span> Pappi Suds &amp; Scents Shop · Philippines</div></div></footer>
-  <a class="button button--gold mobile-order" href="#order">Order direct</a>
+</div>
+
+  <div class="bag-shade" id="bag-shade"></div>
+  <aside class="bag" id="bag" aria-label="Your bag">
+    <div class="bag-head"><h2>Your bag <span id="bag-count"></span></h2><button class="bag-close" id="bag-close" aria-label="Close bag">×</button></div>
+    <div class="bag-body" id="bag-body"><p class="muted">Loading…</p></div>
+    <div class="bag-foot" id="bag-foot"></div>
+  </aside>
+  <button class="bag-fab" id="bag-fab" aria-controls="bag">Bag <span id="bag-fab-count">0</span></button>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
   <script>
+
 (() => {
   // ------------------------- SETTINGS -------------------------
-  const PAPPI_CONFIG = {
+  const CFG = {
     SUPABASE_URL: "https://bkklvfioefrdaddbcisz.supabase.co",
-    SUPABASE_ANON_KEY: "sb_publishable_sXZa6c917YXzSkvKdhzaig_FgrdDbjQ",
-    PAYMENT: {                              // how customers can pay
-      "QR Ph": { qr: "assets/qr/qrph.png",  hint: "Scan with any bank or e-wallet app: GCash, Maya, BPI, MariBank and more." },
-      "GCash": { number: "0905 561 3013",    hint: "Send to this GCash number using Send Money." },
-    },
-    ACCOUNT_NAME: "Vergilio Jr Gamotan",            // shown under the QR so buyers know it's you
+    SUPABASE_KEY: "sb_publishable_sXZa6c917YXzSkvKdhzaig_FgrdDbjQ",
+    ACCOUNT_NAME: "Vergilio Jr Gamotan",
+    QR_IMAGE: "assets/qr/qrph.png",
+    GCASH_NUMBER: "0905 561 3013",
+    SITE: "https://pappiscents.shop",
   };
   // ------------------------------------------------------------
-
-  const root = document.getElementById("pappi-order");
-  const db = window.supabase.createClient(PAPPI_CONFIG.SUPABASE_URL, PAPPI_CONFIG.SUPABASE_ANON_KEY);
-  const peso = n => "₱" + Number(n).toLocaleString("en-PH");
+  const db = window.supabase.createClient(CFG.SUPABASE_URL, CFG.SUPABASE_KEY);
+  const $ = s => document.querySelector(s);
+  const peso = n => "₱" + Number(n || 0).toLocaleString("en-PH");
   const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;" }[c]));
-
-  const state = {
-    step: 1, products: [], line: "Elixir 40%", cart: {},
-    name: "", phone: "", delivery: "nationwide", address: "", note: "",
-    method: "QR Ph", file: null, preview: "", busy: false, error: "", done: null,
+  const slug = s => s.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+  const store = {
+    get(k, d) { try { return JSON.parse(localStorage.getItem(k)) ?? d; } catch { return d; } },
+    set(k, v) { try { v == null ? localStorage.removeItem(k) : localStorage.setItem(k, JSON.stringify(v)); } catch {} },
   };
+  const DELIVERY = { nationwide: "Nationwide delivery", cebu_express: "Cebu City express", pickup: "Pickup" };
 
-  const subtotal = () => Object.entries(state.cart).reduce((s,[id,q]) => {
-    const p = state.products.find(x => x.id === id); return s + (p ? p.price * q : 0); }, 0);
-  const count = () => Object.values(state.cart).reduce((a,b) => a + b, 0);
-  const steps = n => `<div class="pw-steps" aria-hidden="true">${[1,2,3].map(i => `<span class="${i<=n?"on":""}"></span>`).join("")}</div>`;
+  // Pictures for bag items, taken from the cards on this page
+  const thumbs = {};
+  document.querySelectorAll(".product-card, .soap-card").forEach(card => {
+    const name = card.querySelector("h3")?.textContent.trim(); const img = card.querySelector("img")?.getAttribute("src");
+    if (name && img) thumbs[slug(name)] = img;
+  });
+  const thumbFor = p => thumbs[p.id.replace(/^(elixir|parfum|savon)-/, "")] || "";
 
-  function bar(label, enabled, back) {
-    return `<div class="pw-bar">
-      <div class="pw-total">${count() ? peso(subtotal()) : "₱0"}<small>${count()} item${count()===1?"":"s"}${back ? ` · <button class="pw-link" data-back>Back</button>` : ""}</small></div>
-      <button class="pw-btn" data-next ${enabled ? "" : "disabled"}>${label}</button></div>`;
+  const S = {
+    view: "cart", products: {}, cart: store.get("pappi_cart", {}),
+    checkout: store.get("pappi_checkout", null),        // { token, order_no, sig }
+    guest: store.get("pappi_guest", { name: "", phone: "", delivery: "nationwide", address: "", note: "" }),
+    order: null, method: "QR Ph", file: null, preview: "", busy: false, error: "",
+  };
+  const cartSig = () => JSON.stringify(Object.entries(S.cart).sort());
+  const cartItems = () => Object.entries(S.cart).map(([id, qty]) => ({ p: S.products[id], qty })).filter(x => x.p);
+  const count = () => cartItems().reduce((a, x) => a + x.qty, 0);
+  const subtotal = () => cartItems().reduce((a, x) => a + x.p.price * x.qty, 0);
+  const saveCart = () => store.set("pappi_cart", S.cart);
+  const linkFor = t => `${CFG.SITE}/?checkout=${t}`;
+
+  // ---------- open / close on smaller screens ----------
+  const bag = $("#bag"), shade = $("#bag-shade");
+  const wide = () => matchMedia("(min-width: 1280px)").matches;
+  function openBag() { if (wide()) return; bag.classList.add("open"); shade.classList.add("open"); document.body.classList.add("bag-open"); }
+  function closeBag() { bag.classList.remove("open"); shade.classList.remove("open"); document.body.classList.remove("bag-open"); }
+  $("#bag-fab").onclick = openBag; $("#bag-close").onclick = closeBag; shade.onclick = closeBag;
+  document.querySelectorAll("[data-open-bag]").forEach(b => b.addEventListener("click", e => { e.preventDefault(); openBag(); }));
+  document.addEventListener("keydown", e => { if (e.key === "Escape") closeBag(); });
+
+  function toast(text) {
+    if (wide()) return;
+    document.querySelector(".bag-toast")?.remove();
+    const t = document.createElement("div"); t.className = "bag-toast"; t.setAttribute("role", "status");
+    t.innerHTML = `<span>${esc(text)}</span><button>View bag</button>`;
+    t.querySelector("button").onclick = () => { t.remove(); openBag(); };
+    document.body.append(t); setTimeout(() => t.remove(), 3200);
   }
 
-  function viewPick() {
-    const lines = [...new Set(state.products.filter(p => p.line !== "Savon").map(p => p.line))];
-    const scents = state.products.filter(p => p.line === state.line);
-    const savon = state.products.filter(p => p.line === "Savon");
-    const item = p => { const q = state.cart[p.id] || 0; return `
-      <div class="pw-item ${q ? "has" : ""}">
-        <div><b>${esc(p.name)}</b><small>${peso(p.price)}</small></div>
-        <div class="pw-qty">
-          <button data-dec="${p.id}" aria-label="Remove one ${esc(p.name)}">−</button>
-          <output>${q}</output>
-          <button data-inc="${p.id}" aria-label="Add one ${esc(p.name)}">+</button>
-        </div></div>`; };
-    return `${steps(1)}
-      <h3>Choose your scents</h3>
-      <p>Elixir 40% lasts longer with fewer touch-ups. Parfum 20% is lighter for everyday wear. Both are 50 ml.</p>
-      <div class="pw-seg" role="group" aria-label="Strength">
-        ${lines.map(l => `<button data-line="${esc(l)}" aria-pressed="${l===state.line}">${esc(l)}</button>`).join("")}
-      </div>
-      <div class="pw-grid">${scents.map(item).join("")}</div>
-      ${savon.length ? `<div class="pw-group">Pappi Savon</div><div class="pw-grid" style="margin-top:10px">${savon.map(item).join("")}</div>` : ""}
-      ${bar("Continue to delivery", count() > 0)}`;
+  // ---------- add to bag ----------
+  function add(id) {
+    const p = S.products[id]; if (!p) return;
+    S.cart[id] = Math.min(50, (S.cart[id] || 0) + 1); saveCart();
+    if (S.view !== "cart" && S.view !== "status") S.view = "cart";
+    if (S.view === "status") S.view = "cart";
+    render();
+    const fab = $("#bag-fab"); fab.classList.remove("bump"); void fab.offsetWidth; fab.classList.add("bump");
+    toast(`Added ${p.name} ${p.line.split(" ")[0]}`);
+  }
+  document.addEventListener("click", e => {
+    const b = e.target.closest("[data-add]"); if (!b) return;
+    add(b.dataset.add);
+    b.classList.add("is-added"); setTimeout(() => b.classList.remove("is-added"), 900);
+  });
+
+  // ---------- views ----------
+  function viewCart() {
+    const items = cartItems();
+    const pendingSame = S.checkout && S.checkout.sig === cartSig();
+    let banner = "";
+    if (S.checkout && pendingSame) banner = `<div class="bag-banner"><b>Order ${esc(S.checkout.order_no)} is waiting for payment</b>Your bag is saved. Finish paying any time.<br><button data-go="pay">Continue to payment</button></div>`;
+    else if (S.checkout) banner = `<div class="bag-banner"><b>You changed your bag</b>Checking out again replaces unpaid order ${esc(S.checkout.order_no)}.</div>`;
+    const body = items.length ? banner + items.map(({ p, qty }) => `
+      <div class="bag-item">
+        ${thumbFor(p) ? `<img src="${esc(thumbFor(p))}" alt="">` : `<span class="bag-thumb"></span>`}
+        <div><b>${esc(p.name)}</b><small>${esc(p.line)}${p.line === "Savon" ? "" : " · 50 ml"}</small>
+          <div class="bag-qty"><button data-dec="${p.id}" aria-label="Remove one ${esc(p.name)}">−</button><span>${qty}</span><button data-inc="${p.id}" aria-label="Add one ${esc(p.name)}">+</button></div></div>
+        <div class="bag-price">${peso(p.price * qty)}</div>
+      </div>`).join("")
+      : banner + `<div class="bag-empty"><b>Your bag is empty</b>Add a scent from the collection to get started.</div>`;
+    const foot = `<div class="bag-row"><span>Subtotal</span><b>${peso(subtotal())}</b></div>
+      <p class="bag-note">Shipping is texted to you after checkout. Cebu express riders are paid on delivery.</p>
+      <button class="bag-cta" data-go="${pendingSame ? "pay" : "details"}" ${items.length ? "" : "disabled"}>${pendingSame ? "Continue to payment" : "Check out as guest"}</button>`;
+    return [body, foot];
   }
 
   function viewDetails() {
-    const needsAddr = state.delivery !== "pickup";
-    const opt = (v, t, s) => `<label><input type="radio" name="pw-del" value="${v}" ${state.delivery===v?"checked":""}><span>${t}<small>${s}</small></span></label>`;
-    return `${steps(2)}
-      <h3>Where should we send it?</h3>
-      <label for="pw-name">Full name</label>
-      <input id="pw-name" autocomplete="name" value="${esc(state.name)}">
-      <label for="pw-phone">Mobile number</label>
-      <input id="pw-phone" type="tel" inputmode="tel" autocomplete="tel" placeholder="09XX XXX XXXX" value="${esc(state.phone)}">
-      <label>Delivery</label>
-      <div class="pw-radio">
-        ${opt("nationwide","Nationwide delivery","Ships next day, arrives in about 3–5 days")}
-        ${opt("cebu_express","Cebu City express","About 1–2 hours by Maxim, Grab or Angkas. Rider fee is paid on delivery.")}
-        ${opt("pickup","Pickup","We'll text you the pickup time")}
-      </div>
-      ${needsAddr ? `<label for="pw-addr">Complete address</label>
-      <textarea id="pw-addr" autocomplete="street-address" placeholder="House no., street, barangay, city, province, landmark">${esc(state.address)}</textarea>` : ""}
-      <label for="pw-note">Note (optional)</label>
-      <input id="pw-note" placeholder="Gift message, preferred time, etc." value="${esc(state.note)}">
-      <p class="pw-err" role="alert">${esc(state.error)}</p>
-      ${bar("Continue to payment", true, true)}`;
+    const g = S.guest;
+    const opt = (v, t, s) => `<label><input type="radio" name="bag-del" value="${v}" ${g.delivery === v ? "checked" : ""}><span>${t}<small>${s}</small></span></label>`;
+    const body = `<h3>Delivery details</h3><p class="muted">No account needed. We'll text you updates.</p>
+      <label for="bag-name">Full name</label><input id="bag-name" autocomplete="name" value="${esc(g.name)}">
+      <label for="bag-phone">Mobile number</label><input id="bag-phone" type="tel" inputmode="tel" autocomplete="tel" placeholder="09XX XXX XXXX" value="${esc(g.phone)}">
+      <label>Delivery</label><div class="bag-opts">
+        ${opt("nationwide", "Nationwide", "Ships next day, about 3–5 days")}
+        ${opt("cebu_express", "Cebu City express", "About 1–2 hours by Maxim, Grab or Angkas")}
+        ${opt("pickup", "Pickup", "We'll text you the pickup time")}</div>
+      ${g.delivery !== "pickup" ? `<label for="bag-addr">Complete address</label><textarea id="bag-addr" autocomplete="street-address" placeholder="House no., street, barangay, city, province, landmark">${esc(g.address)}</textarea>` : ""}
+      <label for="bag-note">Note (optional)</label><input id="bag-note" placeholder="Gift message, preferred time" value="${esc(g.note)}">
+      ${S.error ? `<p class="bag-err" role="alert">${esc(S.error)}</p>` : ""}`;
+    const foot = `<div class="bag-row"><span>${count()} item${count() === 1 ? "" : "s"}</span><b>${peso(subtotal())}</b></div>
+      <button class="bag-cta" data-go="create" ${S.busy ? "disabled" : ""}>${S.busy ? "Saving your order…" : "Continue to payment"}</button>
+      <button class="bag-back" data-go="cart">Back to bag</button>`;
+    return [body, foot];
   }
 
   function viewPay() {
-    const pay = PAPPI_CONFIG.PAYMENT[state.method];
-    const items = Object.entries(state.cart).map(([id,q]) => { const p = state.products.find(x => x.id===id);
-      return `<li><span>${q} × ${esc(p.name)} <small style="color:var(--pw-mute)">${esc(p.line)}</small></span><span>${peso(p.price*q)}</span></li>`; }).join("");
-    return `${steps(3)}
-      <h3>Pay and send your screenshot</h3>
-      <p>Pay by QR Ph or GCash, then upload your payment screenshot.</p>
-      <div class="pw-methods" role="group" aria-label="Payment method">
-        ${Object.keys(PAPPI_CONFIG.PAYMENT).map(m => `<button data-method="${esc(m)}" aria-pressed="${m===state.method}">${esc(m)}</button>`).join("")}
-      </div>
-      <div class="pw-qr ${pay.qr ? "" : "pw-noqr"}">
-        ${pay.qr ? `<img src="${esc(pay.qr)}" alt="QR Ph code for Pappi Suds & Scents">` : `<div class="pw-num">${esc(pay.number)}</div>`}
-        <div>
-          <p>Send exactly</p>
-          <div class="pw-amount">${peso(subtotal())}</div>
-          <p>to ${esc(PAPPI_CONFIG.ACCOUNT_NAME.replace(/\.$/, ""))}. ${esc(pay.hint)}</p>
-          ${pay.qr ? `<p style="margin-top:8px">On mobile, screenshot the QR, then upload it in your app's Scan QR screen.</p>` : `<p style="margin-top:8px"><button class="pw-link" data-copy="${esc(pay.number.replace(/\s/g,""))}">Copy number</button></p>`}
-          ${state.delivery === "nationwide" ? `<p style="margin-top:8px">We'll text you the shipping fee to settle before dispatch.</p>` : ""}
-        </div>
-      </div>
-      <ul class="pw-summary">${items}</ul>
-      <label for="pw-file">Payment screenshot</label>
-      <label class="pw-drop ${state.file ? "ok" : ""}" for="pw-file">
-        ${state.preview ? `<img src="${state.preview}" alt="Your payment screenshot">` : ""}
-        <span>${state.file ? "Screenshot added. Tap to change." : "Tap to upload your screenshot"}</span>
-      </label>
-      <input id="pw-file" type="file" accept="image/*" hidden>
-      <p class="pw-err" role="alert">${esc(state.error)}</p>
-      ${bar(state.busy ? "Placing order…" : "Place order", !!state.file && !state.busy, true)}`;
+    const o = S.order;
+    if (!o) return [`<p class="muted">Loading your order…</p>`, ""];
+    const lines = o.items.map(i => `<li><span>${i.qty} × ${esc(i.name)} <span class="muted">${esc(i.line.split(" ")[0])}</span></span><span>${peso(i.qty * i.unit_price)}</span></li>`).join("");
+    const payBlock = S.method === "QR Ph"
+      ? `<img class="bag-qr" src="${esc(CFG.QR_IMAGE)}" alt="QR Ph code for ${esc(CFG.ACCOUNT_NAME)}"><p class="muted">Scan with any bank or e-wallet: GCash, Maya, BPI, MariBank and more. On mobile, screenshot the QR and open it from your app's Scan QR screen.</p>`
+      : `<div class="bag-gcash"><span class="muted">GCash Send Money to</span><b>${esc(CFG.GCASH_NUMBER)}</b><span class="muted">${esc(CFG.ACCOUNT_NAME)}</span><br><button class="bag-back" data-copy="${esc(CFG.GCASH_NUMBER.replace(/\s/g, ""))}">Copy number</button></div>`;
+    const body = `<h3>Order ${esc(o.order_no)}</h3><p class="muted">Saved. Pay now or come back later with your order link.</p>
+      <div class="bag-link"><code>${esc(linkFor(S.checkout.token).replace("https://", ""))}</code><button data-copy="${esc(linkFor(S.checkout.token))}">Copy link</button></div>
+      <p class="muted">Keep this link to finish paying or track your order. Anyone with it can see this order.</p>
+      <ul class="bag-lines">${lines}</ul>
+      <div class="bag-row"><span>Send exactly</span><span class="bag-amount">${peso(o.subtotal)}</span></div>
+      <div class="bag-tabs" role="group" aria-label="Payment method">
+        <button data-method="QR Ph" aria-pressed="${S.method === "QR Ph"}">QR Ph</button>
+        <button data-method="GCash" aria-pressed="${S.method === "GCash"}">GCash</button></div>
+      ${payBlock}
+      <label for="bag-file">Payment screenshot</label>
+      <label class="bag-drop ${S.file ? "ok" : ""}" for="bag-file">${S.preview ? `<img src="${S.preview}" alt="Your payment screenshot">` : ""}<span>${S.file ? "Screenshot added. Tap to change." : "Tap to upload your screenshot"}</span></label>
+      <input id="bag-file" type="file" accept="image/*" hidden>
+      ${S.error ? `<p class="bag-err" role="alert">${esc(S.error)}</p>` : ""}`;
+    const foot = `<button class="bag-cta" data-go="submit" ${S.file && !S.busy ? "" : "disabled"}>${S.busy ? "Sending…" : "Submit payment"}</button>
+      <button class="bag-back" data-go="cart">Edit bag</button>`;
+    return [body, foot];
   }
 
-  function viewDone() {
-    return `<div class="pw-done pw-view">
-      <h3>Order received. Salamat!</h3>
-      <div class="pw-no">${esc(state.done.order_no)}</div>
-      <p>We'll check your payment and text ${esc(state.phone)} once your order is confirmed. Keep your order number for follow-ups.</p>
-      <p style="margin-top:18px"><button class="pw-link" data-again>Place another order</button></p></div>`;
+  function viewStatus() {
+    const o = S.order; if (!o) return [`<p class="muted">Loading your order…</p>`, ""];
+    const order = ["new", "paid", "packed", "shipped", "completed"];
+    const at = order.indexOf(o.status);
+    const steps = [["Payment sent", 0], ["Payment confirmed", 1], ["Packed", 2], [o.delivery === "pickup" ? "Ready for pickup" : "On the way", 3]];
+    const lines = o.items.map(i => `<li><span>${i.qty} × ${esc(i.name)} <span class="muted">${esc(i.line.split(" ")[0])}</span></span><span>${peso(i.qty * i.unit_price)}</span></li>`).join("");
+    const body = o.status === "cancelled"
+      ? `<h3>Order ${esc(o.order_no)}</h3><p class="muted">This order was cancelled or replaced by a newer checkout. Text us at ${esc(CFG.GCASH_NUMBER)} if that's unexpected.</p>`
+      : `<h3>Order ${esc(o.order_no)}</h3><p class="muted">Salamat, ${esc(o.name.split(" ")[0])}! We'll text you at each step.</p>
+        <ol class="bag-steps">${steps.map(([t, i]) => `<li class="${at >= i ? "on" : ""}">${t}</li>`).join("")}</ol>
+        ${o.tracking_no ? `<p><b>Tracking number:</b> ${esc(o.tracking_no)}</p>` : ""}
+        <ul class="bag-lines">${lines}${Number(o.shipping_fee) ? `<li><span>Shipping</span><span>${peso(o.shipping_fee)}</span></li>` : ""}<li><b>Total</b><b>${peso(o.total)}</b></li></ul>
+        <p class="muted">${DELIVERY[o.delivery]}${o.address ? ` · ${esc(o.address)}` : ""}</p>`;
+    const foot = `<button class="bag-cta" data-go="fresh">Start a new order</button>`;
+    return [body, foot];
   }
 
   function render() {
-    if (!state.products.length) { root.innerHTML = `<p>Loading scents…</p>`; return; }
-    const html = state.done ? viewDone() : state.step === 1 ? viewPick() : state.step === 2 ? viewDetails() : viewPay();
-    root.innerHTML = `<div class="pw-view">${html}</div>`;
+    const [body, foot] = ({ cart: viewCart, details: viewDetails, pay: viewPay, status: viewStatus })[S.view]();
+    $("#bag-body").innerHTML = body; $("#bag-foot").innerHTML = foot;
+    const n = count();
+    $("#bag-count").textContent = n ? `(${n})` : "";
+    $("#bag-fab-count").textContent = n;
+    document.querySelectorAll("[data-bag-count]").forEach(el => el.textContent = n);
   }
 
-  function saveInputs() {
-    const v = id => root.querySelector("#" + id)?.value;
-    if (root.querySelector("#pw-name")) state.name = v("pw-name").trim();
-    if (root.querySelector("#pw-phone")) state.phone = v("pw-phone").trim();
-    if (root.querySelector("#pw-addr")) state.address = v("pw-addr").trim();
-    if (root.querySelector("#pw-note")) state.note = v("pw-note").trim();
+  // ---------- actions ----------
+  function saveGuest() {
+    const v = id => document.getElementById(id)?.value?.trim();
+    if ($("#bag-name")) S.guest.name = v("bag-name");
+    if ($("#bag-phone")) S.guest.phone = v("bag-phone");
+    if ($("#bag-addr")) S.guest.address = v("bag-addr");
+    if ($("#bag-note")) S.guest.note = v("bag-note");
+    store.set("pappi_guest", { ...S.guest, note: "" });
   }
 
-  function validateDetails() {
-    if (state.name.length < 2) return "Enter your full name.";
-    if (state.phone.replace(/\D/g,"").length < 10) return "Enter a mobile number we can text, like 0917 123 4567.";
-    if (state.delivery !== "pickup" && state.address.length < 8) return "Enter your complete delivery address.";
-    return "";
+  function setUrl(token) {
+    const u = new URL(location.href);
+    token ? u.searchParams.set("checkout", token) : u.searchParams.delete("checkout");
+    history.replaceState(null, "", u);
   }
 
-  // Shrink big phone screenshots so uploads are fast (keeps under the 5 MB limit)
+  async function loadOrder(token) {
+    const { data, error } = await db.rpc("get_checkout", { p_token: token });
+    if (error || !data) return null;
+    return data;
+  }
+
+  async function createCheckout() {
+    saveGuest(); S.error = "";
+    const g = S.guest;
+    if (g.name.length < 2) S.error = "Enter your full name.";
+    else if (g.phone.replace(/\D/g, "").length < 10) S.error = "Enter a mobile number we can text, like 0917 123 4567.";
+    else if (g.delivery !== "pickup" && (g.address || "").length < 8) S.error = "Enter your complete delivery address.";
+    if (S.error) return render();
+    S.busy = true; render();
+    const { data, error } = await db.rpc("create_checkout", {
+      p_name: g.name, p_phone: g.phone, p_address: g.delivery === "pickup" ? null : g.address,
+      p_delivery: g.delivery, p_note: g.note || null,
+      p_items: Object.entries(S.cart).map(([product_id, qty]) => ({ product_id, qty })),
+      p_replace_token: S.checkout?.token || null,
+    });
+    S.busy = false;
+    if (error) { S.error = error.message; return render(); }
+    const row = data[0];
+    S.checkout = { token: row.access_token, order_no: row.order_no, sig: cartSig() };
+    store.set("pappi_checkout", S.checkout); setUrl(row.access_token);
+    S.order = await loadOrder(row.access_token);
+    S.view = "pay"; render();
+    $("#bag-body").scrollTop = 0;
+  }
+
   async function compress(file) {
     try {
       const img = await createImageBitmap(file);
-      const scale = Math.min(1, 1600 / Math.max(img.width, img.height));
-      const c = document.createElement("canvas");
-      c.width = Math.round(img.width * scale); c.height = Math.round(img.height * scale);
+      const k = Math.min(1, 1600 / Math.max(img.width, img.height));
+      const c = document.createElement("canvas"); c.width = Math.round(img.width * k); c.height = Math.round(img.height * k);
       c.getContext("2d").drawImage(img, 0, 0, c.width, c.height);
-      return await new Promise(r => c.toBlob(b => r(b), "image/jpeg", 0.85));
+      return await new Promise(r => c.toBlob(b => r(b || file), "image/jpeg", .85));
     } catch { return file; }
   }
 
-  async function placeOrder() {
-    state.busy = true; state.error = ""; render();
+  async function submitPayment() {
+    S.busy = true; S.error = ""; render();
     try {
-      const blob = await compress(state.file);
+      const blob = await compress(S.file);
       if (blob.size > 5 * 1024 * 1024) throw new Error("That screenshot is over 5 MB. Take a new screenshot and try again.");
-      const ext = blob.type === "image/jpeg" ? "jpg" : (blob.type.split("/")[1] || "jpg");
-      const now = new Date();
-      const path = `proofs/${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,"0")}/${crypto.randomUUID()}.${ext}`;
+      const d = new Date(), ext = blob.type === "image/png" ? "png" : "jpg";
+      const path = `proofs/${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}/${crypto.randomUUID()}.${ext}`;
       const up = await db.storage.from("payment-proofs").upload(path, blob, { contentType: blob.type || "image/jpeg" });
       if (up.error) throw new Error("Your screenshot didn't upload. Check your connection and try again.");
-
-      const { data, error } = await db.rpc("place_order", {
-        p_name: state.name, p_phone: state.phone,
-        p_address: state.delivery === "pickup" ? null : state.address,
-        p_delivery: state.delivery, p_payment_method: state.method,
-        p_proof_path: path, p_note: state.note,
-        p_items: Object.entries(state.cart).map(([product_id, qty]) => ({ product_id, qty })),
-      });
+      const { data: orderId, error } = await db.rpc("submit_payment", { p_token: S.checkout.token, p_method: S.method, p_proof_path: path });
       if (error) throw new Error(error.message);
-      state.done = data[0];
-      db.functions.invoke("notify-telegram", { body: { order_id: state.done.order_id } }).catch(() => {});
-    } catch (e) {
-      state.error = e.message || "Your order didn't go through. Try again, or text us at 0905 561 3013.";
-    }
-    state.busy = false; render();
+      db.functions.invoke("notify-telegram", { body: { order_id: orderId } }).catch(() => {});
+      store.set("pappi_last_order", S.checkout.token);
+      S.order = await loadOrder(S.checkout.token);
+      S.cart = {}; saveCart(); S.checkout = null; store.set("pappi_checkout", null);
+      S.file = null; S.preview = ""; S.view = "status";
+    } catch (e) { S.error = e.message || `Payment didn't go through. Text us at ${CFG.GCASH_NUMBER}.`; }
+    S.busy = false; render();
   }
 
-  root.addEventListener("click", e => {
-    const t = e.target.closest("button"); if (!t) return;
-    const d = t.dataset;
-    if (d.line) { state.line = d.line; }
-    else if (d.inc) { state.cart[d.inc] = Math.min(50, (state.cart[d.inc] || 0) + 1); }
-    else if (d.dec) { const q = (state.cart[d.dec] || 0) - 1; if (q <= 0) delete state.cart[d.dec]; else state.cart[d.dec] = q; }
-    else if (d.method) { state.method = d.method; }
-    else if (d.copy) { navigator.clipboard?.writeText(d.copy); t.textContent = "Copied"; return; }
-    else if ("back" in d) { saveInputs(); state.error = ""; state.step--; }
-    else if ("again" in d) { Object.assign(state, { step: 1, cart: {}, file: null, preview: "", done: null, note: "" }); }
-    else if ("next" in d) {
-      saveInputs();
-      if (state.step === 2) { state.error = validateDetails(); if (state.error) return render(); }
-      if (state.step === 3) return placeOrder();
-      state.error = ""; state.step++;
-      root.scrollIntoView({ behavior: "smooth", block: "start" });
-    } else return;
-    render();
+  bag.addEventListener("click", async e => {
+    const b = e.target.closest("button"); if (!b) return;
+    const d = b.dataset;
+    if (d.inc) { S.cart[d.inc] = Math.min(50, (S.cart[d.inc] || 0) + 1); saveCart(); render(); }
+    else if (d.dec) { const q = (S.cart[d.dec] || 0) - 1; q > 0 ? S.cart[d.dec] = q : delete S.cart[d.dec]; saveCart(); render(); }
+    else if (d.method) { S.method = d.method; render(); }
+    else if (d.copy) { try { await navigator.clipboard.writeText(d.copy); b.textContent = "Copied"; } catch { prompt("Copy this:", d.copy); } }
+    else if (d.go === "details") { S.error = ""; S.view = "details"; render(); }
+    else if (d.go === "cart") { saveGuest(); S.error = ""; S.view = "cart"; render(); }
+    else if (d.go === "create") { createCheckout(); }
+    else if (d.go === "pay") { S.error = ""; S.view = "pay"; if (!S.order || S.order.order_no !== S.checkout.order_no) { render(); S.order = await loadOrder(S.checkout.token); if (!S.order || S.order.status !== "awaiting_payment") { S.checkout = null; store.set("pappi_checkout", null); S.view = S.order ? "status" : "cart"; } } render(); }
+    else if (d.go === "submit") { submitPayment(); }
+    else if (d.go === "fresh") { S.order = null; S.view = "cart"; setUrl(null); render(); }
+  });
+  bag.addEventListener("change", e => {
+    if (e.target.name === "bag-del") { saveGuest(); S.guest.delivery = e.target.value; store.set("pappi_guest", S.guest); render(); }
+    if (e.target.id === "bag-file" && e.target.files[0]) { S.file = e.target.files[0]; S.preview = URL.createObjectURL(S.file); S.error = ""; render(); }
   });
 
-  root.addEventListener("change", e => {
-    if (e.target.name === "pw-del") { saveInputs(); state.delivery = e.target.value; render(); }
-    if (e.target.id === "pw-file" && e.target.files[0]) {
-      state.file = e.target.files[0];
-      state.preview = URL.createObjectURL(state.file);
-      state.error = ""; render();
-    }
-  });
-
-  // "Choose" buttons on the scent cards add one bottle (Elixir by default)
-  window.pappiPick = (scentName) => {
-    const norm = s => s.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
-    const p = state.products.find(x => x.line === state.line && norm(x.name) === norm(scentName))
-           || state.products.find(x => norm(x.name) === norm(scentName));
-    if (!p) return;
-    state.done = null; state.step = 1; state.line = p.line;
-    state.cart[p.id] = Math.min(50, (state.cart[p.id] || 0) + 1);
-    render();
-  };
-
+  // ---------- start ----------
   (async () => {
     render();
     const { data, error } = await db.from("products").select("id,line,name,price").eq("active", true).order("sort");
-    if (error || !data?.length) { root.innerHTML = `<p>Ordering is offline right now. Text us at 0905 561 3013 or order on Shopee.</p>`; return; }
-    state.products = data; render();
+    if (!error && data) data.forEach(p => S.products[p.id] = { ...p, price: Number(p.price) });
+
+    // Show real prices on card buttons; disable anything not on sale yet
+    document.querySelectorAll("[data-add]").forEach(b => {
+      const p = S.products[b.dataset.add];
+      const price = b.querySelector("small");
+      if (p) { if (price) price.textContent = peso(p.price); }
+      else { b.disabled = true; if (price) price.textContent = error ? "Offline" : "Coming soon"; }
+    });
+    // Drop bag items that are no longer sold
+    Object.keys(S.cart).forEach(id => { if (!S.products[id]) delete S.cart[id]; }); saveCart();
+
+    const token = new URLSearchParams(location.search).get("checkout");
+    if (token) {
+      const o = await loadOrder(token);
+      if (o) {
+        S.order = o;
+        if (o.status === "awaiting_payment") {
+          // Returning to an unpaid order: bring its items back into the bag
+          S.cart = {}; o.items.forEach(i => { if (S.products[i.product_id]) S.cart[i.product_id] = i.qty; }); saveCart();
+          S.checkout = { token, order_no: o.order_no, sig: cartSig() }; store.set("pappi_checkout", S.checkout);
+          S.view = "pay";
+        } else {
+          if (S.checkout?.token === token) { S.checkout = null; store.set("pappi_checkout", null); S.cart = {}; saveCart(); }
+          S.view = "status";
+        }
+        render(); openBag(); return;
+      }
+    }
+    render();
   })();
 })();
   </script>
   <script>
-    const orderSection = document.querySelector('#order');
-    const mobileOrder = document.querySelector('.mobile-order');
-    if (orderSection && mobileOrder && 'IntersectionObserver' in window) {
-      new IntersectionObserver(([entry]) => mobileOrder.classList.toggle('is-hidden', entry.isIntersecting), { threshold: 0.05 }).observe(orderSection);
-    }
-    document.querySelectorAll('[data-product]').forEach(button => button.addEventListener('click', () => {
-      if (window.pappiPick) window.pappiPick(button.dataset.product);
-      document.querySelector('#order').scrollIntoView({ behavior: 'smooth' });
-    }));
+    const form = document.querySelector('#contact-form');
+    form.addEventListener('submit', event => {
+      event.preventDefault();
+      if (!form.reportValidity()) return;
+      const data = new FormData(form);
+      const subject = encodeURIComponent(`Message from ${data.get('name')} — pappiscents.shop`);
+      const body = encodeURIComponent(`${data.get('message')}\n\n— ${data.get('name')}\n${data.get('contact')}`);
+      document.querySelector('#success').classList.add('show');
+      window.location.href = `mailto:verge.gamotan@gmail.com?subject=${subject}&body=${body}`;
+    });
 
     const carousel = document.querySelector('.carousel');
     const track = carousel.querySelector('.carousel-track');
