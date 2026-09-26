@@ -1156,6 +1156,7 @@
     if (error) { S.error = error.message; return render(); }
     const row = data[0];
     S.checkout = { token: row.access_token, order_no: row.order_no, sig: cartSig() };
+    db.functions.invoke("notify-telegram", { body: { token: row.access_token, event: "placed" } }).catch(() => {});
     store.set("pappi_checkout", S.checkout); setUrl(row.access_token);
     S.order = await loadOrder(row.access_token);
     S.method = S.order?.payment_method || g.payment;
@@ -1184,7 +1185,7 @@
       if (up.error) throw new Error("Your screenshot didn't upload. Check your connection and try again.");
       const { data: orderId, error } = await db.rpc("submit_payment", { p_token: S.checkout.token, p_method: S.method, p_proof_path: path });
       if (error) throw new Error(error.message);
-      db.functions.invoke("notify-telegram", { body: { order_id: orderId } }).catch(() => {});
+      db.functions.invoke("notify-telegram", { body: { order_id: orderId, event: "paid" } }).catch(() => {});
       store.set("pappi_last_order", S.checkout.token);
       S.order = await loadOrder(S.checkout.token);
       S.cart = {}; saveCart(); S.checkout = null; store.set("pappi_checkout", null);
