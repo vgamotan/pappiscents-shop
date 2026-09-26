@@ -66,6 +66,15 @@
   .err{color:var(--cancel);min-height:1.3em;margin-top:10px}
   .toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom));transform:translateX(-50%);background:var(--gold);color:#1a1409;padding:10px 18px;border-radius:999px;font-weight:600;z-index:20}
   h3{margin:22px 0 10px;font-size:1.05rem}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:0 10px}
+  .items-edit{display:flex;flex-direction:column;gap:6px;margin-bottom:8px}
+  .item-row,.item-head{display:grid;grid-template-columns:1fr 64px 96px 40px;gap:6px;align-items:center}
+  .item-head{font-size:.78rem}
+  .item-row .btn{padding:8px 0}
+  .tag{display:inline-block;margin-left:6px;padding:1px 8px;border:1px solid var(--line);border-radius:999px;color:var(--gold-hi);font-size:.72rem;vertical-align:1px}
+  .card-set{padding:16px;border:1px solid var(--line);border-radius:12px;background:var(--panel);margin-bottom:8px}
+  .linkbtn{border:0;background:none;padding:0;color:var(--gold-hi);text-decoration:underline;cursor:pointer}
+  @media (max-width:560px){.grid2{grid-template-columns:1fr}.item-row,.item-head{grid-template-columns:1fr 54px 78px 36px}}
   @media (max-width:560px){.row{grid-template-columns:auto 1fr}.row .amt{grid-column:2;text-align:left}.kv{grid-template-columns:90px 1fr}}
 </style>
 </head>
@@ -88,8 +97,11 @@ const SITE = "https://pappiscents.shop";
 const LABEL = { new:"To check", awaiting_payment:"Unpaid", paid:"Paid", packed:"Packed", shipped:"Shipped", completed:"Completed", cancelled:"Cancelled" };
 const DELIVERY = { nationwide:"Nationwide", cebu_express:"Cebu express", pickup:"Pickup" };
 const REVENUE_STATUSES = ["paid","packed","shipped","completed"];
+const CHANNELS = { website:"Website", manual:"Manual", messenger:"Messenger", facebook:"Facebook", instagram:"Instagram", tiktok:"TikTok", "walk-in":"Walk-in", reseller:"Reseller", shopee:"Shopee", other:"Other" };
+const PAYMENTS = ["QR Ph","GCash","Maya","Bank transfer","Cash","COD","Other"];
+const peso2 = n => "₱" + Number(n || 0).toLocaleString("en-PH", { maximumFractionDigits: 2 });
 
-const S = { tab:"orders", filter:"new", orders:[], customers:[], products:[], open:null, proofUrl:"", q:"" };
+const S = { tab:"orders", filter:"new", orders:[], customers:[], products:[], settings:{ shipping_fee:80, free_shipping_over:1500 }, open:null, edit:null, proofUrl:"", q:"" };
 
 function toast(msg){ const t=document.createElement("div"); t.className="toast"; t.textContent=msg; document.body.append(t); setTimeout(()=>t.remove(),2200); }
 
@@ -112,13 +124,15 @@ function viewLogin(err=""){
 // ---------------- Data ----------------
 async function load(){
   const since = new Date(Date.now() - 1000*60*60*24*365).toISOString();
-  const [o, c, p] = await Promise.all([
-    db.from("orders").select("*, customers(id,name,phone,address), order_items(name,line,qty,unit_price)").gte("created_at", since).order("created_at",{ascending:false}),
+  const [o, c, p, st] = await Promise.all([
+    db.from("orders").select("*, customers(id,name,phone,address), order_items(product_id,name,line,qty,unit_price)").gte("created_at", since).order("created_at",{ascending:false}),
     db.from("customers").select("*").order("created_at",{ascending:false}),
     db.from("products").select("*").order("sort"),
+    db.from("shop_settings").select("*").eq("id",1).maybeSingle(),
   ]);
   if (o.error) throw o.error;
   S.orders = o.data; S.customers = c.data || []; S.products = p.data || [];
+  S.settings = st.data || { shipping_fee: 80, free_shipping_over: 1500 };
 }
 
 // ---------------- Views ----------------
@@ -127,18 +141,19 @@ function shell(body){
   app.innerHTML = `<header><div class="top"><div class="brand">Pappi <span>Orders</span></div>
       <div><button class="btn ghost" id="refresh">Refresh</button> <button class="btn ghost" id="logout">Sign out</button></div></div>
     <nav>${tabs.map(([k,l])=>`<button data-tab="${k}" ${S.tab===k?'aria-current="page"':""}>${l}</button>`).join("")}</nav></header>
-    <main>${body}</main>${S.open ? viewOrder() : ""}`;
+    <main>${body}</main>${S.edit ? viewEditor() : S.open ? viewOrder() : ""}`;
 }
 
 function viewOrders(){
   const counts = Object.fromEntries(STATUSES.map(s=>[s, S.orders.filter(o=>o.status===s).length]));
   const list = S.orders.filter(o => S.filter==="all" || o.status===S.filter);
-  return `<div class="filters">${["new","awaiting_payment","paid","packed","shipped","completed","cancelled","all"].map(f=>
+  return `<div style="display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:12px"><h3 style="margin:0">Orders</h3><button class="btn" data-neworder>+ New order</button></div>
+    <div class="filters">${["new","awaiting_payment","paid","packed","shipped","completed","cancelled","all"].map(f=>
       `<button class="chip" data-filter="${f}" aria-pressed="${S.filter===f}">${f==="all"?"All":LABEL[f]}<b>${f==="all"?S.orders.length:counts[f]}</b></button>`).join("")}</div>
     <div class="list">${list.length ? list.map(o=>`
       <button class="row" data-order="${o.id}">
         <span class="dot s-${o.status}" title="${LABEL[o.status]}"></span>
-        <span><b>${esc(o.order_no)}</b> · ${esc(o.customers?.name)}
+        <span><b>${esc(o.order_no)}</b> · ${esc(o.customers?.name)}${o.channel && o.channel!=="website" ? ` <span class="tag">${esc(CHANNELS[o.channel] || o.channel)}</span>` : ""}
           <small>${o.order_items.map(i=>`${i.qty}× ${esc(i.name)} ${i.line.split(" ")[0]}`).join(", ")} · ${DELIVERY[o.delivery]} · ${fmtDate(o.created_at)}</small></span>
         <span class="amt">${peso(o.total)}<small>${esc(o.payment_method || "Not paid yet")}</small></span>
       </button>`).join("") : `<p class="muted">No ${S.filter==="all"?"":LABEL[S.filter].toLowerCase()+" "}orders. Paid website orders appear under To check and on Telegram.</p>`}</div>`;
@@ -171,6 +186,7 @@ function viewOrder(){
     <div class="field"><label for="f-track">Tracking number</label><input id="f-track" value="${esc(o.tracking_no)}"></div>
     <div class="field"><label for="f-note">Private note</label><textarea id="f-note" rows="2">${esc(o.admin_note)}</textarea></div>
     <div class="actions"><button class="btn" data-save>Save details</button>
+      <button class="btn ghost" data-editorder="${o.id}">Edit order</button>
       ${o.status!=="cancelled"?`<button class="btn ghost" data-status="cancelled">Cancel order</button>`:`<button class="btn ghost" data-status="new">Reopen order</button>`}</div>
   </div></div>`;
 }
@@ -238,7 +254,16 @@ function viewSales(){
 }
 
 function viewProducts(){
-  return `<p class="muted">Change a price or hide a product, then press Save. The website order form updates right away.</p>
+  return `<div class="card-set">
+      <h3 style="margin-top:0">Shipping</h3>
+      <div class="grid2">
+        <div class="field"><label for="set-ship">Flat shipping fee (₱)</label><input id="set-ship" type="number" min="0" step="1" value="${Number(S.settings.shipping_fee)}"></div>
+        <div class="field"><label for="set-free">Free shipping when items total more than (₱)</label><input id="set-free" type="number" min="0" step="1" value="${Number(S.settings.free_shipping_over)}"></div>
+      </div>
+      <div class="actions"><button class="btn" data-savesettings>Save shipping</button></div>
+    </div>
+    <h3>Products</h3>
+    <p class="muted">Change a price or hide a product, then press Save. The website updates right away, including pages already open.</p>
     <div class="wrap"><table><thead><tr><th>Product</th><th>Line</th><th class="n">Price (₱)</th><th>On sale</th><th></th></tr></thead>
     <tbody>${S.products.map(p=>`<tr><td>${esc(p.name)}</td><td>${esc(p.line)}</td>
       <td class="n"><input type="number" min="0" step="1" value="${Number(p.price)}" data-price="${p.id}" style="max-width:110px;text-align:right"></td>
@@ -249,6 +274,117 @@ function viewProducts(){
 function render(){
   const body = { orders:viewOrders, customers:viewCustomers, sales:viewSales, products:viewProducts }[S.tab]();
   shell(body);
+}
+
+
+// ---------------- Create / edit order ----------------
+function blankDraft(){
+  return { name:"", phone:"", address_parts:{ province:"", city:"", barangay:"", street:"", landmark:"", zip:"" },
+    delivery:"nationwide", payment_method:"GCash", status:"paid", shipping_fee:Number(S.settings.shipping_fee), shipAuto:true,
+    channel:"messenger", customer_note:"", admin_note:"", tracking_no:"", items:[] };
+}
+function draftFrom(o){
+  return { name:o.customers?.name||"", phone:o.customers?.phone||"",
+    address_parts:{ province:"", city:"", barangay:"", street:"", landmark:"", zip:"", ...(o.address_parts||{}), ...(o.address_parts?{}:{ street:o.address||"" }) },
+    delivery:o.delivery||"nationwide", payment_method:o.payment_method||"", status:o.status, shipping_fee:Number(o.shipping_fee), shipAuto:false,
+    channel:o.channel||"website", customer_note:o.customer_note||"", admin_note:o.admin_note||"", tracking_no:o.tracking_no||"",
+    items:o.order_items.map(i=>({ product_id:i.product_id, qty:i.qty, unit_price:Number(i.unit_price) })) };
+}
+const draftSub = d => d.items.reduce((a,i)=>a + (Number(i.unit_price)||0)*(Number(i.qty)||0), 0);
+const ruleShip = d => d.delivery==="pickup" ? 0 : (draftSub(d) > Number(S.settings.free_shipping_over) ? 0 : Number(S.settings.shipping_fee));
+function syncShip(d){ if (d.shipAuto) d.shipping_fee = ruleShip(d); }
+
+function viewEditor(){
+  const E = S.edit, d = E.draft, isNew = !E.id;
+  const o = isNew ? null : S.orders.find(x=>x.id===E.id);
+  const opt = (list, val) => list.map(([v,l])=>`<option value="${esc(v)}" ${v===val?"selected":""}>${esc(l)}</option>`).join("");
+  const prodOpts = sel => `<option value="">Choose product…</option>` + ["Elixir 40%","Parfum 20%","Savon"].map(line=>
+    `<optgroup label="${line}">${S.products.filter(p=>p.line===line).map(p=>`<option value="${p.id}" ${p.id===sel?"selected":""}>${esc(p.name)} · ${esc(p.line.split(" ")[0])} — ${peso2(p.price)}${p.active?"":" (hidden)"}</option>`).join("")}</optgroup>`).join("");
+  const f = (key, label, val, extra="") => `<div class="field"><label>${label}</label><input data-f="${key}" value="${esc(val)}" ${extra}></div>`;
+  const a = d.address_parts, sub = draftSub(d);
+  return `<div class="sheet" data-close><div role="dialog" aria-label="${isNew?"New order":"Edit order"}">
+    <div style="display:flex;justify-content:space-between;align-items:start">
+      <div><h2>${isNew ? "New order" : "Edit " + esc(o.order_no)}</h2><span class="muted">${isNew ? "For Messenger, walk-in or reseller orders. No customer alerts are sent." : "Changes save to the order and the customer's order link."}</span></div>
+      <button class="btn ghost" data-canceledit>Close</button></div>
+
+    <h3>Customer</h3>
+    <div class="grid2">
+      ${f("phone","Mobile number", d.phone, 'list="cust-phones" inputmode="tel" placeholder="09XXXXXXXXX"')}
+      ${f("name","Full name", d.name)}
+    </div>
+    <datalist id="cust-phones">${S.customers.map(c=>`<option value="${esc(c.phone)}">${esc(c.name)}</option>`).join("")}</datalist>
+    <p class="muted" style="margin:4px 0 0;font-size:.85rem">Pick an existing number to fill their name and last address.</p>
+
+    <h3>Items</h3>
+    <div class="items-edit"><div class="item-head muted"><span>Product</span><span>Qty</span><span>Price each (₱)</span><span></span></div>${d.items.map((it,k)=>`
+      <div class="item-row">
+        <select data-item="${k}" data-k="product_id">${prodOpts(it.product_id)}</select>
+        <input data-item="${k}" data-k="qty" type="number" min="1" step="1" value="${it.qty}" aria-label="Quantity">
+        <input data-item="${k}" data-k="unit_price" type="number" min="0" step="1" value="${it.unit_price}" aria-label="Price each">
+        <button class="btn ghost" data-delitem="${k}" aria-label="Remove item">×</button>
+      </div>`).join("") || `<p class="muted">No items yet.</p>`}
+    </div>
+    <button class="btn ghost" data-additem>+ Add item</button>
+
+    <h3>Delivery</h3>
+    <div class="grid2">
+      <div class="field"><label>Method</label><select data-f="delivery">${opt([["nationwide","Nationwide (J&T)"],["cebu_express","Cebu City express"],["pickup","Pickup"]], d.delivery)}</select></div>
+      ${f("tracking_no","Tracking number", d.tracking_no)}
+    </div>
+    <div class="grid2">
+      ${f("a.province","Province", a.province)}${f("a.city","City / Municipality", a.city)}
+      ${f("a.barangay","Barangay", a.barangay)}${f("a.street","House no., street, building", a.street)}
+      ${f("a.landmark","Landmark", a.landmark)}${f("a.zip","ZIP", a.zip, 'inputmode="numeric"')}
+    </div>
+
+    <h3>Payment & status</h3>
+    <div class="grid2">
+      <div class="field"><label>Payment method</label><select data-f="payment_method"><option value="">Not set</option>${opt(PAYMENTS.map(x=>[x,x]), d.payment_method)}</select></div>
+      <div class="field"><label>Status</label><select data-f="status">${opt(STATUSES.map(x=>[x,LABEL[x]]), d.status)}</select></div>
+      <div class="field"><label>Channel</label><select data-f="channel">${opt(Object.entries(CHANNELS), d.channel)}</select></div>
+      <div class="field"><label>Shipping fee (₱) <span class="muted" style="font-size:.8rem">${d.shipAuto?"· auto":""}</span></label><input data-f="shipping_fee" type="number" min="0" step="1" value="${d.shipping_fee}"></div>
+    </div>
+    <p class="muted" style="margin:4px 0 0;font-size:.85rem">Shipping rule: ${peso2(S.settings.shipping_fee)}, free over ${peso2(S.settings.free_shipping_over)}, pickup free. <button class="linkbtn" data-shipauto>Use rule</button></p>
+    <div class="field"><label>Customer note</label><input data-f="customer_note" value="${esc(d.customer_note)}"></div>
+    <div class="field"><label>Private note</label><textarea data-f="admin_note" rows="2">${esc(d.admin_note)}</textarea></div>
+
+    <ul class="items" style="margin-top:16px" id="ed-totals">${totalsHtml(d)}</ul>
+    <p class="err" id="ed-err">${esc(E.error||"")}</p>
+    <div class="actions"><button class="btn" data-saveorder ${E.busy?"disabled":""}>${E.busy?"Saving…":(isNew?"Create order":"Save changes")}</button>
+      <button class="btn ghost" data-canceledit>Cancel</button></div>
+  </div></div>`;
+}
+function totalsHtml(d){ const sub = draftSub(d), ship = Number(d.shipping_fee)||0;
+  return `<li><span>Subtotal</span><span>${peso2(sub)}</span></li><li><span>Shipping fee</span><span>${ship?peso2(ship):"Free"}</span></li><li><b>Total</b><b>${peso2(sub+ship)}</b></li>`; }
+function refreshTotals(){ const d=S.edit.draft; syncShip(d); const t=document.getElementById("ed-totals"); if(t) t.innerHTML=totalsHtml(d);
+  const sf=document.querySelector('[data-f="shipping_fee"]'); if(sf && d.shipAuto && document.activeElement!==sf) sf.value=d.shipping_fee; }
+
+function openEditor(id){
+  const o = id ? S.orders.find(x=>x.id===id) : null;
+  S.edit = { id: id||null, draft: o ? draftFrom(o) : blankDraft(), error:"", busy:false };
+  if (!o) S.edit.draft.items.push({ product_id:"", qty:1, unit_price:0 });
+  render();
+}
+function fillFromCustomer(phone){
+  const d = S.edit.draft, c = S.customers.find(x=>x.phone===phone.replace(/\D/g,"")); if(!c) return false;
+  if (!d.name) d.name = c.name;
+  const last = S.orders.find(o=>o.customer_id===c.id && o.address_parts);
+  if (last && !d.address_parts.street) d.address_parts = { province:"", city:"", barangay:"", street:"", landmark:"", zip:"", ...last.address_parts };
+  else if (!last && c.address && !d.address_parts.street) d.address_parts.street = c.address;
+  return true;
+}
+async function saveDraft(){
+  const E = S.edit, d = E.draft;
+  d.items = d.items.filter(i=>i.product_id);
+  const payload = { ...d, items: d.items.map(i=>({ product_id:i.product_id, qty:Number(i.qty)||1, unit_price:Number(i.unit_price)||0 })) };
+  delete payload.shipAuto;
+  E.busy = true; E.error = ""; render();
+  const { data, error } = await db.rpc("admin_save_order", { p_order_id: E.id, p: payload });
+  E.busy = false;
+  if (error) { E.error = error.message; if (!d.items.length) d.items.push({ product_id:"", qty:1, unit_price:0 }); return render(); }
+  const row = data[0]; const wasNew = !E.id;
+  S.edit = null; await load(); S.open = row.order_id; S.proofUrl = ""; render();
+  toast(wasNew ? `Order ${row.order_no} created` : `Order ${row.order_no} updated`);
 }
 
 // ---------------- Actions ----------------
@@ -263,16 +399,30 @@ async function openOrder(id){
 
 async function updateOrder(id, patch, msg){
   const { data, error } = await db.from("orders").update(patch).eq("id", id)
-    .select("*, customers(id,name,phone,address), order_items(name,line,qty,unit_price)").single();
+    .select("*, customers(id,name,phone,address), order_items(product_id,name,line,qty,unit_price)").single();
   if (error) return toast("Didn't save: " + error.message);
   S.orders = S.orders.map(o=>o.id===id?data:o); render(); toast(msg);
 }
 
 app.addEventListener("click", async e => {
-  if (e.target.matches(".sheet[data-close]")) { S.open=null; return render(); }
+  if (e.target.matches(".sheet[data-close]")) { if (S.edit) return; S.open=null; return render(); }
   const b = e.target.closest("button"); if(!b) return;
   const d = b.dataset;
-  if (d.tab){ S.tab=d.tab; S.open=null; render(); }
+  if (d.tab){ S.tab=d.tab; S.open=null; S.edit=null; render(); }
+  else if ("neworder" in d){ S.open=null; openEditor(null); }
+  else if (d.editorder){ openEditor(d.editorder); }
+  else if ("canceledit" in d){ S.edit=null; render(); }
+  else if ("additem" in d){ S.edit.draft.items.push({ product_id:"", qty:1, unit_price:0 }); render(); }
+  else if (d.delitem){ S.edit.draft.items.splice(Number(d.delitem),1); syncShip(S.edit.draft); render(); }
+  else if ("shipauto" in d){ S.edit.draft.shipAuto=true; syncShip(S.edit.draft); render(); }
+  else if ("saveorder" in d){ saveDraft(); }
+  else if ("savesettings" in d){
+    const shipping_fee = Number(document.getElementById("set-ship").value), free_shipping_over = Number(document.getElementById("set-free").value);
+    if (!(shipping_fee >= 0) || !(free_shipping_over >= 0)) return toast("Enter valid amounts");
+    const { error } = await db.from("shop_settings").update({ shipping_fee, free_shipping_over, updated_at:new Date().toISOString() }).eq("id",1);
+    if (error) return toast("Didn't save: " + error.message);
+    S.settings = { ...S.settings, shipping_fee, free_shipping_over }; toast("Shipping saved. Website updated");
+  }
   else if (d.filter){ S.filter=d.filter; render(); }
   else if (d.jnt){
     const o = S.orders.find(x=>x.id===d.jnt); const a = o.address_parts || {};
@@ -299,6 +449,32 @@ app.addEventListener("click", async e => {
   }
   else if (b.id==="refresh"){ await load(); render(); toast("Up to date"); }
   else if (b.id==="logout"){ await db.auth.signOut(); viewLogin(); }
+});
+app.addEventListener("input", e => {
+  const t = e.target;
+  if (S.edit && t.dataset.f) {
+    const d = S.edit.draft, k = t.dataset.f;
+    if (k.startsWith("a.")) d.address_parts[k.slice(2)] = t.value;
+    else if (k === "shipping_fee") { d.shipping_fee = Number(t.value)||0; d.shipAuto = false; }
+    else d[k] = t.value;
+    if (k === "phone" && fillFromCustomer(t.value)) { render(); const el=document.querySelector('[data-f="phone"]'); el.focus(); el.setSelectionRange(el.value.length, el.value.length); return; }
+    if (k === "delivery") syncShip(d);
+    refreshTotals(); return;
+  }
+  if (S.edit && t.dataset.item) {
+    const it = S.edit.draft.items[Number(t.dataset.item)], k = t.dataset.k;
+    it[k] = k === "product_id" ? t.value : Number(t.value);
+    refreshTotals(); return;
+  }
+});
+app.addEventListener("change", e => {
+  const t = e.target;
+  if (S.edit && t.dataset.item && t.dataset.k === "product_id") {
+    const it = S.edit.draft.items[Number(t.dataset.item)], p = S.products.find(x=>x.id===t.value);
+    it.product_id = t.value; if (p) it.unit_price = Number(p.price); syncShip(S.edit.draft); render();
+  } else if (S.edit && (t.dataset.f === "delivery" || t.dataset.f === "status" || t.dataset.f === "payment_method" || t.dataset.f === "channel")) {
+    S.edit.draft[t.dataset.f] = t.value; syncShip(S.edit.draft); refreshTotals();
+  }
 });
 app.addEventListener("input", e => { if (e.target.id==="q"){ S.q=e.target.value; const pos=e.target.selectionStart; render(); const q=document.getElementById("q"); q.focus(); q.setSelectionRange(pos,pos);} });
 
