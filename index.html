@@ -26,7 +26,7 @@
   <link rel="icon" href="assets/brand/logo.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&amp;family=Italiana&amp;display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700&amp;family=Jost:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&amp;display=swap" rel="stylesheet">
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
@@ -531,6 +531,190 @@
       .bag-grid2 { grid-template-columns: 1fr; }
     }
     @media (prefers-reduced-motion: reduce) { .bag { transition: none; } .bag-fab.bump { animation: none; } }
+    /* =================== Pappi brand theme: lacquer black + crest gold =================== */
+    :root {
+      --ink: #17140f; --black: #0b0a08; --onyx: #15130f; --cream: #f1e7d3; --paper: #f7f1e4;
+      --gold: #c9a24a; --gold-light: #ecd9a8; --gold-deep: #94722c;
+      --line: rgba(23,20,15,.13); --line-dark: rgba(236,217,168,.16); --muted: #6a6153;
+      --serif: "Cinzel", "Trajan Pro", Georgia, serif; --sans: "Jost", "Segoe UI", system-ui, sans-serif;
+      --shadow: 0 14px 36px rgba(0,0,0,.16);
+    }
+    body { background: radial-gradient(ellipse at 50% -10%, #2a2215 0, #0b0a08 55%) fixed #0b0a08; font-size: 15px; line-height: 1.55; }
+    .site { border: 1px solid rgba(201,162,74,.28); background: var(--paper); box-shadow: 0 30px 90px rgba(0,0,0,.55); }
+    h1, h2, h3, .serif { font-family: var(--serif); font-weight: 600; letter-spacing: .03em; }
+    h2 { font-size: clamp(1.55rem, 2.5vw, 2.2rem); line-height: 1.15; margin-bottom: 10px; }
+    .eyebrow { margin-bottom: 8px; color: var(--gold-deep); font-size: .66rem; letter-spacing: .22em; }
+    .lede { font-size: .95rem; line-height: 1.6; }
+    section { padding: 48px 0; }
+    .section-head { margin-bottom: 24px; gap: 28px; align-items: flex-end; }
+    .section-note { font-size: .82rem; }
+    .button { min-height: 42px; font-weight: 600; letter-spacing: .03em; }
+
+    /* Nav + hero */
+    .announcement { background: linear-gradient(90deg, #b48c3a, #e3c67f 50%, #b48c3a); color: #1a140a; letter-spacing: .12em; }
+    .nav-inner { height: 64px; }
+    .brand img { width: 46px; height: 46px; }
+    .brand-name { font-family: var(--serif); font-size: .95rem; letter-spacing: .12em; }
+    .nav-links a { font-size: .8rem; letter-spacing: .04em; }
+    .hero, .hero-inner { min-height: 500px; }
+    .hero { background: radial-gradient(circle at 76% 40%, #3a2f1c 0, #161209 32%, #0b0a08 70%); }
+    .hero-inner { padding-top: 64px; }
+    .hero-copy { padding: 34px 0; }
+    .hero h1 { font-size: clamp(2.5rem, 4.8vw, 4.2rem); line-height: 1.02; letter-spacing: .02em; margin-bottom: 16px; }
+    .hero h1 em { color: var(--gold); }
+    .hero-copy > p:not(.eyebrow) { margin-bottom: 22px; font-size: .95rem; color: #cfc6b5; }
+    .hero::after { top: 90px; right: -90px; width: 400px; height: 400px; border-color: rgba(201,162,74,.35); }
+    .hero-bottle-1 { height: min(82%, 400px); }
+    .hero-bottle-2 { height: min(64%, 320px); }
+    .microproof { margin-top: 22px; font-size: .74rem; }
+    .trust { background: var(--onyx); border: 0; }
+    .trust-item { padding: 12px 16px; border-color: var(--line-dark); }
+    .trust-item strong { color: var(--gold-light); font-family: var(--serif); font-size: .92rem; letter-spacing: .06em; }
+    .trust-item span { color: #9f9582; font-size: .72rem; }
+
+    /* Fragrances */
+    #fragrances { background: var(--paper); }
+    .formats { gap: 12px; margin-bottom: 22px; }
+    .format { min-height: 136px; grid-template-columns: 110px 1fr auto; border: 1px solid var(--line); background: #fffdf8; }
+    .format--dark { border-color: rgba(201,162,74,.4); background: var(--black); }
+    .format-image { height: 130px; padding: 10px 8px; }
+    .format h3 { font-size: 1.1rem; letter-spacing: .06em; }
+    .format p { font-size: .8rem; }
+    .format-badge { font-size: .62rem; }
+    .scent-grid, .soap-grid { gap: 12px; }
+    .product-card { border-color: rgba(201,162,74,.28); border-radius: 16px; background: #fffdf8; }
+    .product-card:hover { transform: translateY(-3px); }
+    .product-card .product-image { height: auto; aspect-ratio: 5 / 4; }
+    .product-card .product-image img { object-position: 50% 78%; }
+    .product-body { padding: 12px 14px 14px; background: #fffdf8; }
+    .product-body h3 { font-size: 1rem; letter-spacing: .08em; }
+    .product-body p { min-height: 0; margin-bottom: 10px; font-size: .78rem; line-height: 1.45; }
+    .add { min-height: 44px; }
+
+    /* Campaign + Savon */
+    .campaign { padding: 44px 0; }
+    .campaign-head { margin-bottom: 22px; }
+    .carousel-controls { margin-top: 14px; }
+    .carousel-caption { margin-top: 10px; }
+    .savon-section { background: var(--onyx); }
+    .savon-logo { width: 88px; height: 88px; margin-bottom: 12px; }
+    .savon-gallery { gap: 10px; margin-bottom: 22px; }
+    .savon-gallery-secondary { gap: 10px; }
+    .savon-gallery-tile img { height: 230px; }
+    .soap-card { border-color: var(--line-dark); background: #1c1a15; }
+    .soap-card .product-image { height: 210px; padding: 14px 14px 0; }
+    .soap-card .product-body { background: transparent; }
+    .soap-card h3 { color: var(--gold-light); }
+    .soap-number { font-size: .64rem; }
+
+    /* Where to shop */
+    .channels { background: var(--cream); }
+    .channel-grid { gap: 12px; }
+    .channel { min-height: 180px; padding: 20px; border-radius: 16px; }
+    .channel h3 { font-size: 1.15rem; letter-spacing: .05em; }
+    .channel p { font-size: .84rem; }
+    .channel-logo { height: 38px !important; margin-bottom: 12px; }
+
+    /* About + compact story */
+    .about { background: var(--paper); }
+    .about-grid { grid-template-columns: .7fr 1.3fr; gap: 32px; align-items: start; }
+    .about-visual { min-height: 0; aspect-ratio: 4 / 5; border-radius: 16px; border: 1px solid rgba(201,162,74,.35); box-shadow: none; }
+    .about-copy { align-self: start; }
+    .about-copy .lede { margin-bottom: 10px; color: #3b352c; }
+    .about-more { margin: 4px 0 0; }
+    .about-more summary { display: inline-block; color: var(--gold-deep); font-size: .84rem; font-weight: 600; cursor: pointer; list-style: none; text-decoration: underline; text-underline-offset: 4px; }
+    .about-more summary::-webkit-details-marker { display: none; }
+    .about-more[open] summary { margin-bottom: 8px; }
+    .about-more p { margin-bottom: 8px; color: var(--muted); font-size: .88rem; }
+    .about-milestones { gap: 8px; margin-top: 16px; }
+    .about-milestone { padding: 10px 12px; border-top-width: 2px; background: var(--cream); }
+    .about-milestone strong { font-size: .95rem; letter-spacing: .05em; }
+    .about-milestone span { font-size: .72rem; }
+    .about-timeline { margin-top: 32px; padding-top: 26px; }
+    .about-timeline-head { margin-bottom: 14px; }
+    .about-timeline-head h3 { margin-bottom: 4px; font-size: 1.3rem; letter-spacing: .05em; }
+    .about-timeline-head p { font-size: .85rem; }
+    .story-rail { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+    .story-era { padding: 14px 14px 6px; border: 1px solid var(--line); border-top: 3px solid var(--gold); border-radius: 14px; background: #fffdf8; }
+    .story-era h4 { margin: 0 0 8px; font-family: var(--serif); font-size: .92rem; font-weight: 600; letter-spacing: .06em; }
+    .story-era h4 span { display: block; color: var(--gold-deep); font-family: var(--sans); font-size: .66rem; font-weight: 600; letter-spacing: .14em; text-transform: uppercase; }
+    .story-era ol { margin: 0; padding: 0; list-style: none; }
+    .story-era li { position: relative; padding: 0 0 10px 14px; border-left: 1px solid rgba(201,162,74,.4); }
+    .story-era li::before { position: absolute; top: 5px; left: -4px; width: 7px; height: 7px; border: 1.5px solid var(--gold); border-radius: 50%; background: #fffdf8; content: ""; }
+    .story-era li.is-milestone::before { background: var(--gold); }
+    .story-when { display: block; color: var(--gold-deep); font-size: .68rem; font-weight: 600; }
+    .story-era b { display: block; font-size: .8rem; line-height: 1.3; }
+    .story-era p { margin: 2px 0 0; color: var(--muted); font-size: .72rem; line-height: 1.4; }
+
+    /* Memory */
+    .memory { padding: 44px 0; }
+    .memory blockquote { margin-bottom: 12px; font-family: var(--serif); font-size: clamp(1.5rem, 3vw, 2.4rem); line-height: 1.15; letter-spacing: .03em; }
+    .memory blockquote em { color: var(--gold); }
+    .memory p { font-size: .86rem; }
+    .memory-quotes { gap: 10px; margin-top: 18px; }
+    .memory-quotes q { padding: 10px 18px; font-family: var(--sans); font-size: .88rem; font-style: italic; }
+
+    /* Testimonials slider */
+    .testimonials { background: var(--cream); }
+    .t-slider { position: relative; }
+    .t-track { display: grid; grid-auto-flow: column; grid-auto-columns: calc((100% - 24px) / 3); gap: 12px; overflow-x: auto; scroll-snap-type: x mandatory; scroll-behavior: smooth; scrollbar-width: none; padding: 2px; }
+    .t-track::-webkit-scrollbar { display: none; }
+    .t-track:focus-visible { outline: 2px solid var(--gold); outline-offset: 4px; border-radius: 16px; }
+    .testimonial { min-height: 0; padding: 18px; scroll-snap-align: start; border-radius: 16px; border-color: rgba(201,162,74,.25); box-shadow: none; grid-column: auto !important; }
+    .testimonial-stars { margin-bottom: 10px; font-size: .72rem; }
+    .testimonial blockquote { margin-bottom: 14px; font-family: var(--sans); font-size: .9rem; line-height: 1.5; color: #2f2a22; }
+    .testimonial-person .testimonial-avatar { display: grid; width: 34px; height: 34px; place-items: center; border: 1px solid var(--gold); color: var(--gold-light); font-size: .66rem; letter-spacing: .04em; }
+    .t-controls { display: flex; align-items: center; justify-content: center; gap: 14px; margin-top: 14px; }
+    .t-arrow { display: grid; width: 38px; height: 38px; place-items: center; border: 1px solid var(--line); border-radius: 50%; background: #fffdf8; font-size: 1rem; cursor: pointer; }
+    .t-arrow:hover { border-color: var(--gold); }
+    .t-dots { display: flex; gap: 7px; }
+    .t-dots button { width: 8px; height: 8px; padding: 0; border: 0; border-radius: 99px; background: #cfc3aa; cursor: pointer; transition: width .2s, background .2s; }
+    .t-dots button[aria-current="true"] { width: 26px; background: var(--gold); }
+
+    /* Contact + closing */
+    .order-grid { grid-template-columns: .9fr 1.1fr; gap: 32px; }
+    .delivery-card { margin-top: 16px; }
+    .delivery-row { padding: 12px 0; }
+    .contact-links { margin-top: 14px; gap: 8px; }
+    .contact-link { min-height: 42px; }
+    form { padding: 22px; border-radius: 18px; box-shadow: none; border-color: rgba(201,162,74,.3); }
+    .form-title { font-family: var(--serif); font-size: 1.2rem; letter-spacing: .05em; margin-bottom: 14px; }
+    .form-grid { gap: 12px; }
+    input, select, textarea { min-height: 44px; }
+    textarea { min-height: 96px; }
+    .promise { padding: 30px 0; background: linear-gradient(90deg, #b48c3a, #e3c67f 50%, #b48c3a); }
+    .promise blockquote { margin-bottom: 8px; font-family: var(--serif); font-size: clamp(1.2rem, 2.2vw, 1.8rem); letter-spacing: .03em; }
+    footer { padding: 26px 0 30px; }
+    .footer-brand img { width: 52px; height: 52px; }
+    .footer-brand strong { font-family: var(--serif); font-size: 1rem; letter-spacing: .08em; }
+
+    /* Bag keeps brand fonts but stays compact */
+    .bag-head h2 { font-size: 1.1rem; letter-spacing: .06em; }
+    .bag h3 { font-family: var(--serif); font-size: 1.05rem; letter-spacing: .05em; }
+    .bag-empty b { font-family: var(--serif); font-size: 1.05rem; }
+
+    @media (max-width: 900px) {
+      .about-grid { grid-template-columns: 1fr; }
+      .about-visual { max-width: 360px; }
+      .story-rail { grid-auto-flow: column; grid-template-columns: none; grid-auto-columns: minmax(240px, 72%); overflow-x: auto; scroll-snap-type: x mandatory; padding-bottom: 6px; }
+      .story-era { scroll-snap-align: start; }
+      .t-track { grid-auto-columns: calc((100% - 12px) / 2); }
+      .order-grid { grid-template-columns: 1fr; }
+      .hero-copy { padding: 110px 0 330px; }
+    }
+    @media (max-width: 620px) {
+      section { padding: 40px 0; }
+      .hero, .hero-inner { min-height: 620px; }
+      .hero-copy { padding: 90px 0 300px; }
+      .hero h1 { font-size: clamp(2.4rem, 11vw, 3.2rem); }
+      .hero-bottle-1 { height: min(72vw, 330px); }
+      .hero-bottle-2 { height: min(58vw, 270px); }
+      .soap-card .product-image { height: 240px; }
+      .t-track { grid-auto-columns: 86%; }
+      .format { grid-template-columns: 96px 1fr; min-height: 120px; }
+      .format-image { height: 116px; }
+      .savon-gallery-tile img { height: auto; }
+    }
   </style>
 </head>
 <body>
@@ -643,9 +827,11 @@
           <p class="eyebrow">About Pappi · Founded by Verge</p>
           <h2>A partner’s obsession. A group chat. A brand.</h2>
           <p class="lede">Pappi started with two things colliding: my partner Larry’s fascination with perfume—and the money he kept spending on it—and a TikTok chat with friends in Singapore who loved luxury fragrance but hated the price tag.</p>
+          <details class="about-more"><summary>Read the full story</summary>
           <p>I didn’t have an answer for them at first. So I went looking for one: Sephora every other day, sniffing everything I could reach, studying mixes, watching videos, flipping through books. Eventually I enrolled in a proper perfumery course and visited manufacturing hubs and suppliers for real base ingredients, until I had over 150 oils on a shelf—ready for mixing, like alchemy in a Singapore bedroom my housemates swore smelled different every time the door opened.</p>
           <p>Some fragrances started as personal requests—friends who wanted a luxury scent without the luxury price—so I named the bottle after them. Under a Singapore-born label called <strong>VG</strong>, that idea traveled with word of mouth into Malaysia and Singapore, and the bottles kept selling.</p>
           <p>Retrenchment hit in May 2026. It could have ended things—instead it sent me home. As a returning OFW, I qualified for financial assistance to start a business, so I made it official. My brothers were dealing with chicken skin and wanted a natural alternative, which became <strong>Savon</strong>. And the perfume line, once VG, became <strong>Pappi</strong> the moment I landed back in the Philippines—black for the dark days it took to get here, gold for what came after.</p>
+          </details>
           <div class="about-milestones" aria-label="Pappi story highlights">
             <div class="about-milestone"><strong>150+ oils</strong><span>Gathered from suppliers and manufacturing hubs</span></div>
             <div class="about-milestone"><strong>April 2025</strong><span>First bottles sold under VG—2,000+ since</span></div>
@@ -657,88 +843,13 @@
       <div class="wrap about-timeline">
         <div class="about-timeline-head">
           <h3>How Pappi came to be.</h3>
-          <p>From a partner’s perfume habit to a name with its own story—here’s the full timeline.</p>
+          <p>From a partner’s perfume habit to a name with its own story.</p>
         </div>
-        <div class="timeline">
-
-          <p class="timeline-era">Singapore — discovery</p>
-          <div class="timeline-entry">
-            <p class="timeline-when">The spark</p>
-            <p class="timeline-what">Larry’s stash grows, and a question follows</p>
-            <p class="timeline-detail">My partner Larry’s fascination with perfume—and the money spent on it—sits alongside a TikTok chat with Singapore friends looking for a cheaper way into luxury scents.</p>
-          </div>
-          <div class="timeline-entry">
-            <p class="timeline-when">Months of learning</p>
-            <p class="timeline-what">Sephora, YouTube, and an online perfumery course</p>
-            <p class="timeline-detail">Sniffing at Sephora every other day, studying mixes, watching countless videos, flipping through books—then enrolling in a proper course and visiting manufacturing hubs and suppliers for base ingredients.</p>
-          </div>
-          <div class="timeline-entry is-milestone">
-            <p class="timeline-when">The lab</p>
-            <p class="timeline-what">150+ oils, one Singapore bedroom</p>
-            <p class="timeline-detail">A room that housemates said smelled different every time the door opened—each blend tested side-by-side against the real designer scent, like alchemy.</p>
-          </div>
-          <div class="timeline-entry">
-            <p class="timeline-when">Naming the bottles</p>
-            <p class="timeline-what">Fragrances named after the friends who requested them</p>
-            <p class="timeline-detail">Arianne, Anne, Ayani, Jo, Ms. Fe, Ms. Jane, Angelina, Maejoy, Khimmy, and more—each one a personal request from someone who wanted a luxury scent without the luxury price.</p>
-          </div>
-
-          <p class="timeline-era">April 2025 — going to market</p>
-          <div class="timeline-entry is-milestone">
-            <p class="timeline-when">April 7, 2025</p>
-            <p class="timeline-what">First bottles sold</p>
-            <p class="timeline-detail">The start of tracked sales—over 2,000 bottles (10–30ml) sold since this date, under the original “VG” label.</p>
-          </div>
-          <div class="timeline-entry">
-            <p class="timeline-when">Expanding</p>
-            <p class="timeline-what">Distribution into Malaysia and Singapore</p>
-            <p class="timeline-detail">Word spread beyond the original friend group; packaging upgraded from loose bottles to named boxes.</p>
-          </div>
-          <div class="timeline-entry">
-            <p class="timeline-when">Giving back</p>
-            <p class="timeline-what">Giveaways for Filipino community groups abroad</p>
-            <p class="timeline-detail">Plus a personalized line built specifically for gifting.</p>
-          </div>
-
-          <p class="timeline-era">May–August 2026 — the turn</p>
-          <div class="timeline-entry is-milestone">
-            <p class="timeline-when">May 2026</p>
-            <p class="timeline-what">Retrenchment</p>
-            <p class="timeline-detail">The job in Singapore ends—and unexpectedly, it paves the way for what comes next.</p>
-          </div>
-          <div class="timeline-entry">
-            <p class="timeline-when">August 10, 2026</p>
-            <p class="timeline-what">Preparing to embark on a new journey</p>
-            <p class="timeline-detail">Packing up Singapore, closing one chapter.</p>
-          </div>
-          <div class="timeline-entry is-milestone">
-            <p class="timeline-when">August 11, 2026</p>
-            <p class="timeline-what">Arrival in Cebu</p>
-            <p class="timeline-detail">Home, and the start of building something official.</p>
-          </div>
-
-          <p class="timeline-era">Cebu — rebirth</p>
-          <div class="timeline-entry">
-            <p class="timeline-when">OFW support</p>
-            <p class="timeline-what">Financial assistance becomes the seed capital</p>
-            <p class="timeline-detail">As a returning OFW, assistance to start a business made the decision easy—might as well make it official.</p>
-          </div>
-          <div class="timeline-entry">
-            <p class="timeline-when">A second line is born</p>
-            <p class="timeline-what">Savon—natural soap, for a very personal reason</p>
-            <p class="timeline-detail">My brothers were dealing with chicken skin and wanted a natural alternative—Savon exists because of them.</p>
-          </div>
-          <div class="timeline-entry is-milestone">
-            <p class="timeline-when">The rebrand</p>
-            <p class="timeline-what">Pappi Suds &amp; Scents—black for the dark days, gold for what’s next</p>
-            <p class="timeline-detail">A new name, new bottles, a new crest—built for premium, international, and a new chapter.</p>
-          </div>
-          <div class="timeline-entry">
-            <p class="timeline-when">Now</p>
-            <p class="timeline-what">Live at pappiscents.shop</p>
-            <p class="timeline-detail">Facebook: pappi.artisan · Shopee: bilyotoy</p>
-          </div>
-
+        <div class="story-rail" tabindex="0" aria-label="Pappi timeline">
+          <div class="story-era"><h4><span>discovery</span>Singapore</h4><ol><li><span class="story-when">The spark</span><b>Larry’s stash grows, and a question follows</b><p>My partner Larry’s fascination with perfume—and the money spent on it—sits alongside a TikTok chat with Singapore friends looking for a cheaper way into luxury scents.</p></li><li><span class="story-when">Months of learning</span><b>Sephora, YouTube, and an online perfumery course</b><p>Sniffing at Sephora every other day, studying mixes, watching countless videos, flipping through books—then enrolling in a proper course and visiting manufacturing hubs and suppliers for base ingredients.</p></li><li class="is-milestone"><span class="story-when">The lab</span><b>150+ oils, one Singapore bedroom</b><p>A room that housemates said smelled different every time the door opened—each blend tested side-by-side against the real designer scent, like alchemy.</p></li><li><span class="story-when">Naming the bottles</span><b>Fragrances named after the friends who requested them</b><p>Arianne, Anne, Ayani, Jo, Ms. Fe, Ms. Jane, Angelina, Maejoy, Khimmy, and more—each one a personal request from someone who wanted a luxury scent without the luxury price.</p></li></ol></div>
+          <div class="story-era"><h4><span>going to market</span>April 2025</h4><ol><li class="is-milestone"><span class="story-when">April 7, 2025</span><b>First bottles sold</b><p>The start of tracked sales—over 2,000 bottles (10–30ml) sold since this date, under the original “VG” label.</p></li><li><span class="story-when">Expanding</span><b>Distribution into Malaysia and Singapore</b><p>Word spread beyond the original friend group; packaging upgraded from loose bottles to named boxes.</p></li><li><span class="story-when">Giving back</span><b>Giveaways for Filipino community groups abroad</b><p>Plus a personalized line built specifically for gifting.</p></li></ol></div>
+          <div class="story-era"><h4><span>the turn</span>May–August 2026</h4><ol><li class="is-milestone"><span class="story-when">May 2026</span><b>Retrenchment</b><p>The job in Singapore ends—and unexpectedly, it paves the way for what comes next.</p></li><li><span class="story-when">August 10, 2026</span><b>Preparing to embark on a new journey</b><p>Packing up Singapore, closing one chapter.</p></li><li class="is-milestone"><span class="story-when">August 11, 2026</span><b>Arrival in Cebu</b><p>Home, and the start of building something official.</p></li></ol></div>
+          <div class="story-era"><h4><span>rebirth</span>Cebu</h4><ol><li><span class="story-when">OFW support</span><b>Financial assistance becomes the seed capital</b><p>As a returning OFW, assistance to start a business made the decision easy—might as well make it official.</p></li><li><span class="story-when">A second line is born</span><b>Savon—natural soap, for a very personal reason</b><p>My brothers were dealing with chicken skin and wanted a natural alternative—Savon exists because of them.</p></li><li class="is-milestone"><span class="story-when">The rebrand</span><b>Pappi Suds &amp; Scents—black for the dark days, gold for what’s next</b><p>A new name, new bottles, a new crest—built for premium, international, and a new chapter.</p></li><li><span class="story-when">Now</span><b>Live at pappiscents.shop</b><p>Facebook: pappi.artisan · Shopee: bilyotoy</p></li></ol></div>
         </div>
       </div>
     </section>
@@ -758,12 +869,16 @@
           <div class="testimonial-intro"><p class="eyebrow">Stories from the Pappi community</p><h2 id="stories-title">A scent can change how a day feels.</h2><p class="lede">From a little everyday confidence to a meaningful gift sent across an ocean, these are the kinds of moments Pappi was created for.</p></div>
           <p class="section-note">Real fragrance, real connection and a little luxury made more reachable for every kababayan.</p>
         </div>
-        <div class="testimonial-grid">
+        <div class="t-slider">
+          <div class="t-track" id="t-track" tabindex="0" aria-label="Customer stories, scroll sideways">
           <article class="testimonial"><div><div class="testimonial-stars" aria-label="Five stars">★★★★★</div><blockquote>“Even my madam and boss were surprised. They thought I had bought an expensive luxury perfume! It felt good to wear something beautiful that still fit my budget.”</blockquote></div><div class="testimonial-person"><span class="testimonial-avatar" aria-hidden="true">MA</span><div><strong>Marites A.</strong><span>OFW · Singapore</span></div></div></article>
           <article class="testimonial"><div><div class="testimonial-stars" aria-label="Five stars">★★★★★</div><blockquote>“I sprayed it before work and could still smell it when I got home. The next morning, the scent was still softly there on my clothes. Sulit talaga.”</blockquote></div><div class="testimonial-person"><span class="testimonial-avatar" aria-hidden="true">LI</span><div><strong>Liza R.</strong><span>Pappi Elixir wearer</span></div></div></article>
           <article class="testimonial"><div><div class="testimonial-stars" aria-label="Five stars">★★★★★</div><blockquote>“Fresh lang and easy to wear. Someone kept asking what perfume I was wearing—and now, may jowa na ako. I’m giving Pappi at least a little credit!”</blockquote></div><div class="testimonial-person"><span class="testimonial-avatar" aria-hidden="true">CP</span><div><strong>Carlo P.</strong><span>Cebu City</span></div></div></article>
           <article class="testimonial"><div><div class="testimonial-stars" aria-label="Five stars">★★★★★</div><blockquote>“I’m in New Zealand, but I was still able to send a heartfelt gift home. My family in the Philippines said opening their Pappi package felt like receiving a little piece of me.”</blockquote></div><div class="testimonial-person"><span class="testimonial-avatar" aria-hidden="true">JI</span><div><strong>Jing N.</strong><span>OFW · New Zealand</span></div></div></article>
           <article class="testimonial"><div><div class="testimonial-stars" aria-label="Five stars">★★★★★</div><blockquote>“It smells refined, never harsh, and lasts beautifully. The quality genuinely surprised me—it wears as confidently as fragrances that cost so much more.”</blockquote></div><div class="testimonial-person"><span class="testimonial-avatar" aria-hidden="true">AN</span><div><strong>Ana C.</strong><span>Fragrance enthusiast</span></div></div></article>
+        
+          </div>
+          <div class="t-controls"><button class="t-arrow" id="t-prev" type="button" aria-label="Previous story">←</button><div class="t-dots" id="t-dots"></div><button class="t-arrow" id="t-next" type="button" aria-label="Next story">→</button></div>
         </div>
       </div>
     </section>
@@ -1147,6 +1262,35 @@
       document.querySelector('#success').classList.add('show');
       window.location.href = `mailto:verge.gamotan@gmail.com?subject=${subject}&body=${body}`;
     });
+
+    // Testimonials slider
+    (() => {
+      const track = document.querySelector('#t-track'); if (!track) return;
+      const cards = [...track.children], dots = document.querySelector('#t-dots');
+      const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      const step = () => cards[0].getBoundingClientRect().width + 12;
+      const perView = () => Math.max(1, Math.round(track.clientWidth / step()));
+      const pages = () => Math.max(1, cards.length - perView() + 1);
+      function drawDots() {
+        dots.innerHTML = '';
+        for (let i = 0; i < pages(); i++) {
+          const b = document.createElement('button'); b.type = 'button'; b.setAttribute('aria-label', `Show story ${i + 1}`);
+          b.addEventListener('click', () => go(i)); dots.appendChild(b);
+        }
+        mark();
+      }
+      const current = () => Math.round(track.scrollLeft / step());
+      function mark() { [...dots.children].forEach((d, i) => d.setAttribute('aria-current', i === Math.min(current(), pages() - 1))); }
+      function go(i) { const n = pages(); track.scrollTo({ left: ((i % n) + n) % n * step(), behavior: reduce ? 'auto' : 'smooth' }); }
+      document.querySelector('#t-prev').addEventListener('click', () => go(current() - 1));
+      document.querySelector('#t-next').addEventListener('click', () => go(current() + 1));
+      track.addEventListener('scroll', () => requestAnimationFrame(mark), { passive: true });
+      window.addEventListener('resize', drawDots);
+      let timer; const play = () => { if (!reduce) timer = setInterval(() => go(current() + 1), 6000); }, stop = () => clearInterval(timer);
+      track.parentElement.addEventListener('mouseenter', stop); track.parentElement.addEventListener('mouseleave', play);
+      track.addEventListener('focusin', stop); track.addEventListener('touchstart', stop, { passive: true });
+      drawDots(); play();
+    })();
 
     const carousel = document.querySelector('.carousel');
     const track = carousel.querySelector('.carousel-track');
