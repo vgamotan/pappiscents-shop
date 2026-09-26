@@ -112,9 +112,10 @@ const REVENUE_STATUSES = ["paid","packed","shipped","completed"];
 const CHANNELS = { website:"Website", distributor:"Distributor", zoho:"Zoho import", manual:"Manual", messenger:"Messenger", facebook:"Facebook", instagram:"Instagram", tiktok:"TikTok", "walk-in":"Walk-in", reseller:"Reseller", shopee:"Shopee", other:"Other" };
 const PAYMENTS = ["QR Ph","GCash","Maya","Bank transfer","Cash","COD","Other"];
 const realPhone = ph => ph && !/^(zoho|shopee):/.test(String(ph));
+const productLines = () => { const seen = []; S.products.slice().sort((a,b)=>(a.sort??0)-(b.sort??0)).forEach(p=>{ if(!seen.includes(p.line)) seen.push(p.line); }); return seen; };
 const peso2 = n => "₱" + Number(n || 0).toLocaleString("en-PH", { maximumFractionDigits: 2 });
 
-const S = { tab:"orders", filter:"new", orders:[], customers:[], products:[], settings:{ shipping_fee:80, free_shipping_over:1500 }, open:null, edit:null, dist:null, distForm:null, payments:[], moves:[], proofUrl:"", q:"" };
+const S = { tab:"orders", filter:"new", orders:[], customers:[], products:[], settings:{ shipping_fee:80, free_shipping_over:1500 }, open:null, edit:null, dist:null, distForm:null, prodForm:null, payments:[], moves:[], proofUrl:"", q:"" };
 
 function toast(msg){ const t=document.createElement("div"); t.className="toast"; t.textContent=msg; document.body.append(t); setTimeout(()=>t.remove(),2200); }
 
@@ -157,7 +158,7 @@ function shell(body){
   app.innerHTML = `<header><div class="top"><div class="brand">Pappi <span>Orders</span></div>
       <div><button class="btn ghost" id="refresh">Refresh</button> <button class="btn ghost" id="logout">Sign out</button></div></div>
     <nav>${tabs.map(([k,l])=>`<button data-tab="${k}" ${S.tab===k?'aria-current="page"':""}>${l}</button>`).join("")}</nav></header>
-    <main>${body}</main>${S.edit ? viewEditor() : S.distForm ? viewDistForm() : S.dist ? viewDistributor() : S.open ? viewOrder() : ""}`;
+    <main>${body}</main>${S.prodForm ? viewProductForm() : S.edit ? viewEditor() : S.distForm ? viewDistForm() : S.dist ? viewDistributor() : S.open ? viewOrder() : ""}`;
 }
 
 function viewOrders(){
@@ -187,6 +188,7 @@ function viewOrder(){
     <ul class="items">${o.order_items.map(i=>`<li><span>${i.qty} × ${esc(i.name)} <span class="muted">${esc(i.line)}</span></span><span>${peso(i.qty*i.unit_price)}</span></li>`).join("")}
       <li><span>Shipping</span><span>${peso(o.shipping_fee)}</span></li>
       ${Number(o.discount)?`<li><span>Discount</span><span>− ${peso2(o.discount)}</span></li>`:""}
+      ${Number(o.commission)?`<li><span>Distributor commission ${Number(o.commission_pct)}%</span><span>− ${peso2(o.commission)}</span></li>`:""}
       <li><b>Total</b><b>${peso2(o.total)}</b></li>
       ${Number(o.platform_fees)?`<li><span>Shopee fees</span><span>− ${peso2(o.platform_fees)}</span></li><li><b>You receive</b><b style="color:var(--gold-hi)">${peso2(o.payout_amount ?? (o.total - o.platform_fees))}</b></li>`:""}</ul>
     <dl class="kv">
@@ -255,14 +257,15 @@ function viewSales(){
   const list = paid.filter(inPer);
   const items = arr => arr.reduce((s,o)=>s+Number(o.subtotal)-Number(o.discount||0),0);
   const deliv = arr => arr.reduce((s,o)=>s+Number(o.shipping_fee||0),0);
-  const gross = arr => arr.reduce((s,o)=>s+Number(o.total),0);
+  const gross = arr => items(arr) + deliv(arr);
   const fees  = arr => arr.reduce((s,o)=>s+Number(o.platform_fees||0),0);
-  const net   = arr => gross(arr) - fees(arr);
-  const units = {}; let elixir=0, parfum=0, savon=0, unknown=0;
+  const comm  = arr => arr.reduce((s,o)=>s+Number(o.commission||0),0);
+  const net   = arr => gross(arr) - fees(arr) - comm(arr);
+  const units = {}; let elixir=0, parfum=0, savon=0, unknown=0, other=0;
   for (const o of list) for (const i of o.order_items){
     const k = i.name + " · " + i.line; units[k] = units[k] || { name:i.name, line:i.line, qty:0, rev:0 };
     units[k].qty += i.qty; units[k].rev += i.qty*i.unit_price;
-    if (i.line.startsWith("Elixir")) elixir+=i.qty; else if (i.line.startsWith("Parfum")) parfum+=i.qty; else if (i.line==="Savon") savon+=i.qty; else unknown+=i.qty;
+    if (i.line.startsWith("Elixir")) elixir+=i.qty; else if (i.line.startsWith("Parfum")) parfum+=i.qty; else if (i.line==="Savon") savon+=i.qty; else if (i.line==="Shopee") unknown+=i.qty; else other+=i.qty;
   }
   const bottles = elixir + parfum;
   const chan = {}; for (const o of list){ const k = o.channel==="shopee" ? "Shopee" : o.channel==="distributor" ? "Distributors" : "Direct (website, Zoho, manual)"; (chan[k] ||= []).push(o); }
@@ -277,10 +280,10 @@ function viewSales(){
   return `<div class="filters">${Object.entries(P).map(([k,v])=>`<button class="chip" data-period="${k}" aria-pressed="${(S.period||"month")===k}">${v.label}</button>`).join("")}</div>
     <div class="stats">
       <div class="stat"><div class="v">${peso(gross(list))}</div><div class="l">Gross sales · items ${peso(items(list))} + delivery ${peso(deliv(list))}</div></div>
-      <div class="stat"><div class="v">− ${peso2(fees(list))}</div><div class="l">Platform fees (Shopee)</div></div>
+      <div class="stat"><div class="v">− ${peso2(fees(list)+comm(list))}</div><div class="l">Shopee fees ${peso2(fees(list))} · commissions ${peso2(comm(list))}</div></div>
       <div class="stat hl"><div class="v">${peso2(net(list))}</div><div class="l">Net income after fees</div></div>
       <div class="stat"><div class="v">${list.length}</div><div class="l">Paid orders · avg ${list.length?peso(Math.round(gross(list)/list.length)):"₱0"}</div></div>
-      <div class="stat"><div class="v">${bottles}</div><div class="l">Bottles · ${elixir} Elixir / ${parfum} Parfum${unknown?` · ${unknown} Shopee item${unknown===1?"":"s"} to label`:""}</div></div>
+      <div class="stat"><div class="v">${bottles}</div><div class="l">Bottles · ${elixir} Elixir / ${parfum} Parfum${savon?` · ${savon} Savon`:""}${other?` · ${other} add-on${other===1?"":"s"}`:""}${unknown?` · ${unknown} Shopee item${unknown===1?"":"s"} to label`:""}</div></div>
       <div class="stat"><div class="v">${waiting} / ${toShip}</div><div class="l">To check / to ship now</div></div>
     </div>
     ${(()=>{ const owed = distributorsList().reduce((a,x)=>a+Math.max(0,x.balance),0); return owed ? `<p class="muted" style="margin:-6px 0 8px">Distributors still owe <b style="color:var(--gold-hi)">${peso2(owed)}</b> — see the Distributors tab.</p>` : ""; })()}
@@ -291,9 +294,9 @@ function viewSales(){
     <div class="wrap"><table><thead><tr><th>Scent</th><th>Line</th><th class="n">Units</th><th class="n">Sales</th></tr></thead>
     <tbody>${Object.values(units).sort((a,b)=>b.qty-a.qty||b.rev-a.rev).map(u=>`<tr><td>${esc(u.name)}</td><td>${esc(u.line)}</td><td class="n">${u.qty}</td><td class="n">${peso(u.rev)}</td></tr>`).join("") || `<tr><td colspan="4" class="muted">No paid orders in this period.</td></tr>`}</tbody></table></div>
     <h3>Where sales came from</h3>
-    <div class="wrap"><table><thead><tr><th>Channel</th><th class="n">Orders</th><th class="n">Items</th><th class="n">Delivery</th><th class="n">Platform fees</th><th class="n">Net income</th></tr></thead>
-    <tbody>${Object.entries(chan).map(([k,v])=>`<tr><td>${esc(k)}</td><td class="n">${v.length}</td><td class="n">${peso(items(v))}</td><td class="n">${peso(deliv(v))}</td><td class="n">${fees(v)?"− "+peso2(fees(v)):"—"}</td><td class="n"><b>${peso2(net(v))}</b></td></tr>`).join("") || `<tr><td colspan="6" class="muted">No paid orders in this period.</td></tr>`}</tbody></table></div>
-    <p class="muted" style="margin-top:10px">Gross = items (after discounts) + delivery fees you charged. Shopee orders use the figures from Shopee's income report; Shopee covers their shipping, and its fees are shown separately. Net = what you keep.</p>`;
+    <div class="wrap"><table><thead><tr><th>Channel</th><th class="n">Orders</th><th class="n">Items</th><th class="n">Delivery</th><th class="n">Fees & commissions</th><th class="n">Net income</th></tr></thead>
+    <tbody>${Object.entries(chan).map(([k,v])=>`<tr><td>${esc(k)}</td><td class="n">${v.length}</td><td class="n">${peso(items(v))}</td><td class="n">${peso(deliv(v))}</td><td class="n">${fees(v)+comm(v)?"− "+peso2(fees(v)+comm(v)):"—"}</td><td class="n"><b>${peso2(net(v))}</b></td></tr>`).join("") || `<tr><td colspan="6" class="muted">No paid orders in this period.</td></tr>`}</tbody></table></div>
+    <p class="muted" style="margin-top:10px">Gross = items (after discounts) + delivery fees you charged. Shopee orders use Shopee's income report (Shopee covers their shipping). Distributor sales count at retail; their commission is deducted like a fee. Net = what you keep.</p>`;
 }
 
 function viewProducts(){
@@ -305,10 +308,10 @@ function viewProducts(){
       </div>
       <div class="actions"><button class="btn" data-savesettings>Save shipping</button></div>
     </div>
-    <h3>Products</h3>
-    <p class="muted">Change a price or hide a product, then press Save. The website updates right away, including pages already open.</p>
+    <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;margin-top:22px"><h3 style="margin:0">Products</h3><button class="btn" data-newproduct>+ Add product</button></div>
+    <p class="muted">Change a price or hide a product, then press Save. Shop products update the website right away. <b>Add-ons</b> (not on the shop page) can be used in orders and distributor receipts.</p>
     <div class="wrap"><table><thead><tr><th>Product</th><th>Line</th><th class="n">Price (₱)</th><th>On sale</th><th></th></tr></thead>
-    <tbody>${S.products.map(p=>`<tr><td>${esc(p.name)}</td><td>${esc(p.line)}</td>
+    <tbody>${S.products.slice().sort((a,b)=>(a.sort??0)-(b.sort??0)).map(p=>`<tr><td>${esc(p.name)}${p.on_website===false?` <span class="tag">Add-on</span>`:""}${p.description?`<br><span class="muted" style="font-size:.8rem">${esc(p.description)}</span>`:""}</td><td>${esc(p.line)}</td>
       <td class="n"><input type="number" min="0" step="1" value="${Number(p.price)}" data-price="${p.id}" style="max-width:110px;text-align:right"></td>
       <td><input type="checkbox" ${p.active?"checked":""} data-active="${p.id}" style="width:auto;accent-color:var(--gold)" aria-label="Show ${esc(p.name)} on the order form"></td>
       <td><button class="btn ghost" data-saveprod="${p.id}">Save</button></td></tr>`).join("")}</tbody></table></div>`;
@@ -341,7 +344,7 @@ function viewEditor(){
   const E = S.edit, d = E.draft, isNew = !E.id;
   const o = isNew ? null : S.orders.find(x=>x.id===E.id);
   const opt = (list, val) => list.map(([v,l])=>`<option value="${esc(v)}" ${v===val?"selected":""}>${esc(l)}</option>`).join("");
-  const prodOpts = sel => `<option value="">Choose product…</option>` + ["Elixir 40%","Parfum 20%","Savon","Shopee"].filter(l=>l!=="Shopee"||S.products.some(p=>p.line==="Shopee")).map(line=>
+  const prodOpts = sel => `<option value="">Choose product…</option>` + productLines().map(line=>
     `<optgroup label="${line}">${S.products.filter(p=>p.line===line).map(p=>`<option value="${p.id}" ${p.id===sel?"selected":""}>${esc(p.name)} · ${esc(p.line.split(" ")[0])} — ${peso2(p.price)}${p.active?"":" (hidden)"}</option>`).join("")}</optgroup>`).join("");
   const f = (key, label, val, extra="") => `<div class="field"><label>${label}</label><input data-f="${key}" value="${esc(val)}" ${extra}></div>`;
   const a = d.address_parts, sub = draftSub(d);
@@ -352,6 +355,7 @@ function viewEditor(){
     ${E.receipt ? `<div class="grid2" style="margin-top:12px">
       <div class="field"><label>Receipt date</label><input data-f="date" type="date" value="${esc(d.date||"")}"></div>
       <div class="field"><label>Due date <span class="muted" style="font-size:.8rem">· blank = ${E.receipt.credit_days} days</span></label><input data-f="due_date" type="date" value="${esc(d.due_date||"")}"></div>
+      <div class="field"><label>Commission (%) <span class="muted" style="font-size:.8rem">· default ${Number(E.receipt.commission_pct||0)}%</span></label><input data-f="commission_pct" type="number" min="0" max="90" step="0.5" value="${esc(d.commission_pct ?? "")}"></div>
     </div>` : ""}
     <div ${E.receipt ? 'hidden' : ""}>
     <h3>Customer</h3>
@@ -404,7 +408,8 @@ function viewEditor(){
   </div></div>`;
 }
 function totalsHtml(d){ const sub = draftSub(d), ship = Number(d.shipping_fee)||0, disc = Number(d.discount)||0;
-  return `<li><span>Subtotal</span><span>${peso2(sub)}</span></li><li><span>Shipping fee</span><span>${ship?peso2(ship):"Free"}</span></li>${disc?`<li><span>Discount</span><span>− ${peso2(disc)}</span></li>`:""}<li><b>Total</b><b>${peso2(sub+ship-disc)}</b></li>`; }
+  const pct = S.edit?.receipt ? Number(d.commission_pct ?? S.edit.receipt.commission_pct ?? 0) || 0 : 0, comm = Math.round((sub-disc)*pct)/100;
+  return `<li><span>Subtotal${pct?" (retail)":""}</span><span>${peso2(sub)}</span></li>${disc?`<li><span>Discount</span><span>− ${peso2(disc)}</span></li>`:""}${pct?`<li><span>Less commission ${pct}%</span><span>− ${peso2(comm)}</span></li>`:""}<li><span>Delivery fee</span><span>${ship?peso2(ship):"Free"}</span></li><li><b>${pct?"Amount due":"Total"}</b><b>${peso2(sub-disc-comm+ship)}</b></li>`; }
 function refreshTotals(){ const d=S.edit.draft; syncShip(d); const t=document.getElementById("ed-totals"); if(t) t.innerHTML=totalsHtml(d);
   const sf=document.querySelector('[data-f="shipping_fee"]'); if(sf && d.shipAuto && document.activeElement!==sf) sf.value=d.shipping_fee; }
 
@@ -443,13 +448,39 @@ async function saveDraft(){
 }
 
 
+
+function viewProductForm(){
+  const F = S.prodForm, d = F.draft, lines = productLines().filter(l=>l!=="Shopee");
+  return `<div class="sheet" data-close><div role="dialog" aria-label="Add product">
+    <div style="display:flex;justify-content:space-between;align-items:start"><div><h2>Add product</h2><span class="muted">For items not on the shop page: new scents, gift sets, samplers, bundles.</span></div><button class="btn ghost" data-cancelprod>Close</button></div>
+    <div class="field"><label>Product name</label><input data-pf="name" value="${esc(d.name)}" placeholder="e.g. Discovery Set (5 × 5 ml)"></div>
+    <div class="grid2">
+      <div class="field"><label>Category</label><select data-pf="line">${lines.map(l=>`<option ${l===d.line?"selected":""}>${esc(l)}</option>`).join("")}<option value="__new" ${d.line==="__new"?"selected":""}>+ New category…</option></select></div>
+      ${d.line==="__new" ? `<div class="field"><label>New category name</label><input data-pf="newline" value="${esc(d.newline)}" placeholder="e.g. Gift Sets"></div>` : `<div class="field"><label>Price (₱)</label><input data-pf="price" type="number" min="0" step="1" value="${esc(d.price)}"></div>`}
+    </div>
+    ${d.line==="__new" ? `<div class="field"><label>Price (₱)</label><input data-pf="price" type="number" min="0" step="1" value="${esc(d.price)}"></div>` : ""}
+    <div class="field"><label>Description (optional)</label><input data-pf="description" value="${esc(d.description)}" placeholder="Shown to you in the product list"></div>
+    <label style="display:flex;gap:8px;align-items:center;margin-top:12px"><input type="checkbox" data-pf="active" ${d.active?"checked":""} style="width:auto;accent-color:var(--gold)"> Available to use in orders and receipts</label>
+    <p class="err">${esc(F.error||"")}</p>
+    <div class="actions"><button class="btn" data-saveprodform ${F.busy?"disabled":""}>${F.busy?"Saving…":"Add product"}</button><button class="btn ghost" data-cancelprod>Cancel</button></div>
+  </div></div>`;
+}
+async function saveProductForm(){
+  const F = S.prodForm, d = F.draft; F.busy = true; F.error = ""; render();
+  const line = d.line==="__new" ? (d.newline||"").trim() : d.line;
+  const { data, error } = await db.rpc("admin_add_product", { p: { name:d.name, line, price:d.price, description:d.description, active:d.active } });
+  F.busy = false;
+  if (error) { F.error = error.message; return render(); }
+  S.prodForm = null; await load(); render(); toast("Product added");
+}
+
 // ================= Distributors =================
 const SHOP = { name:"Pappi Suds & Scents Shop", addr:["20 Mancono Street, La Paloma Subd","Cebu City, Cebu 6000, Philippines"], phone:"+63 905 561 3013", email:"pappi.artisan@gmail.com",
   pay:"GCash 0905 561 3013 · Vergilio Jr Gamotan · QR Ph available on request" };
 const today = () => new Date(Date.now() + 8*3600e3).toISOString().slice(0,10);   // Manila date
 const fmtD = d => d ? new Date(d.length===10 ? d+"T12:00:00+08:00" : d).toLocaleDateString("en-PH",{ year:"numeric", month:"short", day:"numeric" }) : "—";
 const ymd = d => new Date(new Date(d).getTime() + 8*3600e3).toISOString().slice(0,10);
-function distPrice(dist, prod){ const pr = dist.distributor_prices || {}; const v = pr[prod.line]; return v != null && v !== "" ? Number(v) : Number(prod.price); }
+function distPrice(dist, prod){ return Number(prod.price); }   // receipts use retail; commission is deducted
 
 function receiptsOf(cid){ return S.orders.filter(o=>o.customer_id===cid && o.channel==="distributor" && o.status!=="cancelled").sort((a,b)=>new Date(a.created_at)-new Date(b.created_at)); }
 function paidOn(oid){ return S.payments.filter(p=>p.order_id===oid).reduce((a,p)=>a+Number(p.amount),0); }
@@ -471,7 +502,8 @@ function distributorsList(){
     const paid = S.payments.filter(p=>p.customer_id===c.id).reduce((a,p)=>a+Number(p.amount),0);
     const overdue = rs.map(receiptState).filter(x=>x.overdue).reduce((a,x)=>a+x.bal,0);
     const st = stockOf(c.id);
-    return { ...c, receipts: rs, billed, paid, balance: billed - paid, overdue, onhand: st.reduce((a,r)=>a+r.onhand,0), consumed: st.reduce((a,r)=>a+r.consumed,0),
+    const commission = rs.reduce((a,o)=>a+Number(o.commission||0),0), retail = rs.reduce((a,o)=>a+Number(o.subtotal)-Number(o.discount||0),0);
+    return { ...c, receipts: rs, billed, paid, commission, retail, balance: billed - paid, overdue, onhand: st.reduce((a,r)=>a+r.onhand,0), consumed: st.reduce((a,r)=>a+r.consumed,0),
              last: rs.length ? rs[rs.length-1].created_at : null };
   }).sort((a,b)=>b.balance-a.balance);
 }
@@ -491,7 +523,7 @@ function viewDistributors(){
       <button class="row" data-dist="${x.id}">
         <span class="dot" style="background:${x.overdue?"var(--cancel)":x.balance>0?"var(--new)":"var(--paid)"}"></span>
         <span><b>${esc(x.name)}</b>${x.overdue?` <span class="tag st-overdue">Overdue</span>`:""}
-          <small>${x.receipts.length} receipt${x.receipts.length===1?"":"s"} · billed ${peso2(x.billed)} · paid ${peso2(x.paid)} · ${x.onhand} on hand · ${x.consumed} consumed</small></span>
+          <small>${Number(x.commission_pct||0)}% commission · ${x.receipts.length} receipt${x.receipts.length===1?"":"s"} · billed ${peso2(x.billed)} · paid ${peso2(x.paid)} · ${x.onhand} on hand · ${x.consumed} consumed</small></span>
         <span class="amt">${x.balance>0?peso2(x.balance):x.balance<0?"Credit "+peso2(-x.balance):"Settled"}<small>${x.balance>0?"balance":""}</small></span>
       </button>`).join("") || `<p class="muted">No distributors yet. Add one, or turn an existing customer into a distributor.</p>`}</div>`;
 }
@@ -504,20 +536,21 @@ function viewDistributor(){
   const rno = id => S.orders.find(o=>o.id===id)?.order_no || "—";
   return `<div class="sheet wide" data-close><div role="dialog" aria-label="Distributor ${esc(x.name)}">
     <div style="display:flex;justify-content:space-between;align-items:start;gap:10px">
-      <div><h2>${esc(x.name)}</h2><span class="muted">${realPhone(x.phone)?esc(x.phone):"No number"}${x.address?" · "+esc(x.address):""}<br>Terms ${x.credit_days} days · Prices: ${["Elixir 40%","Parfum 20%","Savon"].filter(l=>pr[l]!=null&&pr[l]!=="").map(l=>`${l.split(" ")[0]} ${peso2(pr[l])}`).join(" · ") || "retail"}</span></div>
+      <div><h2>${esc(x.name)}</h2><span class="muted">${realPhone(x.phone)?esc(x.phone):"No number"}${x.address?" · "+esc(x.address):""}<br>Terms ${x.credit_days} days · Commission ${Number(x.commission_pct||0)}%</span></div>
       <div style="display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end"><button class="btn ghost" data-editdist="${x.id}">Edit</button><button class="btn ghost" data-printstatement="${x.id}">Print statement</button><button class="btn ghost" data-distclose>Close</button></div></div>
     <div class="stats" style="margin-top:14px">
       <div class="stat"><div class="v">${peso2(x.billed)}</div><div class="l">Billed</div></div>
       <div class="stat"><div class="v">${peso2(x.paid)}</div><div class="l">Paid</div></div>
       <div class="stat hl"><div class="v">${x.balance>=0?peso2(x.balance):"Credit "+peso2(-x.balance)}</div><div class="l">${x.balance>=0?"Balance":"Overpaid, kept as credit"}</div></div>
       <div class="stat"><div class="v" style="${x.overdue?"color:var(--cancel)":""}">${peso2(x.overdue)}</div><div class="l">Overdue</div></div>
+      <div class="stat"><div class="v">${peso2(x.commission)}</div><div class="l">Commission earned · ${peso2(x.retail)} at retail</div></div>
     </div>
     <div class="actions"><button class="btn" data-newreceipt="${x.id}">+ New receipt</button><button class="btn" data-paydist="${x.id}">+ Record payment</button><button class="btn ghost" data-consume="${x.id}">+ Record consumption</button></div>
 
     <h3>Receipts</h3>
-    <div class="wrap"><table><thead><tr><th>Receipt</th><th>Date</th><th>Due</th><th class="n">Total</th><th class="n">Paid</th><th class="n">Balance</th><th>Status</th><th></th></tr></thead><tbody>
-    ${x.receipts.slice().reverse().map(o=>{ const r = receiptState(o); return `<tr><td><b>${esc(o.order_no)}</b></td><td>${fmtD(o.created_at)}</td><td>${fmtD(o.due_date)}</td><td class="n">${peso2(o.total)}</td><td class="n">${peso2(r.paid)}</td><td class="n">${r.bal>0.005?peso2(r.bal):"—"}</td><td>${stateTag(r.label)}</td>
-      <td style="white-space:nowrap"><button class="linkbtn" data-printreceipt="${o.id}">Print</button> · <button class="linkbtn" data-editreceipt="${o.id}">Edit</button>${r.bal>0.005?` · <button class="linkbtn" data-paydist="${x.id}" data-payorder="${o.id}">Pay</button>`:""}</td></tr>`; }).join("") || `<tr><td colspan="8" class="muted">No receipts yet.</td></tr>`}
+    <div class="wrap"><table><thead><tr><th>Receipt</th><th>Date</th><th>Due</th><th class="n">Retail</th><th class="n">Commission</th><th class="n">Due amount</th><th class="n">Paid</th><th class="n">Balance</th><th>Status</th><th></th></tr></thead><tbody>
+    ${x.receipts.slice().reverse().map(o=>{ const r = receiptState(o); return `<tr><td><b>${esc(o.order_no)}</b></td><td>${fmtD(o.created_at)}</td><td>${fmtD(o.due_date)}</td><td class="n">${peso2(Number(o.subtotal)-Number(o.discount||0))}</td><td class="n">${Number(o.commission)?"− "+peso2(o.commission)+` <span class="muted" style="font-size:.78rem">${Number(o.commission_pct)}%</span>`:"—"}</td><td class="n">${peso2(o.total)}</td><td class="n">${peso2(r.paid)}</td><td class="n">${r.bal>0.005?peso2(r.bal):"—"}</td><td>${stateTag(r.label)}</td>
+      <td style="white-space:nowrap"><button class="linkbtn" data-printreceipt="${o.id}">Print</button> · <button class="linkbtn" data-editreceipt="${o.id}">Edit</button>${r.bal>0.005?` · <button class="linkbtn" data-paydist="${x.id}" data-payorder="${o.id}">Pay</button>`:""}</td></tr>`; }).join("") || `<tr><td colspan="10" class="muted">No receipts yet.</td></tr>`}
     </tbody></table></div>
 
     <h3>Payments</h3>
@@ -542,9 +575,8 @@ function openDistForm(type, extra={}){
   const x = extra.id ? S.customers.find(c=>c.id===extra.id) : null;
   let draft;
   if (type==="distributor") {
-    const pr = x?.distributor_prices || {};
     draft = { id:x?.id||"", name:x?.name||"", phone:realPhone(x?.phone)?x.phone:"", address:x?.address||"", credit_days:x?.credit_days??30,
-              elixir:pr["Elixir 40%"]??"", parfum:pr["Parfum 20%"]??"", savon:pr["Savon"]??"", notes:x?.notes||"" };
+              commission_pct:x?.commission_pct??"", notes:x?.notes||"" };
   } else if (type==="payment") {
     draft = { customer_id:extra.id, amount:"", paid_on:today(), method:"GCash", reference:"", note:"", order_id:extra.order||"" };
     if (extra.order) { const o = S.orders.find(o=>o.id===extra.order); draft.amount = Math.max(0, receiptState(o).bal).toFixed(2).replace(/\.00$/,""); }
@@ -563,10 +595,9 @@ function viewDistForm(){
     body = `${d.id?"":`<div class="field"><label>Or make an existing customer a distributor</label><select data-df="convert"><option value="">— New person —</option>${others.map(c=>`<option value="${c.id}">${esc(c.name)}${realPhone(c.phone)?" · "+esc(c.phone):""}</option>`).join("")}</select></div>`}
       <div class="grid2">${inp("name","Name / business name")}${inp("phone","Mobile number",'inputmode="tel" placeholder="09XXXXXXXXX"')}</div>
       ${inp("address","Address")}
-      <h3>Distributor prices (₱ each)</h3>
-      <div class="grid2">${inp("elixir","Elixir 40% · retail ₱600",'type="number" min="0" step="1" placeholder="e.g. 450"')}${inp("parfum","Parfum 20% · retail ₱300",'type="number" min="0" step="1" placeholder="e.g. 220"')}
-      ${inp("savon","Savon bar",'type="number" min="0" step="1" placeholder="optional"')}${inp("credit_days","Payment terms (days)",'type="number" min="0" step="1"')}</div>
-      <p class="muted" style="font-size:.85rem;margin:4px 0 0">Leave a price blank to use the retail price.</p>
+      <h3>Commission & terms</h3>
+      <div class="grid2">${inp("commission_pct","Commission (%)",'type="number" min="0" max="90" step="0.5" placeholder="e.g. 25"')}${inp("credit_days","Payment terms (days)",'type="number" min="0" step="1"')}</div>
+      <p class="muted" style="font-size:.85rem;margin:4px 0 0">Receipts list items at retail price, then deduct this commission. Example: ₱6,000 at 25% → they pay ₱4,500 (plus delivery).</p>
       ${inp("notes","Notes")}`;
   } else if (F.type==="payment") {
     const x = distributorsList().find(z=>z.id===d.customer_id);
@@ -601,8 +632,7 @@ async function saveDistForm(){
   const F = S.distForm, d = F.draft; F.error = ""; let res;
   F.busy = true; render();
   if (F.type==="distributor") {
-    const prices = {}; if (d.elixir!=="") prices["Elixir 40%"]=Number(d.elixir); if (d.parfum!=="") prices["Parfum 20%"]=Number(d.parfum); if (d.savon!=="") prices["Savon"]=Number(d.savon);
-    res = await db.rpc("admin_save_distributor", { p: { id:d.id||null, name:d.name, phone:d.phone, address:d.address, credit_days:d.credit_days, prices, notes:d.notes } });
+    res = await db.rpc("admin_save_distributor", { p: { id:d.id||null, name:d.name, phone:d.phone, address:d.address, credit_days:d.credit_days, commission_pct:d.commission_pct, notes:d.notes } });
     if (!res.error) { await load(); S.distForm = null; S.dist = res.data; render(); return toast("Distributor saved"); }
   } else if (F.type==="payment") {
     res = await db.rpc("admin_record_payment", { p_customer_id:d.customer_id, p_amount:Number(d.amount), p_paid_on:d.paid_on||null, p_method:d.method, p_reference:d.reference||null, p_note:d.note||null, p_order_id:d.order_id||null });
@@ -618,8 +648,8 @@ async function saveDistForm(){
 }
 function openReceiptEditor(distId, orderId){
   const x = S.customers.find(c=>c.id===distId);
-  if (orderId) { openEditor(orderId); const o = S.orders.find(z=>z.id===orderId); S.edit.draft.date = ymd(o.created_at); S.edit.draft.due_date = o.due_date||""; }
-  else { openEditor(null); Object.assign(S.edit.draft, { channel:"distributor", status:"completed", delivery:"pickup", shipping_fee:0, shipAuto:false, date:today(), due_date:"" }); }
+  if (orderId) { openEditor(orderId); const o = S.orders.find(z=>z.id===orderId); Object.assign(S.edit.draft, { date:ymd(o.created_at), due_date:o.due_date||"", commission_pct:Number(o.commission_pct||0) }); }
+  else { openEditor(null); Object.assign(S.edit.draft, { channel:"distributor", status:"completed", delivery:"pickup", shipping_fee:0, shipAuto:false, date:today(), due_date:"", commission_pct:Number(x.commission_pct||0) }); }
   S.edit.receipt = x; render();
 }
 
@@ -655,13 +685,14 @@ function printReceipt(id){
   const inner = shopHead(o.channel==="distributor" ? "Delivery Receipt" : "Receipt", `No. <b>${esc(o.order_no)}</b><br>Date: <b>${fmtD(o.created_at)}</b>${o.due_date?`<br>Due: <b>${fmtD(o.due_date)}</b>`:""}`) + `
     <div class="two"><div class="box"><h4>Bill to</h4><b>${esc(c?.name)}</b><br>${realPhone(c?.phone)?esc(c.phone)+"<br>":""}${esc(o.address||c?.address||"")}</div>
       <div class="box" style="text-align:right"><h4>Status</h4><b>${r.label}</b>${c?.credit_days!=null && o.channel==="distributor"?`<br>Terms: ${c.credit_days} days`:""}</div></div>
-    <table><thead><tr><th>#</th><th>Item</th><th class="n">Qty</th><th class="n">Unit price</th><th class="n">Amount</th></tr></thead><tbody>
+    <table><thead><tr><th>#</th><th>Item</th><th class="n">Qty</th><th class="n">${Number(o.commission)?"Retail price":"Unit price"}</th><th class="n">Amount</th></tr></thead><tbody>
       ${o.order_items.map((i,k)=>`<tr><td>${k+1}</td><td>${esc(i.name)} · ${esc(i.line)}${/Elixir|Parfum/.test(i.line)?" · 50 ml":""}</td><td class="n">${i.qty}</td><td class="n">${peso2(i.unit_price)}</td><td class="n">${peso2(i.qty*i.unit_price)}</td></tr>`).join("")}
     </tbody></table>
     <table class="tot"><tr><td>Subtotal</td><td class="n">${peso2(o.subtotal)}</td></tr>
       ${Number(o.shipping_fee)?`<tr><td>Delivery fee</td><td class="n">${peso2(o.shipping_fee)}</td></tr>`:""}
       ${Number(o.discount)?`<tr><td>Discount</td><td class="n">− ${peso2(o.discount)}</td></tr>`:""}
-      <tr class="big"><td>Total</td><td class="n">${peso2(o.total)}</td></tr>
+      ${Number(o.commission)?`<tr><td>Less: distributor commission (${Number(o.commission_pct)}%)</td><td class="n">− ${peso2(o.commission)}</td></tr>`:""}
+      <tr class="big"><td>${Number(o.commission)?"Amount due":"Total"}</td><td class="n">${peso2(o.total)}</td></tr>
       ${pays.map(p=>`<tr><td>Paid ${fmtD(p.paid_on)}${p.method?` · ${esc(p.method)}`:""}</td><td class="n">− ${peso2(p.amount)}</td></tr>`).join("")}
       <tr class="bal"><td>Balance due</td><td class="n">${peso2(Math.max(0,r.bal))}</td></tr></table>
     <div class="note"><b>Payment:</b> ${SHOP.pay}. Please send a screenshot after paying.${o.admin_note && o.channel!=="distributor" ? "" : ""}</div>
@@ -708,11 +739,14 @@ async function updateOrder(id, patch, msg){
 }
 
 app.addEventListener("click", async e => {
-  if (e.target.matches(".sheet[data-close]")) { if (S.edit || S.distForm) return; if (S.dist) { S.dist=null; return render(); } S.open=null; return render(); }
+  if (e.target.matches(".sheet[data-close]")) { if (S.edit || S.distForm || S.prodForm) return; if (S.dist) { S.dist=null; return render(); } S.open=null; return render(); }
   const b = e.target.closest("button"); if(!b) return;
   const d = b.dataset;
   if (d.tab){ S.tab=d.tab; S.open=null; S.edit=null; S.dist=null; S.distForm=null; render(); }
   else if ("neworder" in d){ S.open=null; openEditor(null); }
+  else if ("newproduct" in d){ S.prodForm = { draft:{ name:"", line:productLines().find(l=>l!=="Shopee")||"Elixir 40%", newline:"", price:"", description:"", active:true }, error:"", busy:false }; render(); }
+  else if ("cancelprod" in d){ S.prodForm = null; render(); }
+  else if ("saveprodform" in d){ saveProductForm(); }
   else if (d.dist){ S.open=null; S.dist=d.dist; render(); }
   else if ("distclose" in d){ S.dist=null; render(); }
   else if ("newdist" in d){ openDistForm("distributor"); }
@@ -772,6 +806,7 @@ app.addEventListener("click", async e => {
 });
 app.addEventListener("input", e => {
   const t = e.target;
+  if (S.prodForm && t.dataset.pf) { const k = t.dataset.pf; S.prodForm.draft[k] = t.type==="checkbox" ? t.checked : t.value; if (k==="line") render(); return; }
   if (S.distForm && t.dataset.df && t.dataset.df!=="convert") { S.distForm.draft[t.dataset.df] = t.value; return; }
   if (S.distForm && t.dataset.ml) { const l = S.distForm.draft.lines[Number(t.dataset.ml)]; l[t.dataset.mk] = t.dataset.mk==="qty" ? t.value : t.value; return; }
   if (S.edit && t.dataset.f) {
@@ -779,6 +814,7 @@ app.addEventListener("input", e => {
     if (k.startsWith("a.")) d.address_parts[k.slice(2)] = t.value;
     else if (k === "shipping_fee") { d.shipping_fee = Number(t.value)||0; d.shipAuto = false; }
     else if (k === "discount") { d.discount = Math.max(0, Number(t.value)||0); }
+    else if (k === "commission_pct") { d.commission_pct = t.value === "" ? "" : Math.min(90, Math.max(0, Number(t.value)||0)); }
     else d[k] = t.value;
     if (k === "phone" && fillFromCustomer(t.value)) { render(); const el=document.querySelector('[data-f="phone"]'); el.focus(); el.setSelectionRange(el.value.length, el.value.length); return; }
     if (k === "delivery") syncShip(d);
@@ -792,6 +828,7 @@ app.addEventListener("input", e => {
 });
 app.addEventListener("change", e => {
   const t = e.target;
+  if (S.prodForm && t.dataset.pf) { const k = t.dataset.pf; S.prodForm.draft[k] = t.type==="checkbox" ? t.checked : t.value; if (k==="line") { render(); document.querySelector('[data-pf="newline"],[data-pf="price"]')?.focus(); } return; }
   if (S.distForm && t.dataset.df === "convert") {
     const c = S.customers.find(z=>z.id===t.value), d = S.distForm.draft;
     if (c) Object.assign(d, { id:c.id, name:c.name, phone:realPhone(c.phone)?c.phone:"", address:c.address||"" }); else Object.assign(d, { id:"", name:"", phone:"", address:"" });
