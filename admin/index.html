@@ -4,12 +4,12 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="robots" content="noindex, nofollow">
-<meta name="theme-color" content="#0c0b09">
+<meta name="theme-color" content="#efe7d9">
 <title>Pappi Orders</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Serif:wght@600;700&family=Noto+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
-  :root{--bg:#0c0b09;--panel:#16140f;--panel2:#1d1a13;--line:#2d2819;--gold:#c9a45c;--gold-hi:#e3c585;--text:#f3ede0;--mute:#a39a86;--new:#e3c585;--paid:#7fc8a9;--packed:#8fb3e8;--shipped:#b89ae8;--done:#6f6a5c;--cancel:#ff8a7a}
+  :root{--bg:#efe7d9;--panel:#fffdf8;--panel2:#faf6ee;--line:#e0d3bd;--gold:#b8903f;--gold-hi:#8a6a2a;--text:#33291f;--mute:#6b5d4d;--new:#b07d1a;--paid:#2f7d5b;--packed:#3d68a6;--shipped:#7650b3;--done:#8a8173;--cancel:#b3261e;--espresso:#2e241b}
   *{box-sizing:border-box}
   html,body{margin:0;background:var(--bg);color:var(--text);font:15px/1.55 "Noto Sans",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
   h1,h2,.brand,.stat .v{font-family:"Noto Serif",Georgia,serif}
@@ -22,10 +22,10 @@
   .brand{font-weight:700;letter-spacing:.02em}.brand span{color:var(--gold)}
   nav{display:flex;gap:4px;max-width:1100px;margin:0 auto;padding:0 12px 10px;overflow-x:auto}
   nav button{border:0;background:none;padding:8px 14px;border-radius:999px;color:var(--mute);white-space:nowrap}
-  nav button[aria-current="page"]{background:var(--gold);color:#1a1409;font-weight:600}
+  nav button[aria-current="page"]{background:var(--gold);color:var(--espresso);font-weight:600}
   main{max-width:1100px;margin:0 auto;padding:16px}
   .muted{color:var(--mute)}
-  .btn{border:0;border-radius:999px;padding:10px 18px;background:var(--gold);color:#1a1409;font-weight:700}
+  .btn{border:0;border-radius:999px;padding:10px 18px;background:var(--gold);color:var(--espresso);font-weight:700}
   .btn.ghost{background:transparent;border:1px solid var(--line);color:var(--text);font-weight:500}
   .btn:disabled{opacity:.5}
   input,select,textarea{width:100%;padding:10px 12px;border-radius:10px;border:1px solid var(--line);background:var(--panel)}
@@ -40,15 +40,15 @@
   .s-new{background:var(--new)}.s-awaiting_payment{background:transparent;border:2px solid var(--mute)}.s-paid{background:var(--paid)}.s-packed{background:var(--packed)}.s-shipped{background:var(--shipped)}.s-completed{background:var(--done)}.s-cancelled{background:var(--cancel)}
   .row small{display:block;color:var(--mute)}
   .amt{font-weight:700;text-align:right}
-  .sheet{position:fixed;inset:0;z-index:10;background:rgba(0,0,0,.6);display:flex;justify-content:flex-end}
+  .sheet{position:fixed;inset:0;z-index:10;background:rgba(46,36,27,.32);backdrop-filter:blur(2px);display:flex;justify-content:flex-end}
   .sheet>div{width:min(560px,100%);height:100%;overflow:auto;background:var(--panel2);border-left:1px solid var(--line);padding:20px 18px calc(24px + env(safe-area-inset-bottom))}
   .sheet h2{margin:0 0 2px;font-size:1.4rem}
   .kv{display:grid;grid-template-columns:110px 1fr;gap:6px 12px;margin:16px 0}
   .kv dt{color:var(--mute)}.kv dd{margin:0;word-break:break-word}
-  .proof{width:100%;border-radius:10px;border:1px solid var(--line);background:#000;margin-top:6px}
+  .proof{width:100%;border-radius:10px;border:1px solid var(--line);background:#f3ece0;margin-top:6px}
   .pipeline{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin:16px 0}
   .pipeline button{border:1px solid var(--line);background:var(--panel);border-radius:10px;padding:10px 4px;font-size:.9rem}
-  .pipeline button[aria-pressed="true"]{border-color:var(--gold);background:var(--gold);color:#1a1409;font-weight:700}
+  .pipeline button[aria-pressed="true"]{border-color:var(--gold);background:var(--gold);color:var(--espresso);font-weight:700}
   .items{list-style:none;margin:0;padding:0}.items li{display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--line)}
   .field{margin-top:12px}.field label{display:block;color:var(--mute);margin-bottom:4px;font-size:.9rem}
   .actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
@@ -57,7 +57,14 @@
   .stat .v{font-size:1.6rem;font-weight:700}
   .stat .l{color:var(--mute);font-size:.9rem}
   .stat.hl{border-color:var(--gold)}
-  .promo-preview{display:flex;flex-wrap:wrap;gap:10px 14px;align-items:center;margin-top:12px;padding:12px 16px;border:1px solid var(--gold);border-radius:999px;background:#0b0a08;color:#ecd9a8;font-weight:700;font-size:.85rem;letter-spacing:.06em;text-transform:uppercase}
+  .row,.stat,.wrap,.card-set,.login{box-shadow:0 1px 3px rgba(90,70,40,.06)}
+  header{background:rgba(239,231,217,.92);backdrop-filter:blur(8px)}
+  .sheet>div{box-shadow:-18px 0 40px rgba(90,70,40,.18)}
+  .btn.ghost{background:var(--panel)}
+  input:focus,select:focus,textarea:focus{outline:2px solid var(--gold);outline-offset:1px;border-color:var(--gold)}
+  table th{background:var(--panel2)}
+  .brand span{color:var(--gold-hi)}
+  .promo-preview{display:flex;flex-wrap:wrap;gap:10px 14px;align-items:center;margin-top:12px;padding:12px 16px;border:1px solid var(--gold);border-radius:999px;background:#2e241b;color:#ecd9a8;font-weight:700;font-size:.85rem;letter-spacing:.06em;text-transform:uppercase}
   .promo-preview b{color:var(--gold)}
   .sheet.wide>div{width:min(860px,100%)}
   .tag.st-paid{color:var(--paid);border-color:var(--paid);font-weight:700} .tag.st-partial{color:var(--packed);border-color:var(--packed);font-weight:700} .tag.st-unpaid{color:var(--new);border-color:var(--new);font-weight:700} .tag.st-overdue{color:#fff;background:var(--cancel);border-color:var(--cancel);font-weight:700}
@@ -78,7 +85,7 @@
   .login h1{margin:0 0 4px;font-size:1.4rem}
   .login .field{margin-top:14px}
   .err{color:var(--cancel);min-height:1.3em;margin-top:10px}
-  .toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom));transform:translateX(-50%);background:var(--gold);color:#1a1409;padding:10px 18px;border-radius:999px;font-weight:600;z-index:20}
+  .toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom));transform:translateX(-50%);background:var(--gold);color:var(--espresso);padding:10px 18px;border-radius:999px;font-weight:600;z-index:20}
   h3{margin:22px 0 10px;font-size:1.05rem}
   .grid2{display:grid;grid-template-columns:1fr 1fr;gap:0 10px}
   .items-edit{display:flex;flex-direction:column;gap:6px;margin-bottom:8px}
@@ -174,7 +181,7 @@ function viewOrders(){
         <span class="dot s-${o.status}" title="${LABEL[o.status]}"></span>
         <span><b>${esc(o.order_no)}</b> · ${esc(o.customers?.name)}${o.channel && o.channel!=="website" ? ` <span class="tag">${esc(CHANNELS[o.channel] || o.channel)}</span>` : ""}
           <small>${o.order_items.map(i=>`${i.qty}× ${esc(i.name)} ${i.line.split(" ")[0]}`).join(", ")} · ${DELIVERY[o.delivery]} · ${fmtDate(o.created_at)}</small></span>
-        <span class="amt">${peso(o.total)}<small>${o.channel==="shopee" && Number(o.platform_fees) ? `net ${peso2(o.total - o.platform_fees)}` : esc(o.payment_method || "Not paid yet")}</small></span>
+        <span class="amt">${peso(o.total)}<small>${o.channel==="shopee" && Number(o.platform_fees) ? `net ${peso2(o.total - o.platform_fees)}` : o.channel==="distributor" ? receiptState(o).label : o.status==="awaiting_payment" ? "Not paid yet" : o.status==="cancelled" ? "Cancelled" : esc(o.payment_method || (REVENUE_STATUSES.includes(o.status) ? "Paid" : "—"))}</small></span>
       </button>`).join("") : `<p class="muted">No ${S.filter==="all"?"":LABEL[S.filter].toLowerCase()+" "}orders. Paid website orders appear under To check and on Telegram.</p>`}</div>`;
 }
 
@@ -673,18 +680,18 @@ function printDoc(title, inner){
     *{box-sizing:border-box} body{margin:0;background:#eee;font:13px/1.5 "Noto Sans",Arial,sans-serif;color:#17140f}
     .page{width:210mm;min-height:297mm;margin:12px auto;padding:16mm 16mm 14mm;background:#fff}
     .top{display:flex;justify-content:space-between;align-items:flex-start;gap:20px;padding-bottom:12px;border-bottom:3px solid #c9a24a}
-    .brand{display:flex;gap:12px;align-items:center}.brand img{width:62px;height:62px;object-fit:contain;background:#0b0a08;border-radius:8px;padding:4px}
+    .brand{display:flex;gap:12px;align-items:center}.brand img{width:62px;height:62px;object-fit:contain;background:#2e241b;border-radius:8px;padding:4px}
     .brand b{display:block;font:700 17px "Noto Serif",Georgia,serif}.brand span{display:block;color:#6a6153;font-size:11.5px}
     h1{margin:0;font:700 22px "Noto Serif",Georgia,serif;text-align:right}.meta{text-align:right;color:#6a6153;font-size:12px}.meta b{color:#17140f}
     .two{display:flex;justify-content:space-between;gap:20px;margin:16px 0}.box h4{margin:0 0 4px;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:#94722c}
-    table{width:100%;border-collapse:collapse;margin-top:6px}th{background:#0b0a08;color:#ecd9a8;font-weight:600;text-align:left;padding:7px 8px;font-size:12px}
+    table{width:100%;border-collapse:collapse;margin-top:6px}th{background:#2e241b;color:#ecd9a8;font-weight:600;text-align:left;padding:7px 8px;font-size:12px}
     td{padding:7px 8px;border-bottom:1px solid #e6dcc6}.n{text-align:right;white-space:nowrap}
     .tot{width:300px;margin:10px 0 0 auto}.tot td{border:0;padding:4px 8px}.tot .big td{border-top:2px solid #17140f;font-weight:700;font-size:15px}
     .bal td{background:#fbf5e7;font-weight:700;font-size:15px;color:#94722c}
     .note{margin-top:18px;padding:10px 12px;border:1px solid #e6dcc6;border-radius:8px;background:#fffdf8;font-size:12px}
     .sign{display:flex;gap:40px;margin-top:44px}.sign div{flex:1;border-top:1px solid #17140f;padding-top:4px;text-align:center;font-size:11.5px;color:#6a6153}
     .foot{margin-top:24px;text-align:center;color:#94722c;font:600 12px "Noto Serif",Georgia,serif}
-    .bar{position:sticky;top:0;background:#17140f;padding:8px;text-align:center}.bar button{font:600 14px "Noto Sans",sans-serif;padding:8px 18px;border:0;border-radius:999px;background:#c9a24a;cursor:pointer}
+    .bar{position:sticky;top:0;background:#2e241b;padding:8px;text-align:center}.bar button{font:600 14px "Noto Sans",sans-serif;padding:8px 18px;border:0;border-radius:999px;background:#c9a24a;cursor:pointer}
     @media print{body{background:#fff}.page{margin:0;width:auto;min-height:0;padding:10mm}.bar{display:none}@page{size:A4;margin:8mm}}
   </style></head><body><div class="bar"><button onclick="print()">Print / Save as PDF</button></div><div class="page">${inner}</div></body></html>`);
   w.document.close();
