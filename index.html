@@ -1116,6 +1116,25 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
     .nav-links a { font-family: var(--sans); font-size: .95rem; font-weight: 700; }
     .announcement { font-family: var(--sans); letter-spacing: .1em; }
     .msg p, .chat input, .chat textarea, .bag input, .bag textarea { font-family: var(--sans); font-size: 1rem; }
+
+    /* chat: who's replying + typing dots */
+    .msg .who { display: block; margin-bottom: 2px; color: var(--gold-deep, #8a6a2a); font-size: .7rem; font-weight: 700; letter-spacing: .03em; }
+    .msg.typing p { display: inline-flex; gap: 4px; padding: 12px 14px; }
+    .msg.typing i { width: 7px; height: 7px; border-radius: 50%; background: #a8987f; animation: chat-dot 1.2s infinite ease-in-out; }
+    .msg.typing i:nth-child(2) { animation-delay: .15s; } .msg.typing i:nth-child(3) { animation-delay: .3s; }
+    @keyframes chat-dot { 0%, 80%, 100% { opacity: .35; transform: translateY(0); } 40% { opacity: 1; transform: translateY(-3px); } }
+    @media (prefers-reduced-motion: reduce) { .msg.typing i { animation: none; } }
+
+    /* chat quick answers */
+    .faq-chips { display: flex; flex-wrap: wrap; gap: 6px; margin: 10px 0 4px; }
+    .faq-chip { padding: 8px 12px; border: 1px solid rgba(184,144,63,.5); border-radius: 999px; background: #fffdf8; color: var(--ink); font: 600 .84rem var(--sans); text-align: left; cursor: pointer; }
+    .faq-chip:hover { border-color: var(--gold); background: #fbf3e2; }
+    .faq-chip:focus-visible, .chat-link:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
+    .msg.them p a { color: #8a6a2a; font-weight: 700; text-decoration: underline; text-underline-offset: 3px; }
+    .chat-agent { padding: 10px 12px 12px; border-top: 1px solid rgba(23,20,15,.08); background: #fff; text-align: center; }
+    .chat-agent .chat-go { margin-top: 0; }
+    .chat-agent small { display: block; margin-top: 6px; color: var(--muted); font-size: .76rem; }
+    .chat-link { display: inline-block; margin: 0 0 8px; padding: 0; border: 0; background: none; color: #8a6a2a; font: 700 .82rem var(--sans); cursor: pointer; }
   </style>
 </head>
 <body>
@@ -1889,20 +1908,63 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;" }[c]));
     const store = { get(k, d) { try { return JSON.parse(localStorage.getItem(k)) ?? d; } catch { return d; } }, set(k, v) { try { v == null ? localStorage.removeItem(k) : localStorage.setItem(k, JSON.stringify(v)); } catch {} } };
     const box = $("#chat"), fab = $("#chat-fab"), body = $("#chat-body"), bottom = $("#chat-bottom");
-    const C = { token: store.get("pappi_chat", null), msgs: [], last: 0, seen: store.get("pappi_chat_seen", 0), busy: false, error: "", timer: null };
+    const C = { token: store.get("pappi_chat", null), msgs: [], last: 0, seen: store.get("pappi_chat_seen", 0), busy: false, error: "", timer: null, view: null, faqLog: [], info: null };
+
+    // ---- Quick answers (edit them in the dashboard → Chats → Quick answers). {placeholders} fill in live values.
+    const DEFAULT_FAQ = [
+      { q: "How much are your perfumes?", a: "Elixir 40% (50 ml) is {elixir_price} and Parfum 20% (50 ml) is {parfum_price}. All 9 signature scents come in both. [Browse scents](#fragrances)" },
+      { q: "Elixir vs Parfum — what's the difference?", a: "Elixir 40% is our concentrated version: deeper, longer-lasting, fewer touch-ups. Parfum 20% is lighter — a polished everyday signature. Same 9 scents, both 50 ml." },
+      { q: "Shipping fee & delivery time?", a: "Flat {shipping_fee} anywhere in the Philippines — FREE when your items total more than {free_over}. We ship the next day and it arrives in about 3–5 days. In Cebu City, we can book Maxim, Grab or Angkas for 1–2 hour delivery." },
+      { q: "How do I order?", a: "Tap Add to Cart on any scent → open your Cart → Check out as guest (name, mobile, address) → pay by QR Ph or GCash and upload your screenshot. You'll get an order link to track it, and we'll text you once confirmed. [Shop scents](#fragrances)" },
+      { q: "How can I pay?", a: "At checkout, pay by QR Ph (works with any bank or e-wallet — GCash, Maya, BPI, MariBank and more) or GCash Send Money, then upload your payment screenshot. We confirm by text." },
+      { q: "Which scents are for men or women?", a: "For Men: Savage, Imagination, Acqua DG and 540 Red. For Women: Fantasy, English Pear, Vanilla Lace, Sweet Pea, Éclat and 540 Red (it's unisex). [See the scents](#fragrances)" },
+      { q: "Can I track my order?", a: "Yes! After checkout you get a personal order link — open it anytime to see if your payment is confirmed, packed or on the way, plus your tracking number." },
+      { q: "Are you on Shopee?", a: "Yes — find us on Shopee as bilyotoy. [Open Shopee](https://shopee.ph/bilyotoy)" },
+      { q: "Where are you located?", a: "We're in Cebu City. [Open in Google Maps](https://maps.app.goo.gl/wPRMuWsfBQyrzJ5r5) — chat with Verge if you'd like to arrange a pickup." },
+    ];
+    async function loadInfo() {
+      if (C.info) return C.info;
+      const [st, pr] = await Promise.all([
+        db.from("shop_settings").select("*").eq("id", 1).maybeSingle(),
+        db.from("products").select("line,price").eq("active", true),
+      ]);
+      const min = line => { const v = (pr.data || []).filter(p => p.line === line).map(p => Number(p.price)); return v.length ? Math.min(...v) : null; };
+      const set = st.data || {};
+      C.info = { set, faq: Array.isArray(set.chat_faq) && set.chat_faq.length ? set.chat_faq : DEFAULT_FAQ,
+        vals: { shipping_fee: set.shipping_fee ?? 80, free_over: set.free_shipping_over ?? 1500, elixir_price: min("Elixir 40%") ?? 600, parfum_price: min("Parfum 20%") ?? 300,
+                promo: String(set.promo_text || "").split(/\n+/).filter(Boolean).join(" · ") } };
+      return C.info;
+    }
+    const pesoT = n => "₱" + Number(n).toLocaleString("en-PH");
+    function fill(text) {
+      const v = (C.info || { vals: {} }).vals;
+      let t = esc(text).replace(/\{(shipping_fee|free_over|elixir_price|parfum_price|promo)\}/g, (_, k) => k === "promo" ? esc(v.promo || "") : pesoT(v[k] ?? 0));
+      t = t.replace(/\[([^\]]+)\]\((#[\w-]+|https?:\/\/[^\s)]+)\)/g, (_, label, url) => `<a href="${url}" ${url.startsWith("#") ? 'data-close-chat' : 'target="_blank" rel="noopener"'}>${label}</a>`);
+      return t.replace(/\n/g, "<br>");
+    }
 
     const manilaHour = () => new Date(Date.now() + 8 * 3600e3).getUTCHours();
     const online = () => { const h = manilaHour(); return h >= CHAT.ONLINE_FROM && h < CHAT.ONLINE_TO; };
     function status() {
       const on = online();
       $("#chat-live").classList.toggle("away", !on); $("#chat-dot").classList.toggle("away", !on);
-      $("#chat-status").textContent = on ? "Online · usually replies in minutes" : "Away · we'll reply first thing in the morning";
+      $("#chat-status").textContent = on ? "Instant answers · Verge is online" : "Instant answers · Verge replies in the morning";
     }
     const time = d => new Date(d).toLocaleTimeString("en-PH", { hour: "numeric", minute: "2-digit" });
 
+    function viewFaq() {
+      const info = C.info, faq = info ? info.faq : DEFAULT_FAQ;
+      const log = C.faqLog.map(i => `<div class="msg me"><p>${esc(faq[i]?.q || "")}</p></div><div class="msg them"><p><small class="who">Quick answer</small>${fill(faq[i]?.a || "")}</p></div>`).join("");
+      body.innerHTML = `<div class="msg them"><p><small class="who">Pappi Suds &amp; Scents</small>Hi! 👋 Tap a question for an instant answer${info && info.vals.promo ? ` — and don't miss it: <b>${esc(info.vals.promo)}</b>` : ""}.</p></div>
+        ${log}
+        <div class="faq-chips" role="list" aria-label="Quick questions">${faq.map((f, i) => `<button role="listitem" class="faq-chip" data-q="${i}">${esc(f.q)}</button>`).join("")}</div>`;
+      const unread = unreadReplies();
+      bottom.innerHTML = `<div class="chat-agent"><button class="chat-go" data-agent>💬 ${unread ? `New reply from Verge — open chat (${unread})` : C.token ? "Back to your chat with Verge" : "Chat with Verge"}</button><small>${online() ? "Verge is online and usually replies in minutes." : "Verge is away — leave a message and he'll reply in the morning."}</small></div>`;
+      if (C.faqLog.length) { const answers = body.querySelectorAll(".msg.me"); const q = answers[answers.length - 1]; if (q) body.scrollTop = Math.max(0, q.offsetTop - 10); }
+    }
     function viewStart() {
       const g = store.get("pappi_guest", {});
-      body.innerHTML = `<p class="chat-intro">Hi! 👋 Ask us about scents, orders or delivery. We'll reply right here.</p>
+      body.innerHTML = `<button class="chat-link" data-faq>← Quick answers</button><p class="chat-intro">Leave your name and number, and Verge will reply right here.</p>
         <label for="chat-name">Your name</label><input id="chat-name" autocomplete="name" value="${esc(g.name || "")}">
         <label for="chat-phone">Mobile number</label><input id="chat-phone" type="tel" inputmode="tel" autocomplete="tel" placeholder="09XXXXXXXXX" value="${esc(g.phone || "")}">
         <label for="chat-msg">Message</label><textarea id="chat-msg" placeholder="Type your question…"></textarea>
@@ -1911,33 +1973,46 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
       bottom.innerHTML = "";
     }
     function viewThread() {
-      const list = C.msgs.map(m => `<div class="msg ${m.sender === "customer" ? "me" : "them"}"><p>${esc(m.body)}<time>${time(m.created_at)}</time></p></div>`).join("");
+      const who = { ai: `<small class="who">Pappi Assistant · AI</small>`, admin: `<small class="who">Verge</small>` };
+      const list = C.msgs.map(m => `<div class="msg ${m.sender === "customer" ? "me" : "them"} ${m.sender}"><p>${who[m.sender] || ""}${esc(m.body)}<time>${time(m.created_at)}</time></p></div>`).join("");
       const waiting = C.msgs.length && C.msgs[C.msgs.length - 1].sender === "customer";
-      body.innerHTML = list + (waiting ? `<div class="msg sys"><p>${online() ? "Sent. Verge will reply here shortly." : "Sent. We're away right now and will reply here as soon as we can."}</p></div>` : "");
+      const typing = waiting && Date.now() - (C.sentAt || 0) < 20000 && C.info && C.info.set.ai_chat_enabled === true;
+      body.innerHTML = `<button class="chat-link" data-faq>← Quick answers</button>` + list + (typing
+        ? `<div class="msg them typing" aria-label="Typing"><p><i></i><i></i><i></i></p></div>`
+        : waiting ? `<div class="msg sys"><p>${online() ? "Sent! You'll get a reply here shortly." : "Sent! We're away right now and will reply here as soon as we can."}</p></div>` : "");
       body.scrollTop = body.scrollHeight;
       if (!bottom.innerHTML) bottom.innerHTML = `<div class="chat-send"><textarea id="chat-text" rows="1" placeholder="Type a message…" aria-label="Message"></textarea><button id="chat-send-btn" aria-label="Send"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M22 2 11 13M22 2l-7 20-4-9-9-4 20-7z"/></svg></button></div>`;
       if (C.error) body.insertAdjacentHTML("beforeend", `<p class="chat-err" role="alert">${esc(C.error)}</p>`);
     }
-    const render = () => (C.token ? viewThread() : viewStart());
+    const curView = () => C.view || (C.token ? "thread" : "faq");
+    const unreadReplies = () => C.msgs.filter(m => m.sender !== "customer" && m.id > C.seen).length;
+    const render = () => { const v = curView(); if (v !== "thread" || !bottom.querySelector("#chat-text")) bottom.innerHTML = ""; if (v === "faq") viewFaq(); else if (v === "thread" && C.token) { viewThread(); markSeen(); } else viewStart(); };
 
     function badge() {
-      const unread = C.msgs.filter(m => m.sender === "admin" && m.id > C.seen).length;
+      const unread = C.msgs.filter(m => m.sender !== "customer" && m.id > C.seen).length;
       const b = $("#chat-badge"); b.hidden = !unread || box.classList.contains("open"); b.textContent = unread;
     }
-    function markSeen() { const last = C.msgs.filter(m => m.sender === "admin").pop(); if (last) { C.seen = last.id; store.set("pappi_chat_seen", C.seen); } badge(); }
+    function markSeen() { const last = C.msgs.filter(m => m.sender !== "customer").pop(); if (last) { C.seen = last.id; store.set("pappi_chat_seen", C.seen); } badge(); }
 
     async function poll() {
       if (!C.token) return;
       const { data, error } = await db.rpc("chat_fetch", { p_token: C.token, p_after: C.last });
       if (error) return;
-      if (data && data.length) {
-        C.msgs.push(...data); C.last = data[data.length - 1].id;
-        if (box.classList.contains("open")) { viewThread(); markSeen(); } else badge();
+      const fresh = (data || []).filter(m => m.id > C.last && !C.msgs.some(x => x.id === m.id));   // two refreshes can overlap — never add a message twice
+      if (fresh.length) {
+        C.msgs.push(...fresh); C.last = fresh[fresh.length - 1].id;
+        if (box.classList.contains("open") && curView() === "thread") { viewThread(); markSeen(); }
+        else { badge(); if (box.classList.contains("open") && curView() === "faq") viewFaq(); }
       }
     }
     function schedule() { clearInterval(C.timer); if (C.token) C.timer = setInterval(poll, box.classList.contains("open") ? 4000 : 30000); }
 
-    const forward = (id) => db.functions.invoke("telegram-chat", { body: { action: "customer_message", token: C.token, message_id: id } }).catch(() => {});
+    const forward = (id) => {
+      C.sentAt = Date.now();
+      [1500, 3500, 6000, 9000, 13000, 20500].forEach(ms => setTimeout(() => poll().then(() => { if (box.classList.contains("open") && curView() === "thread") viewThread(); }), ms));
+      return db.functions.invoke("telegram-chat", { body: { action: "customer_message", token: C.token, message_id: id } })
+        .then(() => poll()).catch(() => {});
+    };
 
     async function start() {
       const name = $("#chat-name").value.trim(), phone = $("#chat-phone").value.trim(), msg = $("#chat-msg").value.trim();
@@ -1950,7 +2025,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
       const { data, error } = await db.rpc("chat_start", { p_name: name, p_phone: phone, p_message: msg, p_page: location.pathname });
       C.busy = false;
       if (error) { C.error = error.message; viewStart(); $("#chat-name").value = name; $("#chat-phone").value = phone; $("#chat-msg").value = msg; return; }
-      C.token = data[0].token; store.set("pappi_chat", C.token);
+      C.token = data[0].token; store.set("pappi_chat", C.token); C.view = "thread";
       try { (window.dataLayer = window.dataLayer || []).push({ event: "generate_lead", lead_source: "website_chat" }); } catch {}
       store.set("pappi_guest", { ...store.get("pappi_guest", {}), name, phone });
       forward(data[0].message_id);
@@ -1962,7 +2037,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
       const { data, error } = await db.rpc("chat_send", { p_token: C.token, p_body: text });
       C.busy = false;
       if (error) {
-        if (/ended/i.test(error.message)) { C.token = null; store.set("pappi_chat", null); C.msgs = []; C.last = 0; render(); return; }
+        if (/ended/i.test(error.message)) { C.token = null; store.set("pappi_chat", null); C.msgs = []; C.last = 0; C.view = "form"; render(); return; }
         C.error = error.message; viewThread(); return;
       }
       ta.value = ""; ta.style.height = "42px"; forward(data); await poll();
@@ -1971,8 +2046,9 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     function open() {
       const bagClose = document.getElementById("bag-close"); if (document.getElementById("bag")?.classList.contains("open")) bagClose?.click();
       box.classList.add("open"); document.body.classList.add("chat-open"); fab.setAttribute("aria-expanded", "true");
-      status(); render(); markSeen(); schedule();
-      setTimeout(() => (C.token ? $("#chat-text") : $("#chat-name").value ? $("#chat-msg") : $("#chat-name"))?.focus(), 150);
+      status(); render(); schedule();
+      loadInfo().then(() => { if (box.classList.contains("open") && (C.view || (C.token ? "thread" : "faq")) === "faq") viewFaq(); }).catch(() => {});
+      setTimeout(() => (C.view === "thread" ? $("#chat-text") : C.view === "form" ? ($("#chat-name").value ? $("#chat-msg") : $("#chat-name")) : null)?.focus(), 150);
     }
     function close() { box.classList.remove("open"); document.body.classList.remove("chat-open"); fab.setAttribute("aria-expanded", "false"); badge(); schedule(); }
     fab.onclick = () => box.classList.contains("open") ? close() : open();
@@ -1982,7 +2058,17 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     const bagEl = document.getElementById("bag");
     if (bagEl) new MutationObserver(() => { if (bagEl.classList.contains("open") && box.classList.contains("open")) close(); }).observe(bagEl, { attributes: true, attributeFilter: ["class"] });
 
-    box.addEventListener("click", e => { if (e.target.closest("#chat-start")) start(); if (e.target.closest("#chat-send-btn")) send(); });
+    box.addEventListener("click", e => {
+      if (e.target.closest("#chat-start")) return start();
+      if (e.target.closest("#chat-send-btn")) return send();
+      const q = e.target.closest("[data-q]");
+      if (q) { const i = Number(q.dataset.q); C.faqLog.push(i); viewFaq();
+        try { (window.dataLayer = window.dataLayer || []).push({ event: "chat_faq", question: (C.info ? C.info.faq : DEFAULT_FAQ)[i]?.q }); } catch {} return; }
+      if (e.target.closest("[data-agent]")) { C.view = C.token ? "thread" : "form"; render(); setTimeout(() => (C.token ? $("#chat-text") : $("#chat-name").value ? $("#chat-msg") : $("#chat-name"))?.focus(), 60);
+        try { (window.dataLayer = window.dataLayer || []).push({ event: "chat_agent_request" }); } catch {} return; }
+      if (e.target.closest("[data-faq]")) { C.view = "faq"; render(); return; }
+      if (e.target.closest("[data-close-chat]")) { close(); }
+    });
     box.addEventListener("keydown", e => { if (e.target.id === "chat-text" && e.key === "Enter" && !e.shiftKey) { e.preventDefault(); send(); } });
     box.addEventListener("input", e => { if (e.target.id === "chat-text") { e.target.style.height = "42px"; e.target.style.height = Math.min(110, e.target.scrollHeight) + "px"; } });
 
