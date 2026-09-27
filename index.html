@@ -954,6 +954,109 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
     }
     /* Savon photos now sit below the products */
     .soap-grid + .savon-gallery { margin: 12px 0 0; }
+
+    /* =================== Earth-tone theme (light, easy on the eyes) =================== */
+    :root {
+      --black: #2e241b;           /* warm espresso instead of pure black — buttons, bottle accents */
+      --ink: #33291f; --muted: #6b5d4d;
+      --paper: #faf6ee; --cream: #f2e9da; --clay: #eaddc6; --linen: #e9e0d0;
+      --gold: #b8903f; --gold-light: #e6cf9a; --gold-deep: #8a6a2a;
+      --line: rgba(51,41,31,.12); --line-dark: rgba(46,36,27,.14);
+      --shadow: 0 14px 34px rgba(90,70,40,.10);
+    }
+    body { background: radial-gradient(ellipse at 50% -10%, #f3ead9 0, #e9e0d0 55%) fixed #e9e0d0; color: var(--ink); }
+    .site { background: var(--paper); border: 1px solid rgba(184,144,63,.25); box-shadow: 0 24px 70px rgba(90,70,40,.14); }
+    .eyebrow { color: var(--gold-deep); }
+    .announcement { background: linear-gradient(90deg, #d9bf86, #efdcae 50%, #d9bf86); color: #3a2c17; }
+
+    /* Hero + nav */
+    .hero { background: radial-gradient(circle at 76% 42%, #efe0c2 0, #f5ecdc 34%, #faf6ee 72%); color: var(--ink); }
+    .hero::before { background: none; }
+    .hero::after { border-color: rgba(184,144,63,.35); box-shadow: 0 0 0 40px rgba(184,144,63,.06), 0 0 0 90px rgba(184,144,63,.04); }
+    .hero h1 { color: var(--ink); }
+    .hero h1 em { color: var(--gold-deep); }
+    .hero-copy > p:not(.eyebrow) { color: var(--muted); }
+    .microproof { color: var(--ink); }
+    .nav-inner { border-bottom: 1px solid var(--line); }
+    .brand, .brand-name { color: var(--ink); }
+    .nav-links a { color: var(--ink); }
+    .nav-links a:hover { color: var(--gold-deep); }
+    .button--light { border-color: var(--line); background: #fff; color: var(--ink); }
+
+    /* Trust strip */
+    .trust { background: var(--cream); border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+    .trust-item { border-color: var(--line); }
+    .trust-item strong { color: var(--ink); }
+    .trust-item span { color: var(--muted); }
+
+    /* Fragrances */
+    #fragrances { background: var(--paper); }
+    .product-card, .product-body { background: #fffdf8; }
+    .product-card { border-color: rgba(184,144,63,.28); }
+    .format { background: #fffdf8; }
+    .format--dark { background: var(--black); border-color: rgba(184,144,63,.45); }
+    .format--dark p { color: #d9ccb6; }
+    .scent-tabs { background: #fffdf8; }
+
+    /* Campaign slider */
+    .campaign { background: var(--clay); color: var(--ink); }
+    .campaign .eyebrow { color: var(--gold-deep); }
+    .campaign .lede, .campaign-hint, .carousel-caption { color: var(--muted); }
+    .carousel-slide { background: #fffdf8; border-color: rgba(184,144,63,.3); box-shadow: 0 14px 34px rgba(90,70,40,.12); }
+    .carousel-arrow { border-color: rgba(51,41,31,.25); color: var(--ink); background: rgba(255,255,255,.5); }
+    .carousel-arrow:hover { border-color: var(--gold); background: #fff; }
+    .carousel-dot { background: #cbbca2; }
+
+    /* Savon */
+    .savon-section { background: var(--cream); color: var(--ink); }
+    .savon-section .eyebrow { color: var(--gold-deep); }
+    .savon-section .lede, .savon-section .section-note, .savon-head .section-note { color: var(--muted); }
+    .savon-section h2 { color: var(--ink); }
+    .soap-card { background: #fffdf8; border-color: rgba(184,144,63,.28); }
+    .soap-card .product-image { background: radial-gradient(circle at 50% 38%, #fbf5ea, #efe3cf 72%); }
+    .soap-card h3 { color: var(--ink); }
+    .soap-card .product-body p { color: var(--muted); }
+    .soap-number { color: var(--gold-deep); }
+    .soap-card .add { background: var(--black); border-color: var(--black); }
+    .soap-card .add[disabled] { opacity: .7; }
+    .soap-card .add[disabled] .add-price { color: #d9ccb6; }
+    .savon-gallery-tile { border-color: rgba(184,144,63,.28); }
+
+    /* Where to shop, about, story */
+    .channels { background: var(--paper); }
+    .channel { background: #fffdf8; border-color: rgba(184,144,63,.25); }
+    .channel--shopee { background: #ee4d2d; border-color: #ee4d2d; color: #fff; }
+    .about { background: var(--cream); }
+    .about-visual { border-color: rgba(184,144,63,.35); }
+    .about-milestone { background: #fffdf8; }
+    .story-era { background: #fffdf8; }
+
+    /* Memory quote band */
+    .memory { background: var(--clay); color: var(--ink); }
+    .memory::before { background: radial-gradient(circle, rgba(184,144,63,.16), transparent 55%); }
+    .memory blockquote { color: var(--ink); }
+    .memory blockquote em { color: var(--gold-deep); }
+    .memory p { color: var(--muted); }
+    .memory-quotes q { border-color: rgba(184,144,63,.35); color: var(--ink); background: rgba(255,255,255,.45); }
+
+    /* Testimonials, contact, closing */
+    .testimonials { background: var(--paper); }
+    .testimonial { background: #fffdf8; }
+    .order { background: var(--cream); }
+    form { background: #fffdf8; }
+    .contact-link { background: #fffdf8; }
+    .promise { background: linear-gradient(90deg, #d9bf86, #efdcae 50%, #d9bf86); color: #3a2c17; }
+    footer { background: #e3d6bf; color: var(--ink); }
+    .footer-brand strong { color: var(--ink); }
+    .footer-brand span, .footer-meta { color: #54483a; }
+    footer a { color: var(--ink); }
+
+    /* Floating widgets in espresso instead of black */
+    .chat-fab { background: var(--black); border-color: rgba(184,144,63,.55); }
+    .chat-head { background: var(--black); }
+    .promo { background: var(--black); }
+    .msg.me p { background: var(--black); }
+    .msg.them p { background: #efe4d0; }
   </style>
 </head>
 <body>
