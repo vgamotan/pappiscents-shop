@@ -33,7 +33,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
   <link rel="icon" href="assets/brand/logo.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif:ital,wght@0,500;0,600;0,700;1,500;1,600&amp;family=Noto+Sans:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700&amp;family=Lora:ital,wght@0,500;0,600;0,700;1,500;1,600&amp;family=Quattrocento:wght@400;700&amp;display=swap" rel="stylesheet">
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
@@ -1057,6 +1057,65 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
     .promo { background: var(--black); }
     .msg.me p { background: var(--black); }
     .msg.them p { background: #efe4d0; }
+
+    /* ---- Location card (Google Maps) ---- */
+    .map-card { display: grid; grid-template-columns: 1fr; overflow: hidden; margin-top: 18px; border: 1px solid rgba(184,144,63,.35); border-radius: 18px; background: #fffdf8; color: var(--ink); text-decoration: none; transition: transform .18s ease, box-shadow .18s ease, border-color .18s; }
+    .map-card:hover { transform: translateY(-2px); border-color: var(--gold); box-shadow: 0 14px 30px rgba(90,70,40,.14); }
+    .map-card:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
+    .map-visual { position: relative; display: grid; height: 130px; place-items: center;
+      background:
+        linear-gradient(90deg, transparent 47%, #fbf6ec 47% 53%, transparent 53%) 0 0 / 120px 100%,
+        linear-gradient(0deg, transparent 44%, #fbf6ec 44% 52%, transparent 52%) 0 0 / 100% 70px,
+        linear-gradient(62deg, transparent 48%, #f6ecd9 48% 51%, transparent 51%),
+        radial-gradient(circle at 78% 30%, #dfe3c8 0 16%, transparent 17%),
+        radial-gradient(circle at 18% 78%, #dfe3c8 0 12%, transparent 13%),
+        #ece1cb; }
+    .map-pin { filter: drop-shadow(0 6px 6px rgba(46,36,27,.25)); transition: transform .2s ease; }
+    .map-card:hover .map-pin { transform: translateY(-4px); }
+    .map-text { display: grid; gap: 2px; padding: 14px 18px 0; }
+    .map-text b { font-family: var(--serif); font-size: 1.1rem; }
+    .map-text small { color: var(--muted); font-size: .88rem; }
+    .map-go { justify-self: start; margin: 12px 18px 16px; padding: 8px 16px; border-radius: 999px; background: var(--black); color: var(--gold-light); font-weight: 700; font-size: .88rem; }
+
+    /* =================== Mediterranean type: Cinzel + Lora + Quattrocento =================== */
+    :root {
+      --display: "Cinzel", "Trajan Pro", Georgia, serif;          /* headings — Roman capitals like the bottle engraving */
+      --serif: "Lora", Georgia, "Times New Roman", serif;          /* product names, quotes, accents */
+      --sans: "Quattrocento", Georgia, "Times New Roman", serif;   /* body text, buttons, forms */
+    }
+    body { font-family: var(--sans); font-size: 17px; line-height: 1.65; }
+    button, input, select, textarea { font-family: var(--sans); }
+
+    /* Cinzel: main headings */
+    h1, h2, .hero h1, .brand-name, .footer-brand strong, .about-timeline-head h3, .form-title, .bag-head h2, .chat-head b {
+      font-family: var(--display); font-weight: 600; letter-spacing: .02em; text-transform: none;
+    }
+    h2 { font-size: clamp(1.6rem, 2.6vw, 2.3rem); line-height: 1.18; text-wrap: balance; }
+    .hero h1 { font-size: clamp(2.4rem, 4.6vw, 3.9rem); line-height: 1.08; letter-spacing: .01em; }
+    .brand-name { font-size: .98rem; letter-spacing: .06em; }
+    .savon-copy h2 { font-size: clamp(1.5rem, 2.4vw, 2.05rem); }
+
+    /* Lora: product names, quotes, italics */
+    h3, .product-body h3, .soap-card h3, .format h3, .channel h3, .story-era h4, .about-milestone strong, .trust-item strong, .bag h3, .bag-empty b, .map-text b {
+      font-family: var(--serif); font-weight: 600; letter-spacing: 0;
+    }
+    .hero h1 em { font-family: var(--serif); font-style: italic; font-weight: 600; letter-spacing: 0; }
+    .memory blockquote, .promise blockquote { font-family: var(--serif); font-weight: 600; letter-spacing: -.005em; }
+    .memory blockquote em { font-style: italic; }
+    .testimonial blockquote, .memory-quotes q { font-family: var(--serif); font-weight: 500; }
+    .story-era h4 span, .story-when { font-family: var(--sans); }
+
+    /* Quattrocento: body, UI — sized for comfortable reading */
+    .lede, .hero-copy > p:not(.eyebrow), .about-copy .lede { font-size: 1.08rem; line-height: 1.65; }
+    .product-body p, .soap-card .product-body p, .format p, .channel p, .delivery-row p, .section-note, .story-era p, .about-more p { font-size: .95rem; line-height: 1.6; }
+    .eyebrow { font-family: var(--sans); font-weight: 700; letter-spacing: .16em; font-size: .78rem; }
+    .button, .add, .add-alt, .bag-cta, .chat-go, .scent-tabs button, .bag-fab, .chat-fab, .map-go { font-family: var(--sans); font-weight: 700; letter-spacing: .01em; }
+    .add-label b { font-size: .95rem; } .add-label small { font-size: .8rem; }
+    .add-price { font-family: var(--sans); font-size: 1.12rem; }
+    .promo-track span { font-family: var(--sans); font-weight: 700; letter-spacing: .08em; }
+    .nav-links a { font-family: var(--sans); font-size: .95rem; font-weight: 700; }
+    .announcement { font-family: var(--sans); letter-spacing: .1em; }
+    .msg p, .chat input, .chat textarea, .bag input, .bag textarea { font-family: var(--sans); font-size: 1rem; }
   </style>
 </head>
 <body>
@@ -1242,11 +1301,11 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
       <div class="wrap order-grid">
         <div id="delivery"><p class="eyebrow">Delivery &amp; contact</p><h2>Questions? Message us.</h2><p class="lede">Ask about scents, gifting, bulk or reseller orders. We reply as soon as we can.</p>
           <div class="delivery-card"><div class="delivery-row"><span class="delivery-icon">PH</span><div><b>Flat <span data-ship-fee>₱80</span> shipping nationwide</b><p>Free on orders over <span data-free-over>₱1,500</span>. We aim to ship the next day, arriving in about 3–5 days.</p></div></div><div class="delivery-row"><span class="delivery-icon">CEB</span><div><b>Cebu City express delivery</b><p>We can book Maxim, Grab or Angkas so your Pappi order can reach you in around 1–2 hours, subject to rider availability.</p></div></div><div class="delivery-row"><span class="delivery-icon">✓</span><div><b>Easy payment</b><p>Check out from your cart, then pay by QR Ph with any bank or e-wallet, or GCash. We text you at every step.</p></div></div></div>
-          <div class="contact-links" aria-label="Contact Pappi Suds and Scents Shop">
-            <a class="contact-link" href="tel:+639055613013">Call or text <span>+63 905 561 3013 →</span></a>
-            <a class="contact-link" href="mailto:verge.gamotan@gmail.com">Email us <span>verge.gamotan@gmail.com →</span></a>
-            <a class="contact-link" href="https://maps.app.goo.gl/wPRMuWsfBQyrzJ5r5" target="_blank" rel="noopener">Our location <span>Open Google Maps →</span></a>
-          </div>
+          <a class="map-card" href="https://maps.app.goo.gl/wPRMuWsfBQyrzJ5r5" target="_blank" rel="noopener" aria-label="Open Pappi Suds and Scents Shop location in Google Maps (opens in a new tab)">
+            <span class="map-visual" aria-hidden="true"><svg class="map-pin" width="34" height="44" viewBox="0 0 34 44"><path d="M17 43s15-14.2 15-26A15 15 0 0 0 2 17c0 11.8 15 26 15 26z" fill="#b8903f" stroke="#2e241b" stroke-width="2"/><circle cx="17" cy="17" r="6" fill="#faf6ee"/></svg></span>
+            <span class="map-text"><b>Find us in Cebu City</b><small>Tap for directions in Google Maps</small></span>
+            <span class="map-go">Open Maps <span aria-hidden="true">→</span></span>
+          </a>
         </div>
         <form id="contact-form">
           <div class="form-title">Send us a message</div>
@@ -1255,7 +1314,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
             <div class="field"><label for="c-contact">Mobile or email</label><input id="c-contact" name="contact" autocomplete="tel" required placeholder="09XX XXX XXXX"></div>
             <div class="field field--wide"><label for="c-message">Message</label><textarea id="c-message" name="message" required placeholder="How can we help?"></textarea></div>
           </div>
-          <p class="form-help">This opens your email app with your message ready to send to verge.gamotan@gmail.com.</p>
+          <p class="form-help">This opens your email app with your message ready to send to us.</p>
           <button class="button button--gold" type="submit">Send message</button>
           <div class="success" id="success" role="status">Your message is ready. Press send in your email app.</div>
         </form>
