@@ -2,6 +2,13 @@
 <html lang="en-PH">
 <head>
   <meta charset="utf-8">
+<!-- Google Tag Manager -->
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+})(window,document,'script','dataLayer','GTM-WCK3W4JV');</script>
+<!-- End Google Tag Manager -->
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Pappi Suds &amp; Scents Shop Philippines | Parfum, Elixir &amp; Artisan Savon</title>
   <meta name="description" content="Shop Pappi Parfum, concentrated 40% Elixir fragrances and Pappi Savon artisan cleansing bars. Next-day dispatch and delivery across the Philippines.">
@@ -858,9 +865,82 @@
     .formats-after { margin-top: 30px; }
     .formats-after .formats { margin-bottom: 0; }
     @media (max-width: 620px) { .scent-tabs { display: flex; } .scent-tabs button { flex: 1; justify-content: center; } }
+
+    /* ---- Cart button: gold, lively ---- */
+    .bag-fab { gap: 8px; padding: 0 8px 0 16px; border: 2px solid var(--black); background: var(--gold); color: var(--black); font-weight: 800; box-shadow: 0 10px 30px rgba(201,162,74,.45), 0 4px 12px rgba(0,0,0,.25); transition: transform .18s ease, box-shadow .18s ease, background .18s; }
+    .bag-fab:hover { transform: translateY(-3px); background: #d8b45c; box-shadow: 0 16px 36px rgba(201,162,74,.55), 0 6px 14px rgba(0,0,0,.25); }
+    .bag-fab:active { transform: scale(.96); }
+    .bag-fab:focus-visible { outline: 3px solid var(--black); outline-offset: 3px; }
+    .bag-fab .fab-ic { flex: 0 0 auto; }
+    .bag-fab span.fab-count { background: var(--black); color: var(--gold-light); }
+    .bag-fab .fab-total { background: rgba(0,0,0,.12); color: var(--black); font-weight: 800; }
+    .bag-fab.has-items { animation: cart-hop 6s ease-in-out 2s infinite; }
+    .bag-fab.has-items::after { position: absolute; inset: -2px; border-radius: 999px; box-shadow: 0 0 0 0 rgba(201,162,74,.7); content: ""; animation: cart-ring 2.4s ease-out infinite; pointer-events: none; }
+    .bag-fab.bump { animation: cart-bounce .55s cubic-bezier(.3,1.6,.5,1); }
+    .fab-plus { position: absolute; top: -8px; right: 14px; color: var(--black); background: var(--gold-light); border: 2px solid var(--black); border-radius: 999px; padding: 0 6px; font-size: .74rem; font-weight: 800; animation: cart-plus .9s ease-out forwards; pointer-events: none; }
+    @keyframes cart-bounce { 0% { transform: scale(1); } 30% { transform: scale(1.14) translateY(-6px); } 60% { transform: scale(.96); } 100% { transform: scale(1); } }
+    @keyframes cart-hop { 0%, 88%, 100% { transform: translateY(0); } 91% { transform: translateY(-9px); } 94% { transform: translateY(0); } 97% { transform: translateY(-4px); } }
+    @keyframes cart-ring { 0% { box-shadow: 0 0 0 0 rgba(201,162,74,.65); } 80%, 100% { box-shadow: 0 0 0 14px rgba(201,162,74,0); } }
+    @keyframes cart-plus { 0% { opacity: 0; transform: translateY(6px) scale(.8); } 25% { opacity: 1; transform: translateY(-4px) scale(1); } 100% { opacity: 0; transform: translateY(-26px); } }
+    @media (prefers-reduced-motion: reduce) { .bag-fab, .bag-fab.has-items, .bag-fab.bump, .bag-fab.has-items::after, .fab-plus { animation: none !important; transition: none; } }
+
+    /* ---- Savon: compact ---- */
+    .savon-section { padding: 40px 0 44px; }
+    .savon-section .section-head { margin-bottom: 18px; align-items: flex-end; }
+    .savon-title { display: flex; align-items: center; gap: 16px; }
+    .savon-title .savon-logo { flex: 0 0 auto; width: 74px; height: 74px; margin: 0; }
+    .savon-title .eyebrow { margin-bottom: 4px; }
+    .savon-title h2 { margin: 0; }
+    .savon-section .lede { margin-top: 10px; }
+    .savon-gallery { gap: 10px; margin-bottom: 16px; }
+    .savon-gallery-secondary { grid-template-columns: 1.45fr 1fr; gap: 10px; }
+    .savon-gallery-tile { border-radius: 14px; }
+    .savon-gallery-tile img { height: 190px; }
+    .soap-grid { gap: 10px; }
+    .soap-card .product-image { height: 180px; padding: 10px 10px 0; }
+    .soap-card .product-body { padding: 10px 14px 14px; }
+    .soap-card .product-body p { margin-bottom: 8px; }
+    @media (max-width: 620px) {
+      .savon-title { gap: 12px; }
+      .savon-title .savon-logo { width: 58px; height: 58px; }
+      .savon-gallery-secondary { grid-template-columns: 1fr 1fr; }
+      .savon-gallery-tile img { height: 130px; aspect-ratio: auto; }
+      .soap-card .product-image { height: 200px; }
+    }
+
+    /* ---- Promo marquee (text set in the dashboard) ---- */
+    .scent-bar { display: flex; align-items: center; gap: 14px; margin: 0 0 18px; }
+    .scent-bar .scent-tabs { flex: 0 0 auto; margin: 0; }
+    .promo { position: relative; flex: 1; min-width: 0; height: 52px; overflow: hidden; border: 1px solid rgba(201,162,74,.55); border-radius: 999px; background: var(--black); color: var(--gold-light);
+      -webkit-mask-image: linear-gradient(90deg, transparent, #000 6%, #000 94%, transparent); mask-image: linear-gradient(90deg, transparent, #000 6%, #000 94%, transparent); }
+    .promo[hidden] { display: none; }
+    .promo-static { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); margin: 0; }
+    .promo-track { display: flex; width: max-content; height: 100%; align-items: center; animation: promo-scroll var(--promo-dur, 22s) linear infinite; }
+    .promo:hover .promo-track, .promo:focus-within .promo-track { animation-play-state: paused; }
+    .promo-track span { display: inline-flex; align-items: center; gap: 22px; padding-right: 22px; font: 700 .9rem var(--sans); letter-spacing: .06em; white-space: nowrap; text-transform: uppercase; }
+    .promo-track span b { color: var(--gold); font-size: .8rem; }
+    @keyframes promo-scroll { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+    @media (prefers-reduced-motion: reduce) {
+      .promo { -webkit-mask-image: none; mask-image: none; }
+      .promo-track { animation: none; width: 100%; justify-content: center; }
+      .promo-track span:not(:first-child) { display: none; }
+      .promo-track span { padding: 0 16px; white-space: normal; text-align: center; }
+      .promo-track span b { display: none; }
+    }
+    @media (max-width: 760px) {
+      .scent-bar { flex-direction: column; align-items: stretch; gap: 10px; }
+      .scent-bar .scent-tabs { display: flex; }
+      .scent-bar .scent-tabs button { flex: 1; justify-content: center; }
+      .promo { flex: 0 0 auto; height: 44px; order: -1; }
+      .promo-track span { font-size: .8rem; }
+    }
   </style>
 </head>
 <body>
+<!-- Google Tag Manager (noscript) -->
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-WCK3W4JV"
+height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+<!-- End Google Tag Manager (noscript) -->
 <div class="site">
   <div class="announcement">Free shipping on orders over <span data-free-over>₱1,500</span> · Flat <span data-ship-fee>₱80</span> nationwide</div>
   <nav aria-label="Main navigation">
@@ -889,9 +969,15 @@
     <section id="fragrances">
       <div class="wrap">
         <div class="section-head"><div><p class="eyebrow">The fragrance wardrobe</p><h2>A scent for every version of you.</h2><p class="lede">Choose your scent, then choose how you want to wear it. All nine signature variants are available in Parfum and concentrated Elixir.</p></div><p class="section-note">Not sure where to begin? Tell us what you usually love—fresh, floral, sweet, warm or bold—and we’ll help you choose.</p></div>
+        <div class="scent-bar">
         <div class="scent-tabs" role="tablist" aria-label="Browse scents">
           <button role="tab" id="tab-men" aria-controls="scent-grid" aria-selected="true" data-gender-tab="men">For Men <span>4</span></button>
           <button role="tab" id="tab-women" aria-controls="scent-grid" aria-selected="false" data-gender-tab="women">For Women <span>6</span></button>
+        </div>
+        <div class="promo" id="promo" role="region" aria-label="Promotion">
+          <p class="promo-static" id="promo-static">FREE SHIPPING for orders ₱1,500 and up</p>
+          <div class="promo-track" id="promo-track" aria-hidden="true"></div>
+        </div>
         </div>
         <div class="scent-grid" id="scent-grid" role="tabpanel" aria-labelledby="tab-men">
           <article class="product-card" data-gender="women"><div class="product-image"><img src="assets/fragrances/gg-fantasy.jpg" width="900" height="900" alt="Pappi Fantasy Parfum and Elixir with red berries, jasmine, vanilla and amber" loading="lazy" decoding="async"></div><div class="product-body"><h3>Fantasy</h3><p>Warm, glamorous and sweet—a dressed-up scent with magnetic energy.</p><div class="buy"><button class="add" data-add="elixir-fantasy" aria-label="Add Fantasy Elixir 40%, 600 pesos, to cart"><span class="add-label"><b>Add to Cart</b><small>Elixir 40% · 50 ml</small></span><span class="add-price" data-price>₱600</span></button><button class="add-alt" data-add="parfum-fantasy" aria-label="Add Fantasy Parfum 20%, 300 pesos, to cart">or Parfum 20% · <span data-price>₱300</span></button></div></div></article>
@@ -941,11 +1027,8 @@
 
     <section class="savon-section" id="savon">
       <div class="wrap">
-        <div class="section-head"><div><img class="savon-logo" src="assets/brand/savon-logo.png" width="500" height="500" alt="Pappi Savon logo" loading="lazy" decoding="async"><p class="eyebrow">Pappi Savon</p><h2>Turn the everyday shower into a ritual.</h2><p class="lede">Artisan cleansing bars with creamy lather, a comfortable clean and a beautiful finish.</p></div><p class="section-note">Each bar has its own character. Choose the ritual that suits your mood—or bring home the full trio.</p></div>
+        <div class="section-head"><div><div class="savon-title"><img class="savon-logo" src="assets/brand/savon-logo.png" width="500" height="500" alt="Pappi Savon logo" loading="lazy" decoding="async"><div><p class="eyebrow">Pappi Savon</p><h2>Turn the everyday shower into a ritual.</h2></div></div><p class="lede">Artisan cleansing bars with creamy lather, a comfortable clean and a beautiful finish.</p></div><p class="section-note">Each bar has its own character. Choose the ritual that suits your mood—or bring home the full trio.</p></div>
         <div class="savon-gallery">
-          <a class="savon-gallery-feature" href="#savon-products" aria-label="Shop the Pappi Savon collection">
-            <img src="assets/savon-gallery/collection-hero.jpg" width="1600" height="800" alt="Pappi Savon handcrafted botanical soap collection featuring Noir Charcoal, Coconut Silk and Golden Glow" loading="lazy" decoding="async">
-          </a>
           <div class="savon-gallery-secondary">
             <figure class="savon-gallery-tile"><img src="assets/savon-gallery/parfum-savon-collection.jpg" width="1500" height="844" alt="Pappi Parfum bottles displayed with Coconut Silk, Golden Glow and Noir Charcoal artisan soaps" loading="lazy" decoding="async"></figure>
             <figure class="savon-gallery-tile"><img src="assets/savon-gallery/artisan-trio.jpg" width="1100" height="1100" alt="Pappi Savon artisan cleansing bar trio with charcoal, coconut, oatmeal and turmeric ingredients" loading="lazy" decoding="async"></figure>
@@ -1068,7 +1151,7 @@
     <div class="bag-body" id="bag-body"><p class="muted">Loading…</p></div>
     <div class="bag-foot" id="bag-foot"></div>
   </aside>
-  <button class="bag-fab" id="bag-fab" aria-controls="bag" aria-expanded="false">Cart <span class="fab-count" id="bag-fab-count">0</span><span class="fab-total" id="bag-fab-total">₱0</span></button>
+  <button class="bag-fab" id="bag-fab" aria-controls="bag" aria-expanded="false"><svg class="fab-ic" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="20" r="1.4"/><circle cx="18" cy="20" r="1.4"/><path d="M2.5 3h2.6l2.4 11.2a1.6 1.6 0 0 0 1.6 1.3h8.6a1.6 1.6 0 0 0 1.6-1.2L21 7H6"/></svg>Cart <span class="fab-count" id="bag-fab-count">0</span><span class="fab-total" id="bag-fab-total">₱0</span></button>
 
   <button class="chat-fab" id="chat-fab" aria-controls="chat" aria-expanded="false">
     <span class="ic" aria-hidden="true"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l1.1-4.6A8 8 0 1 1 21 12z"/></svg></span>
@@ -1106,6 +1189,10 @@
     get(k, d) { try { return JSON.parse(localStorage.getItem(k)) ?? d; } catch { return d; } },
     set(k, v) { try { v == null ? localStorage.removeItem(k) : localStorage.setItem(k, JSON.stringify(v)); } catch {} },
   };
+  // Tag Manager events (GA4 e-commerce format)
+  const track = (event, data = {}) => { try { window.dataLayer = window.dataLayer || []; window.dataLayer.push({ ecommerce: null }); window.dataLayer.push({ event, ...data }); } catch {} };
+  const gaItem = (p, qty) => ({ item_id: p.id, item_name: p.name, item_category: p.line, price: Number(p.price), quantity: qty });
+  const gaCart = () => ({ currency: "PHP", value: subtotal(), items: cartItems().map(({ p, qty }) => gaItem(p, qty)) });
   const DELIVERY = { nationwide: "Nationwide delivery", cebu_express: "Cebu City express", pickup: "Pickup" };
   const PROVINCES = ["Metro Manila","Abra","Agusan del Norte","Agusan del Sur","Aklan","Albay","Antique","Apayao","Aurora","Basilan","Bataan","Batanes","Batangas","Benguet","Biliran","Bohol","Bukidnon","Bulacan","Cagayan","Camarines Norte","Camarines Sur","Camiguin","Capiz","Catanduanes","Cavite","Cebu","Cotabato","Davao de Oro","Davao del Norte","Davao del Sur","Davao Occidental","Davao Oriental","Dinagat Islands","Eastern Samar","Guimaras","Ifugao","Ilocos Norte","Ilocos Sur","Iloilo","Isabela","Kalinga","La Union","Laguna","Lanao del Norte","Lanao del Sur","Leyte","Maguindanao del Norte","Maguindanao del Sur","Marinduque","Masbate","Misamis Occidental","Misamis Oriental","Mountain Province","Negros Occidental","Negros Oriental","Northern Samar","Nueva Ecija","Nueva Vizcaya","Occidental Mindoro","Oriental Mindoro","Palawan","Pampanga","Pangasinan","Quezon","Quirino","Rizal","Romblon","Samar","Sarangani","Siquijor","Sorsogon","South Cotabato","Southern Leyte","Sultan Kudarat","Sulu","Surigao del Norte","Surigao del Sur","Tarlac","Tawi-Tawi","Zambales","Zamboanga del Norte","Zamboanga del Sur","Zamboanga Sibugay"];
 
@@ -1138,7 +1225,8 @@
   // ---------- open / close on smaller screens ----------
   const bag = $("#bag"), shade = $("#bag-shade"), fab = $("#bag-fab");
   const isOpen = () => bag.classList.contains("open");
-  function openBag() { bag.classList.add("open"); shade.classList.add("open"); document.body.classList.add("bag-open"); fab.setAttribute("aria-expanded", "true"); document.querySelector(".bag-toast")?.remove(); }
+  fab.addEventListener("animationend", e => { if (e.animationName === "cart-bounce") fab.classList.remove("bump"); });
+  function openBag() { if (!isOpen() && count()) track("view_cart", { ecommerce: gaCart() }); bag.classList.add("open"); shade.classList.add("open"); document.body.classList.add("bag-open"); fab.setAttribute("aria-expanded", "true"); document.querySelector(".bag-toast")?.remove(); }
   function closeBag() { bag.classList.remove("open"); shade.classList.remove("open"); document.body.classList.remove("bag-open"); fab.setAttribute("aria-expanded", "false"); }
   fab.onclick = () => isOpen() ? closeBag() : openBag();
   $("#bag-close").onclick = closeBag; shade.onclick = closeBag;
@@ -1158,10 +1246,13 @@
   function add(id) {
     const p = S.products[id]; if (!p) return;
     S.cart[id] = Math.min(50, (S.cart[id] || 0) + 1); saveCart();
+    track("add_to_cart", { ecommerce: { currency: "PHP", value: Number(p.price), items: [gaItem(p, 1)] } });
     if (S.view !== "cart" && S.view !== "status") S.view = "cart";
     if (S.view === "status") S.view = "cart";
     render();
     fab.classList.remove("bump"); void fab.offsetWidth; fab.classList.add("bump");
+    const plus = document.createElement("span"); plus.className = "fab-plus"; plus.textContent = "+1"; plus.setAttribute("aria-hidden", "true");
+    fab.appendChild(plus); setTimeout(() => plus.remove(), 900);
     toast(`Added ${p.name} ${p.line.split(" ")[0]}`);
   }
   document.addEventListener("click", e => {
@@ -1271,6 +1362,7 @@
     const n = count();
     $("#bag-count").textContent = n ? `(${n})` : "";
     $("#bag-fab-count").textContent = n;
+    fab.classList.toggle("has-items", n > 0);
     $("#bag-fab-total").textContent = peso(subtotal());
     document.querySelectorAll("[data-bag-count]").forEach(el => el.textContent = n);
   }
@@ -1317,6 +1409,8 @@
     if (error) { S.error = error.message; return render(); }
     const row = data[0];
     S.checkout = { token: row.access_token, order_no: row.order_no, sig: cartSig() };
+    track("add_shipping_info", { ecommerce: { ...gaCart(), shipping_tier: "Nationwide", value: Number(row.total ?? subtotal()) } });
+    track("order_placed", { order_no: row.order_no, value: Number(row.total ?? subtotal()), currency: "PHP", payment_method: g.payment });
     db.functions.invoke("notify-telegram", { body: { token: row.access_token, event: "placed" } }).catch(() => {});
     store.set("pappi_checkout", S.checkout); setUrl(row.access_token);
     S.order = await loadOrder(row.access_token);
@@ -1348,6 +1442,8 @@
       if (error) throw new Error(error.message);
       db.functions.invoke("notify-telegram", { body: { order_id: orderId, event: "paid" } }).catch(() => {});
       store.set("pappi_last_order", S.checkout.token);
+      track("purchase", { ecommerce: { transaction_id: S.checkout.order_no, currency: "PHP", value: Number(S.order?.total ?? subtotal()),
+        shipping: Number(S.order?.shipping_fee ?? 0), payment_type: S.method, items: cartItems().map(({ p, qty }) => gaItem(p, qty)) } });
       S.order = await loadOrder(S.checkout.token);
       S.cart = {}; saveCart(); S.checkout = null; store.set("pappi_checkout", null);
       S.file = null; S.preview = ""; S.view = "status";
@@ -1362,7 +1458,7 @@
     else if (d.dec) { const q = (S.cart[d.dec] || 0) - 1; q > 0 ? S.cart[d.dec] = q : delete S.cart[d.dec]; saveCart(); render(); }
     else if (d.method) { S.method = d.method; render(); }
     else if (d.copy) { try { await navigator.clipboard.writeText(d.copy); b.textContent = "Copied"; } catch { prompt("Copy this:", d.copy); } }
-    else if (d.go === "details") { S.error = ""; S.view = "details"; render(); }
+    else if (d.go === "details") { S.error = ""; S.view = "details"; track("begin_checkout", { ecommerce: gaCart() }); render(); }
     else if (d.go === "cart") { saveGuest(); S.error = ""; S.view = "cart"; render(); }
     else if (d.go === "create") { createCheckout(); }
     else if (d.go === "pay") { S.error = ""; S.view = "pay"; if (!S.order || S.order.order_no !== S.checkout.order_no) { render(); S.order = await loadOrder(S.checkout.token); if (!S.order || S.order.status !== "awaiting_payment") { S.checkout = null; store.set("pappi_checkout", null); S.view = S.order ? "status" : "cart"; } } render(); }
@@ -1375,13 +1471,33 @@
     if (e.target.id === "bag-file" && e.target.files[0]) { S.file = e.target.files[0]; S.preview = URL.createObjectURL(S.file); S.error = ""; render(); }
   });
 
+  // ---------- promo marquee ----------
+  function renderPromo(set) {
+    const box = document.getElementById("promo"); if (!box) return;
+    const lines = (set && typeof set.promo_text === "string" ? set.promo_text : box.dataset.text || document.getElementById("promo-static").textContent)
+      .split(/\n+/).map(t => t.trim()).filter(Boolean);
+    const on = !(set && set.promo_enabled === false) && lines.length > 0;
+    box.hidden = !on; if (!on) return;
+    box.dataset.text = lines.join("\n");
+    document.getElementById("promo-static").textContent = lines.join(" · ");
+    const one = lines.map(t => `<span>${esc(t)}<b aria-hidden="true">✦</b></span>`).join("");
+    const track = document.getElementById("promo-track");
+    // repeat enough to fill wide screens, then double it for a seamless loop
+    const reps = Math.max(2, Math.ceil(6 / lines.length));
+    const half = Array(reps).fill(one).join("");
+    track.innerHTML = half + half;
+    track.style.setProperty("--promo-dur", Math.max(14, lines.join("").length * reps * 0.15) + "s");
+  }
+  renderPromo(null);
+
   // ---------- prices & shipping from the dashboard ----------
   async function loadCatalog() {
     const [pr, st] = await Promise.all([
       db.from("products").select("id,line,name,price").eq("active", true).order("sort"),
-      db.from("shop_settings").select("shipping_fee,free_shipping_over").eq("id", 1).maybeSingle(),
+      db.from("shop_settings").select("*").eq("id", 1).maybeSingle(),
     ]);
     if (st.data) { CFG.SHIPPING_FEE = Number(st.data.shipping_fee); CFG.FREE_SHIPPING_OVER = Number(st.data.free_shipping_over); }
+    renderPromo(st.data);
     document.querySelectorAll("[data-ship-fee]").forEach(el => el.textContent = peso(CFG.SHIPPING_FEE));
     document.querySelectorAll("[data-free-over]").forEach(el => el.textContent = peso(CFG.FREE_SHIPPING_OVER));
     if (!pr.error && pr.data) { S.products = {}; pr.data.forEach(p => S.products[p.id] = { ...p, price: Number(p.price) }); }
@@ -1653,6 +1769,7 @@
       C.busy = false;
       if (error) { C.error = error.message; viewStart(); $("#c-name").value = name; $("#c-phone").value = phone; $("#c-msg").value = msg; return; }
       C.token = data[0].token; store.set("pappi_chat", C.token);
+      try { (window.dataLayer = window.dataLayer || []).push({ event: "generate_lead", lead_source: "website_chat" }); } catch {}
       store.set("pappi_guest", { ...store.get("pappi_guest", {}), name, phone });
       forward(data[0].message_id);
       await poll(); render(); schedule();
