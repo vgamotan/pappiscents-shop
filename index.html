@@ -846,6 +846,18 @@
       body.bag-open .chat-fab { display: none; }
     }
     @media (prefers-reduced-motion: reduce) { .chat { transition: none; } }
+
+    /* ---- For Men / For Women tabs ---- */
+    .scent-tabs { display: inline-flex; gap: 4px; margin: 0 0 18px; padding: 4px; border: 1px solid rgba(201,162,74,.4); border-radius: 999px; background: #fffdf8; }
+    .scent-tabs button { display: inline-flex; align-items: center; gap: 8px; min-height: 42px; padding: 0 20px; border: 0; border-radius: 999px; background: none; color: var(--ink); font: 600 .95rem var(--sans); cursor: pointer; }
+    .scent-tabs button span { display: grid; min-width: 22px; height: 22px; place-items: center; padding: 0 6px; border-radius: 999px; background: var(--cream); color: var(--muted); font-size: .74rem; }
+    .scent-tabs button[aria-selected="true"] { background: var(--black); color: var(--gold-light); }
+    .scent-tabs button[aria-selected="true"] span { background: var(--gold); color: var(--black); }
+    .scent-tabs button:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
+    .product-card[hidden] { display: none; }
+    .formats-after { margin-top: 30px; }
+    .formats-after .formats { margin-bottom: 0; }
+    @media (max-width: 620px) { .scent-tabs { display: flex; } .scent-tabs button { flex: 1; justify-content: center; } }
   </style>
 </head>
 <body>
@@ -854,7 +866,7 @@
   <nav aria-label="Main navigation">
     <div class="wrap nav-inner">
       <a class="brand" href="#top" aria-label="Pappi Suds and Scents Shop home"><img src="assets/brand/logo.png" width="500" height="500" alt="Pappi Parfum logo" decoding="async"><span class="brand-name">Pappi Suds &amp; Scents Shop</span></a>
-      <div class="nav-links"><a href="#fragrances">Fragrances</a><a href="#savon">Savon</a><a href="#about">About</a><a href="#contact">Contact</a><a class="button button--gold nav-bag" href="#" data-open-bag>Bag (<span data-bag-count>0</span>)</a></div>
+      <div class="nav-links"><a href="#fragrances">Fragrances</a><a href="#savon">Savon</a><a href="#about">About</a><a href="#contact">Contact</a><a class="button button--gold nav-bag" href="#" data-open-bag>Cart (<span data-bag-count>0</span>)</a></div>
     </div>
   </nav>
 
@@ -865,7 +877,7 @@
           <p class="eyebrow">Pappi Suds &amp; Scents Shop</p>
           <h1>Your ritual, <em>bottled.</em></h1>
           <p>Distinctive fragrance. Beautifully crafted savon. Everyday luxuries made to stay with you—from the first spritz to the last rinse.</p>
-          <div class="hero-actions"><a class="button button--gold" href="#fragrances">Find your scent →</a><a class="button button--light" href="https://shopee.ph/bilyotoy" rel="noopener" target="_blank">Shop on Shopee</a></div>
+          <div class="hero-actions"><a class="button button--gold" href="#fragrances">Find your scent →</a></div>
           <div class="microproof"><span>9 signature scents</span><span>2 fragrance styles</span><span>3 artisan savon bars</span></div>
         </div>
         <div class="hero-art"><img class="hero-bottle-1" src="assets/brand/elixir-40-cutout.png" width="377" height="656" alt="Pappi Elixir 40% concentrated fragrance bottle on a transparent background" fetchpriority="high" decoding="async"><img class="hero-bottle-2" src="assets/brand/parfum-20-cutout.png" width="381" height="1231" alt="Pappi Parfum 20% everyday body spray bottle on a transparent background" decoding="async"></div>
@@ -877,17 +889,23 @@
     <section id="fragrances">
       <div class="wrap">
         <div class="section-head"><div><p class="eyebrow">The fragrance wardrobe</p><h2>A scent for every version of you.</h2><p class="lede">Choose your scent, then choose how you want to wear it. All nine signature variants are available in Parfum and concentrated Elixir.</p></div><p class="section-note">Not sure where to begin? Tell us what you usually love—fresh, floral, sweet, warm or bold—and we’ll help you choose.</p></div>
+        <div class="scent-tabs" role="tablist" aria-label="Browse scents">
+          <button role="tab" id="tab-men" aria-controls="scent-grid" aria-selected="true" data-gender-tab="men">For Men <span>4</span></button>
+          <button role="tab" id="tab-women" aria-controls="scent-grid" aria-selected="false" data-gender-tab="women">For Women <span>6</span></button>
+        </div>
+        <div class="scent-grid" id="scent-grid" role="tabpanel" aria-labelledby="tab-men">
+          <article class="product-card" data-gender="women"><div class="product-image"><img src="assets/fragrances/gg-fantasy.jpg" width="900" height="900" alt="Pappi Fantasy Parfum and Elixir with red berries, jasmine, vanilla and amber" loading="lazy" decoding="async"></div><div class="product-body"><h3>Fantasy</h3><p>Warm, glamorous and sweet—a dressed-up scent with magnetic energy.</p><div class="buy"><button class="add" data-add="elixir-fantasy" aria-label="Add Fantasy Elixir 40%, 600 pesos, to cart"><span class="add-label"><b>Add to Cart</b><small>Elixir 40% · 50 ml</small></span><span class="add-price" data-price>₱600</span></button><button class="add-alt" data-add="parfum-fantasy" aria-label="Add Fantasy Parfum 20%, 300 pesos, to cart">or Parfum 20% · <span data-price>₱300</span></button></div></div></article>
+          <article class="product-card" data-gender="women"><div class="product-image"><img src="assets/fragrances/jm-english-pear.jpg" width="900" height="900" alt="Pappi English Pear Parfum and Elixir with pear and freesia" loading="lazy" decoding="async"></div><div class="product-body"><h3>English Pear</h3><p>Crisp pear and airy florals for an elegant, freshly gathered feel.</p><div class="buy"><button class="add" data-add="elixir-english-pear" aria-label="Add English Pear Elixir 40%, 600 pesos, to cart"><span class="add-label"><b>Add to Cart</b><small>Elixir 40% · 50 ml</small></span><span class="add-price" data-price>₱600</span></button><button class="add-alt" data-add="parfum-english-pear" aria-label="Add English Pear Parfum 20%, 300 pesos, to cart">or Parfum 20% · <span data-price>₱300</span></button></div></div></article>
+          <article class="product-card" data-gender="men"><div class="product-image"><img src="assets/fragrances/dr-savage.jpg" width="900" height="900" alt="Pappi Savage Parfum and Elixir with bergamot, lavender and pepper" loading="lazy" decoding="async"></div><div class="product-body"><h3>Savage</h3><p>Fresh spice and confident woods with a clean, commanding trail.</p><div class="buy"><button class="add" data-add="elixir-savage" aria-label="Add Savage Elixir 40%, 600 pesos, to cart"><span class="add-label"><b>Add to Cart</b><small>Elixir 40% · 50 ml</small></span><span class="add-price" data-price>₱600</span></button><button class="add-alt" data-add="parfum-savage" aria-label="Add Savage Parfum 20%, 300 pesos, to cart">or Parfum 20% · <span data-price>₱300</span></button></div></div></article>
+          <article class="product-card" data-gender="men"><div class="product-image"><img src="assets/fragrances/lv-imagine.jpg" width="900" height="900" alt="Pappi Imagination Parfum and Elixir with lemon, bergamot, ginger and tea" loading="lazy" decoding="async"></div><div class="product-body"><h3>Imagination</h3><p>Bright citrus and cool freshness with a clean, modern finish.</p><div class="buy"><button class="add" data-add="elixir-imagination" aria-label="Add Imagination Elixir 40%, 600 pesos, to cart"><span class="add-label"><b>Add to Cart</b><small>Elixir 40% · 50 ml</small></span><span class="add-price" data-price>₱600</span></button><button class="add-alt" data-add="parfum-imagination" aria-label="Add Imagination Parfum 20%, 300 pesos, to cart">or Parfum 20% · <span data-price>₱300</span></button></div></div></article>
+          <article class="product-card" data-gender="women"><div class="product-image"><img src="assets/fragrances/vs-vanilla.jpg" width="900" height="900" alt="Pappi Vanilla Lace Parfum and Elixir with vanilla, cotton flower and amber" loading="lazy" decoding="async"></div><div class="product-body"><h3>Vanilla Lace</h3><p>Soft, creamy vanilla warmth made for cozy, close-to-skin days.</p><div class="buy"><button class="add" data-add="elixir-vanilla-lace" aria-label="Add Vanilla Lace Elixir 40%, 600 pesos, to cart"><span class="add-label"><b>Add to Cart</b><small>Elixir 40% · 50 ml</small></span><span class="add-price" data-price>₱600</span></button><button class="add-alt" data-add="parfum-vanilla-lace" aria-label="Add Vanilla Lace Parfum 20%, 300 pesos, to cart">or Parfum 20% · <span data-price>₱300</span></button></div></div></article>
+          <article class="product-card" data-gender="women"><div class="product-image"><img src="assets/fragrances/jm-sweet-pea.jpg" width="900" height="900" alt="Pappi Sweet Pea Parfum and Elixir with pear and sweet pea" loading="lazy" decoding="async"></div><div class="product-body"><h3>Sweet Pea</h3><p>A tender bouquet with a soft fruity lift—pretty, graceful and light.</p><div class="buy"><button class="add" data-add="elixir-sweet-pea" aria-label="Add Sweet Pea Elixir 40%, 600 pesos, to cart"><span class="add-label"><b>Add to Cart</b><small>Elixir 40% · 50 ml</small></span><span class="add-price" data-price>₱600</span></button><button class="add-alt" data-add="parfum-sweet-pea" aria-label="Add Sweet Pea Parfum 20%, 300 pesos, to cart">or Parfum 20% · <span data-price>₱300</span></button></div></div></article>
+          <article class="product-card" data-gender="men women"><div class="product-image"><img src="assets/fragrances/br-540-red.jpg" width="900" height="900" alt="Pappi 540 Red Parfum and Elixir with saffron, jasmine, amber and cedar" loading="lazy" decoding="async"></div><div class="product-body"><h3>540 Red</h3><p>Luminous amber warmth with a rich, unforgettable sweetness.</p><div class="buy"><button class="add" data-add="elixir-540-red" aria-label="Add 540 Red Elixir 40%, 600 pesos, to cart"><span class="add-label"><b>Add to Cart</b><small>Elixir 40% · 50 ml</small></span><span class="add-price" data-price>₱600</span></button><button class="add-alt" data-add="parfum-540-red" aria-label="Add 540 Red Parfum 20%, 300 pesos, to cart">or Parfum 20% · <span data-price>₱300</span></button></div></div></article>
+          <article class="product-card" data-gender="women"><div class="product-image"><img src="assets/fragrances/ln-eclat.jpg" width="900" height="900" alt="Pappi Eclat Parfum and Elixir with lilac, peony and peach blossom" loading="lazy" decoding="async"></div><div class="product-body"><h3>Éclat</h3><p>Delicate florals with a serene, polished softness from day to night.</p><div class="buy"><button class="add" data-add="elixir-eclat" aria-label="Add Éclat Elixir 40%, 600 pesos, to cart"><span class="add-label"><b>Add to Cart</b><small>Elixir 40% · 50 ml</small></span><span class="add-price" data-price>₱600</span></button><button class="add-alt" data-add="parfum-eclat" aria-label="Add Éclat Parfum 20%, 300 pesos, to cart">or Parfum 20% · <span data-price>₱300</span></button></div></div></article>
+          <article class="product-card" data-gender="men"><div class="product-image"><img src="assets/fragrances/ga-acqua.jpg" width="900" height="900" alt="Pappi Acqua DG Parfum and Elixir with bergamot, sea salt and woods" loading="lazy" decoding="async"></div><div class="product-body"><h3>Acqua DG</h3><p>Aquatic freshness, bright citrus and an easy coastal confidence.</p><div class="buy"><button class="add" data-add="elixir-acqua-dg" aria-label="Add Acqua DG Elixir 40%, 600 pesos, to cart"><span class="add-label"><b>Add to Cart</b><small>Elixir 40% · 50 ml</small></span><span class="add-price" data-price>₱600</span></button><button class="add-alt" data-add="parfum-acqua-dg" aria-label="Add Acqua DG Parfum 20%, 300 pesos, to cart">or Parfum 20% · <span data-price>₱300</span></button></div></div></article>
+        </div>
+        <div class="formats-after"><p class="eyebrow">Two ways to wear every scent</p>
         <div class="formats"><div class="format"><img class="format-image" src="assets/brand/parfum-20-cutout.png" width="381" height="1231" alt="Pappi Parfum 20% oil-base body spray bottle" loading="lazy" decoding="async"><div><h3>Pappi Parfum · 20%</h3><p>A polished 50 ml signature for everyday wear.</p></div><span class="format-badge">Everyday</span></div><div class="format format--dark"><img class="format-image" src="assets/brand/elixir-40-cutout.png" width="377" height="656" alt="Pappi Elixir 40% concentrated fragrance bottle" loading="lazy" decoding="async"><div><h3>Pappi Elixir · 40%</h3><p>Our concentrated 50 ml expression for deeper presence.</p></div><span class="format-badge">Intense</span></div></div>
-        <div class="scent-grid">
-          <article class="product-card"><div class="product-image"><img src="assets/fragrances/gg-fantasy.jpg" width="900" height="900" alt="Pappi Fantasy Parfum and Elixir with red berries, jasmine, vanilla and amber" loading="lazy" decoding="async"></div><div class="product-body"><h3>Fantasy</h3><p>Warm, glamorous and sweet—a dressed-up scent with magnetic energy.</p><div class="buy"><button class="add" data-add="elixir-fantasy" aria-label="Add Fantasy Elixir 40%, 600 pesos, to bag"><span class="add-label"><b>Add to bag</b><small>Elixir 40% · 50 ml</small></span><span class="add-price" data-price>₱600</span></button><button class="add-alt" data-add="parfum-fantasy" aria-label="Add Fantasy Parfum 20%, 300 pesos, to bag">or Parfum 20% · <span data-price>₱300</span></button></div></div></article>
-          <article class="product-card"><div class="product-image"><img src="assets/fragrances/jm-english-pear.jpg" width="900" height="900" alt="Pappi English Pear Parfum and Elixir with pear and freesia" loading="lazy" decoding="async"></div><div class="product-body"><h3>English Pear</h3><p>Crisp pear and airy florals for an elegant, freshly gathered feel.</p><div class="buy"><button class="add" data-add="elixir-english-pear" aria-label="Add English Pear Elixir 40%, 600 pesos, to bag"><span class="add-label"><b>Add to bag</b><small>Elixir 40% · 50 ml</small></span><span class="add-price" data-price>₱600</span></button><button class="add-alt" data-add="parfum-english-pear" aria-label="Add English Pear Parfum 20%, 300 pesos, to bag">or Parfum 20% · <span data-price>₱300</span></button></div></div></article>
-          <article class="product-card"><div class="product-image"><img src="assets/fragrances/dr-savage.jpg" width="900" height="900" alt="Pappi Savage Parfum and Elixir with bergamot, lavender and pepper" loading="lazy" decoding="async"></div><div class="product-body"><h3>Savage</h3><p>Fresh spice and confident woods with a clean, commanding trail.</p><div class="buy"><button class="add" data-add="elixir-savage" aria-label="Add Savage Elixir 40%, 600 pesos, to bag"><span class="add-label"><b>Add to bag</b><small>Elixir 40% · 50 ml</small></span><span class="add-price" data-price>₱600</span></button><button class="add-alt" data-add="parfum-savage" aria-label="Add Savage Parfum 20%, 300 pesos, to bag">or Parfum 20% · <span data-price>₱300</span></button></div></div></article>
-          <article class="product-card"><div class="product-image"><img src="assets/fragrances/lv-imagine.jpg" width="900" height="900" alt="Pappi Imagination Parfum and Elixir with lemon, bergamot, ginger and tea" loading="lazy" decoding="async"></div><div class="product-body"><h3>Imagination</h3><p>Bright citrus and cool freshness with a clean, modern finish.</p><div class="buy"><button class="add" data-add="elixir-imagination" aria-label="Add Imagination Elixir 40%, 600 pesos, to bag"><span class="add-label"><b>Add to bag</b><small>Elixir 40% · 50 ml</small></span><span class="add-price" data-price>₱600</span></button><button class="add-alt" data-add="parfum-imagination" aria-label="Add Imagination Parfum 20%, 300 pesos, to bag">or Parfum 20% · <span data-price>₱300</span></button></div></div></article>
-          <article class="product-card"><div class="product-image"><img src="assets/fragrances/vs-vanilla.jpg" width="900" height="900" alt="Pappi Vanilla Lace Parfum and Elixir with vanilla, cotton flower and amber" loading="lazy" decoding="async"></div><div class="product-body"><h3>Vanilla Lace</h3><p>Soft, creamy vanilla warmth made for cozy, close-to-skin days.</p><div class="buy"><button class="add" data-add="elixir-vanilla-lace" aria-label="Add Vanilla Lace Elixir 40%, 600 pesos, to bag"><span class="add-label"><b>Add to bag</b><small>Elixir 40% · 50 ml</small></span><span class="add-price" data-price>₱600</span></button><button class="add-alt" data-add="parfum-vanilla-lace" aria-label="Add Vanilla Lace Parfum 20%, 300 pesos, to bag">or Parfum 20% · <span data-price>₱300</span></button></div></div></article>
-          <article class="product-card"><div class="product-image"><img src="assets/fragrances/jm-sweet-pea.jpg" width="900" height="900" alt="Pappi Sweet Pea Parfum and Elixir with pear and sweet pea" loading="lazy" decoding="async"></div><div class="product-body"><h3>Sweet Pea</h3><p>A tender bouquet with a soft fruity lift—pretty, graceful and light.</p><div class="buy"><button class="add" data-add="elixir-sweet-pea" aria-label="Add Sweet Pea Elixir 40%, 600 pesos, to bag"><span class="add-label"><b>Add to bag</b><small>Elixir 40% · 50 ml</small></span><span class="add-price" data-price>₱600</span></button><button class="add-alt" data-add="parfum-sweet-pea" aria-label="Add Sweet Pea Parfum 20%, 300 pesos, to bag">or Parfum 20% · <span data-price>₱300</span></button></div></div></article>
-          <article class="product-card"><div class="product-image"><img src="assets/fragrances/br-540-red.jpg" width="900" height="900" alt="Pappi 540 Red Parfum and Elixir with saffron, jasmine, amber and cedar" loading="lazy" decoding="async"></div><div class="product-body"><h3>540 Red</h3><p>Luminous amber warmth with a rich, unforgettable sweetness.</p><div class="buy"><button class="add" data-add="elixir-540-red" aria-label="Add 540 Red Elixir 40%, 600 pesos, to bag"><span class="add-label"><b>Add to bag</b><small>Elixir 40% · 50 ml</small></span><span class="add-price" data-price>₱600</span></button><button class="add-alt" data-add="parfum-540-red" aria-label="Add 540 Red Parfum 20%, 300 pesos, to bag">or Parfum 20% · <span data-price>₱300</span></button></div></div></article>
-          <article class="product-card"><div class="product-image"><img src="assets/fragrances/ln-eclat.jpg" width="900" height="900" alt="Pappi Eclat Parfum and Elixir with lilac, peony and peach blossom" loading="lazy" decoding="async"></div><div class="product-body"><h3>Éclat</h3><p>Delicate florals with a serene, polished softness from day to night.</p><div class="buy"><button class="add" data-add="elixir-eclat" aria-label="Add Éclat Elixir 40%, 600 pesos, to bag"><span class="add-label"><b>Add to bag</b><small>Elixir 40% · 50 ml</small></span><span class="add-price" data-price>₱600</span></button><button class="add-alt" data-add="parfum-eclat" aria-label="Add Éclat Parfum 20%, 300 pesos, to bag">or Parfum 20% · <span data-price>₱300</span></button></div></div></article>
-          <article class="product-card"><div class="product-image"><img src="assets/fragrances/ga-acqua.jpg" width="900" height="900" alt="Pappi Acqua DG Parfum and Elixir with bergamot, sea salt and woods" loading="lazy" decoding="async"></div><div class="product-body"><h3>Acqua DG</h3><p>Aquatic freshness, bright citrus and an easy coastal confidence.</p><div class="buy"><button class="add" data-add="elixir-acqua-dg" aria-label="Add Acqua DG Elixir 40%, 600 pesos, to bag"><span class="add-label"><b>Add to bag</b><small>Elixir 40% · 50 ml</small></span><span class="add-price" data-price>₱600</span></button><button class="add-alt" data-add="parfum-acqua-dg" aria-label="Add Acqua DG Parfum 20%, 300 pesos, to bag">or Parfum 20% · <span data-price>₱300</span></button></div></div></article>
         </div>
       </div>
     </section>
@@ -934,9 +952,9 @@
           </div>
         </div>
         <div class="soap-grid" id="savon-products">
-          <article class="soap-card"><div class="product-image"><img src="assets/savon/coconut-silk.png" width="723" height="760" alt="Pappi Savon Coconut Silk artisan cleansing bar" loading="lazy" decoding="async"></div><div class="product-body"><span class="soap-number">RITUAL 01</span><h3>Coconut Silk</h3><p>A soft, comforting cleanse with creamy lather for normal, dry and combination skin.</p><button class="add" data-add="savon-coconut-silk" aria-label="Add Coconut Silk Savon to bag"><span class="add-label"><b>Add to bag</b><small>Artisan bar</small></span><span class="add-price" data-price>Coming soon</span></button></div></article>
-          <article class="soap-card"><div class="product-image"><img src="assets/savon/golden-glow.png" width="731" height="760" alt="Pappi Savon Golden Glow artisan cleansing bar" loading="lazy" decoding="async"></div><div class="product-body"><span class="soap-number">RITUAL 02</span><h3>Golden Glow</h3><p>A warm, uplifting cleanse with artisan golden swirls for dull, normal and combination skin.</p><button class="add" data-add="savon-golden-glow" aria-label="Add Golden Glow Savon to bag"><span class="add-label"><b>Add to bag</b><small>Artisan bar</small></span><span class="add-price" data-price>Coming soon</span></button></div></article>
-          <article class="soap-card"><div class="product-image"><img src="assets/savon/noir-charcoal.png" width="723" height="760" alt="Pappi Savon Noir Charcoal artisan cleansing bar" loading="lazy" decoding="async"></div><div class="product-body"><span class="soap-number">RITUAL 03</span><h3>Noir Charcoal</h3><p>A bold charcoal-inspired bar with a refined black-and-gold finish for a fresh daily cleanse.</p><button class="add" data-add="savon-noir-charcoal" aria-label="Add Noir Charcoal Savon to bag"><span class="add-label"><b>Add to bag</b><small>Artisan bar</small></span><span class="add-price" data-price>Coming soon</span></button></div></article>
+          <article class="soap-card"><div class="product-image"><img src="assets/savon/coconut-silk.png" width="723" height="760" alt="Pappi Savon Coconut Silk artisan cleansing bar" loading="lazy" decoding="async"></div><div class="product-body"><span class="soap-number">RITUAL 01</span><h3>Coconut Silk</h3><p>A soft, comforting cleanse with creamy lather for normal, dry and combination skin.</p><button class="add" data-add="savon-coconut-silk" aria-label="Add Coconut Silk Savon to cart"><span class="add-label"><b>Add to Cart</b><small>Artisan bar</small></span><span class="add-price" data-price>Coming soon</span></button></div></article>
+          <article class="soap-card"><div class="product-image"><img src="assets/savon/golden-glow.png" width="731" height="760" alt="Pappi Savon Golden Glow artisan cleansing bar" loading="lazy" decoding="async"></div><div class="product-body"><span class="soap-number">RITUAL 02</span><h3>Golden Glow</h3><p>A warm, uplifting cleanse with artisan golden swirls for dull, normal and combination skin.</p><button class="add" data-add="savon-golden-glow" aria-label="Add Golden Glow Savon to cart"><span class="add-label"><b>Add to Cart</b><small>Artisan bar</small></span><span class="add-price" data-price>Coming soon</span></button></div></article>
+          <article class="soap-card"><div class="product-image"><img src="assets/savon/noir-charcoal.png" width="723" height="760" alt="Pappi Savon Noir Charcoal artisan cleansing bar" loading="lazy" decoding="async"></div><div class="product-body"><span class="soap-number">RITUAL 03</span><h3>Noir Charcoal</h3><p>A bold charcoal-inspired bar with a refined black-and-gold finish for a fresh daily cleanse.</p><button class="add" data-add="savon-noir-charcoal" aria-label="Add Noir Charcoal Savon to cart"><span class="add-label"><b>Add to Cart</b><small>Artisan bar</small></span><span class="add-price" data-price>Coming soon</span></button></div></article>
         </div>
       </div>
     </section>
@@ -946,7 +964,7 @@
         <div class="channel-grid">
           <article class="channel channel--shopee"><div><img class="channel-logo" src="assets/brand/shopee-logo.svg" width="64" height="64" alt="Shopee logo" loading="lazy" decoding="async"><h3>Available now on Shopee</h3><p>Prefer checkout in the app? Browse Pappi, place your order and track delivery from your Shopee account.</p></div><a class="button button--light" href="https://shopee.ph/bilyotoy" rel="noopener" target="_blank">Open Shopee →</a></article>
           <article class="channel"><div><img class="channel-logo" src="assets/brand/tiktok-logo.svg" width="64" height="64" alt="TikTok logo" loading="lazy" decoding="async"><span class="coming">Coming soon</span><h3>TikTok Shop</h3><p>Live selling, scent stories and easy TikTok checkout are on the way.</p></div><span aria-hidden="true">TikTok Shop · Pending</span></article>
-          <article class="channel"><div><div class="channel-icon">✦</div><h3>Order here</h3><p>Add scents to your bag and check out as a guest. Pay by QR Ph bank transfer or GCash—no account needed.</p></div><a class="button button--ghost" href="#fragrances">Shop scents</a></article>
+          <article class="channel"><div><div class="channel-icon">✦</div><h3>Order here</h3><p>Add scents to your cart and check out as a guest. Pay by QR Ph bank transfer or GCash—no account needed.</p></div><a class="button button--ghost" href="#fragrances">Shop scents</a></article>
         </div>
       </div>
     </section>
@@ -1017,7 +1035,7 @@
     <section class="order" id="contact">
       <div class="wrap order-grid">
         <div id="delivery"><p class="eyebrow">Delivery &amp; contact</p><h2>Questions? Message us.</h2><p class="lede">Ask about scents, gifting, bulk or reseller orders. We reply as soon as we can.</p>
-          <div class="delivery-card"><div class="delivery-row"><span class="delivery-icon">PH</span><div><b>Flat <span data-ship-fee>₱80</span> shipping nationwide</b><p>Free on orders over <span data-free-over>₱1,500</span>. We aim to ship the next day, arriving in about 3–5 days.</p></div></div><div class="delivery-row"><span class="delivery-icon">CEB</span><div><b>Cebu City express delivery</b><p>We can book Maxim, Grab or Angkas so your Pappi order can reach you in around 1–2 hours, subject to rider availability.</p></div></div><div class="delivery-row"><span class="delivery-icon">✓</span><div><b>Easy payment</b><p>Check out from your bag, then pay by QR Ph with any bank or e-wallet, or GCash. We text you at every step.</p></div></div></div>
+          <div class="delivery-card"><div class="delivery-row"><span class="delivery-icon">PH</span><div><b>Flat <span data-ship-fee>₱80</span> shipping nationwide</b><p>Free on orders over <span data-free-over>₱1,500</span>. We aim to ship the next day, arriving in about 3–5 days.</p></div></div><div class="delivery-row"><span class="delivery-icon">CEB</span><div><b>Cebu City express delivery</b><p>We can book Maxim, Grab or Angkas so your Pappi order can reach you in around 1–2 hours, subject to rider availability.</p></div></div><div class="delivery-row"><span class="delivery-icon">✓</span><div><b>Easy payment</b><p>Check out from your cart, then pay by QR Ph with any bank or e-wallet, or GCash. We text you at every step.</p></div></div></div>
           <div class="contact-links" aria-label="Contact Pappi Suds and Scents Shop">
             <a class="contact-link" href="tel:+639055613013">Call or text <span>+63 905 561 3013 →</span></a>
             <a class="contact-link" href="mailto:verge.gamotan@gmail.com">Email us <span>verge.gamotan@gmail.com →</span></a>
@@ -1045,12 +1063,12 @@
 </div>
 
   <div class="bag-shade" id="bag-shade"></div>
-  <aside class="bag" id="bag" aria-label="Your bag">
-    <div class="bag-head"><h2>Your bag <span id="bag-count"></span></h2><button class="bag-close" id="bag-close" aria-label="Close bag">×</button></div>
+  <aside class="bag" id="bag" aria-label="Your cart">
+    <div class="bag-head"><h2>Your cart <span id="bag-count"></span></h2><button class="bag-close" id="bag-close" aria-label="Close cart">×</button></div>
     <div class="bag-body" id="bag-body"><p class="muted">Loading…</p></div>
     <div class="bag-foot" id="bag-foot"></div>
   </aside>
-  <button class="bag-fab" id="bag-fab" aria-controls="bag" aria-expanded="false">Bag <span class="fab-count" id="bag-fab-count">0</span><span class="fab-total" id="bag-fab-total">₱0</span></button>
+  <button class="bag-fab" id="bag-fab" aria-controls="bag" aria-expanded="false">Cart <span class="fab-count" id="bag-fab-count">0</span><span class="fab-total" id="bag-fab-total">₱0</span></button>
 
   <button class="chat-fab" id="chat-fab" aria-controls="chat" aria-expanded="false">
     <span class="ic" aria-hidden="true"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l1.1-4.6A8 8 0 1 1 21 12z"/></svg></span>
@@ -1131,7 +1149,7 @@
     if (isOpen()) return;
     document.querySelector(".bag-toast")?.remove();
     const t = document.createElement("div"); t.className = "bag-toast"; t.setAttribute("role", "status");
-    t.innerHTML = `<span>${esc(text)}</span><button>View bag</button>`;
+    t.innerHTML = `<span>${esc(text)}</span><button>View cart</button>`;
     t.querySelector("button").onclick = () => { t.remove(); openBag(); };
     document.body.append(t); setTimeout(() => t.remove(), 3200);
   }
@@ -1157,8 +1175,8 @@
     const items = cartItems();
     const pendingSame = S.checkout && S.checkout.sig === cartSig();
     let banner = "";
-    if (S.checkout && pendingSame) banner = `<div class="bag-banner"><b>Order ${esc(S.checkout.order_no)} is waiting for payment</b>Your bag is saved. Finish paying any time.<br><button data-go="pay">Continue to payment</button></div>`;
-    else if (S.checkout) banner = `<div class="bag-banner"><b>You changed your bag</b>Checking out again replaces unpaid order ${esc(S.checkout.order_no)}.</div>`;
+    if (S.checkout && pendingSame) banner = `<div class="bag-banner"><b>Order ${esc(S.checkout.order_no)} is waiting for payment</b>Your cart is saved. Finish paying any time.<br><button data-go="pay">Continue to payment</button></div>`;
+    else if (S.checkout) banner = `<div class="bag-banner"><b>You changed your cart</b>Checking out again replaces unpaid order ${esc(S.checkout.order_no)}.</div>`;
     const body = items.length ? banner + items.map(({ p, qty }) => `
       <div class="bag-item">
         ${thumbFor(p) ? `<img src="${esc(thumbFor(p))}" alt="">` : `<span class="bag-thumb"></span>`}
@@ -1166,7 +1184,7 @@
           <div class="bag-qty"><button data-dec="${p.id}" aria-label="Remove one ${esc(p.name)}">−</button><span>${qty}</span><button data-inc="${p.id}" aria-label="Add one ${esc(p.name)}">+</button></div></div>
         <div class="bag-price">${peso(p.price * qty)}</div>
       </div>`).join("")
-      : banner + `<div class="bag-empty"><b>Your bag is empty</b>Add a scent from the collection to get started.</div>`;
+      : banner + `<div class="bag-empty"><b>Your cart is empty</b>Add a scent from the collection to get started.</div>`;
     const sub = subtotal(), ship = items.length ? shipFor(sub) : 0;
     const foot = `<div class="bag-sum"><div><span>Subtotal</span><span>${peso(sub)}</span></div>
         <div><span>Shipping fee</span><span>${items.length ? shipText(ship) : "—"}</span></div>
@@ -1201,7 +1219,7 @@
         <div><span>Shipping fee</span><span>${shipText(shipFor(subtotal()))}</span></div>
         <div class="tot"><span>Total to pay</span><span>${peso(subtotal() + shipFor(subtotal()))}</span></div></div>
       <button class="bag-cta" data-go="create" ${S.busy ? "disabled" : ""}>${S.busy ? "Saving your order…" : "Place order"}</button>
-      <button class="bag-back" data-go="cart">Back to bag</button>`;
+      <button class="bag-back" data-go="cart">Back to cart</button>`;
     return [body, foot];
   }
 
@@ -1226,7 +1244,7 @@
       <input id="bag-file" type="file" accept="image/*" hidden>
       ${S.error ? `<p class="bag-err" role="alert">${esc(S.error)}</p>` : ""}`;
     const foot = `<button class="bag-cta" data-go="submit" ${S.file && !S.busy ? "" : "disabled"}>${S.busy ? "Sending…" : "Submit payment"}</button>
-      <button class="bag-back" data-go="cart">Edit bag</button>`;
+      <button class="bag-back" data-go="cart">Edit cart</button>`;
     return [body, foot];
   }
 
@@ -1371,7 +1389,7 @@
       const p = S.products[b.dataset.add];
       b.querySelectorAll("[data-price]").forEach(el => el.textContent = p ? peso(p.price) : (pr.error ? "Offline" : "Coming soon"));
       b.disabled = !p;
-      if (p) b.setAttribute("aria-label", `Add ${p.name} ${p.line}, ${p.price} pesos, to bag`);
+      if (p) b.setAttribute("aria-label", `Add ${p.name} ${p.line}, ${p.price} pesos, to cart`);
     });
     render();
   }
@@ -1448,6 +1466,24 @@
       track.parentElement.addEventListener('mouseenter', stop); track.parentElement.addEventListener('mouseleave', play);
       track.addEventListener('focusin', stop); track.addEventListener('touchstart', stop, { passive: true });
       drawDots(); play();
+    })();
+
+    // For Men / For Women tabs
+    (() => {
+      const tabs = [...document.querySelectorAll('[data-gender-tab]')], grid = document.querySelector('#scent-grid');
+      if (!tabs.length || !grid) return;
+      function show(g, focus) {
+        tabs.forEach(t => { const on = t.dataset.genderTab === g; t.setAttribute('aria-selected', on); t.tabIndex = on ? 0 : -1; if (on && focus) t.focus(); });
+        grid.setAttribute('aria-labelledby', 'tab-' + g);
+        grid.querySelectorAll('.product-card').forEach(c => { c.hidden = !c.dataset.gender.split(' ').includes(g); });
+      }
+      tabs.forEach((t, i) => {
+        t.addEventListener('click', () => show(t.dataset.genderTab));
+        t.addEventListener('keydown', e => { if (e.key === 'ArrowRight' || e.key === 'ArrowLeft') { e.preventDefault(); show(tabs[(i + (e.key === 'ArrowRight' ? 1 : tabs.length - 1)) % tabs.length].dataset.genderTab, true); } });
+      });
+      const fromHash = () => /women/.test(location.hash) ? 'women' : /for-men/.test(location.hash) ? 'men' : null;
+      show(fromHash() || 'men');
+      window.addEventListener('hashchange', () => { const g = fromHash(); if (g) { show(g); document.querySelector('#fragrances').scrollIntoView({ behavior: 'smooth' }); } });
     })();
 
     const carousel = document.querySelector('.carousel');
