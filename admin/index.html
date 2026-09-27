@@ -57,6 +57,8 @@
   .stat .v{font-size:1.6rem;font-weight:700}
   .stat .l{color:var(--mute);font-size:.9rem}
   .stat.hl{border-color:var(--gold)}
+  .promo-preview{display:flex;flex-wrap:wrap;gap:10px 14px;align-items:center;margin-top:12px;padding:12px 16px;border:1px solid var(--gold);border-radius:999px;background:#0b0a08;color:#ecd9a8;font-weight:700;font-size:.85rem;letter-spacing:.06em;text-transform:uppercase}
+  .promo-preview b{color:var(--gold)}
   .sheet.wide>div{width:min(860px,100%)}
   .tag.st-paid{color:var(--paid);border-color:var(--paid);font-weight:700} .tag.st-partial{color:var(--packed);border-color:var(--packed);font-weight:700} .tag.st-unpaid{color:var(--new);border-color:var(--new);font-weight:700} .tag.st-overdue{color:#fff;background:var(--cancel);border-color:var(--cancel);font-weight:700}
   .stat.hl .v{color:var(--gold-hi)}
@@ -299,6 +301,7 @@ function viewSales(){
     <p class="muted" style="margin-top:10px">Gross = items (after discounts) + delivery fees you charged. Shopee orders use Shopee's income report (Shopee covers their shipping). Distributor sales count at retail; their commission is deducted like a fee. Net = what you keep.</p>`;
 }
 
+function promoPreview(text){ const l = String(text||"").split(/\n+/).map(t=>t.trim()).filter(Boolean); return l.length ? l.map(t=>`<span>${esc(t)}</span>`).join('<b>✦</b>') : '<span class="muted">No messages — the banner will be hidden.</span>'; }
 function viewProducts(){
   return `<div class="card-set">
       <h3 style="margin-top:0">Shipping</h3>
@@ -307,6 +310,14 @@ function viewProducts(){
         <div class="field"><label for="set-free">Free shipping when items total more than (₱)</label><input id="set-free" type="number" min="0" step="1" value="${Number(S.settings.free_shipping_over)}"></div>
       </div>
       <div class="actions"><button class="btn" data-savesettings>Save shipping</button></div>
+    </div>
+    <div class="card-set">
+      <h3 style="margin-top:0">Promo banner</h3>
+      <p class="muted" style="margin-top:-4px">Scrolling message beside the For Men / For Women tabs. One message per line. Changes show on the website right away.</p>
+      <div class="field"><label for="set-promo">Messages</label><textarea id="set-promo" rows="3" placeholder="FREE SHIPPING for orders ₱1,500 and up">${esc(S.settings.promo_text ?? "")}</textarea></div>
+      <label style="display:flex;gap:8px;align-items:center;margin-top:10px"><input type="checkbox" id="set-promo-on" ${S.settings.promo_enabled === false ? "" : "checked"} style="width:auto;accent-color:var(--gold)"> Show the banner on the website</label>
+      <div class="promo-preview" id="promo-preview" aria-hidden="true">${promoPreview(S.settings.promo_text ?? "")}</div>
+      <div class="actions"><button class="btn" data-savepromo>Save banner</button></div>
     </div>
     <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;margin-top:22px"><h3 style="margin:0">Products</h3><button class="btn" data-newproduct>+ Add product</button></div>
     <p class="muted">Change a price or hide a product, then press Save. Shop products update the website right away. <b>Add-ons</b> (not on the shop page) can be used in orders and distributor receipts.</p>
@@ -769,6 +780,14 @@ app.addEventListener("click", async e => {
   else if (d.delitem){ S.edit.draft.items.splice(Number(d.delitem),1); syncShip(S.edit.draft); render(); }
   else if ("shipauto" in d){ S.edit.draft.shipAuto=true; syncShip(S.edit.draft); render(); }
   else if ("saveorder" in d){ saveDraft(); }
+  else if ("savepromo" in d){
+    const promo_text = document.getElementById("set-promo").value.split("\n").map(t=>t.trim()).filter(Boolean).join("\n");
+    const promo_enabled = document.getElementById("set-promo-on").checked;
+    if (promo_text.length > 600) return toast("Keep the banner under 600 characters");
+    const { error } = await db.from("shop_settings").update({ promo_text, promo_enabled, updated_at:new Date().toISOString() }).eq("id",1);
+    if (error) return toast(/promo/.test(error.message) ? "Run SQL-15 Promo banner in Supabase first" : "Didn't save: " + error.message);
+    S.settings = { ...S.settings, promo_text, promo_enabled }; toast(promo_enabled && promo_text ? "Banner saved. Website updated" : "Banner hidden on the website");
+  }
   else if ("savesettings" in d){
     const shipping_fee = Number(document.getElementById("set-ship").value), free_shipping_over = Number(document.getElementById("set-free").value);
     if (!(shipping_fee >= 0) || !(free_shipping_over >= 0)) return toast("Enter valid amounts");
@@ -806,6 +825,7 @@ app.addEventListener("click", async e => {
 });
 app.addEventListener("input", e => {
   const t = e.target;
+  if (t.id === "set-promo") { const pv = document.getElementById("promo-preview"); if (pv) pv.innerHTML = promoPreview(t.value); return; }
   if (S.prodForm && t.dataset.pf) { const k = t.dataset.pf; S.prodForm.draft[k] = t.type==="checkbox" ? t.checked : t.value; if (k==="line") render(); return; }
   if (S.distForm && t.dataset.df && t.dataset.df!=="convert") { S.distForm.draft[t.dataset.df] = t.value; return; }
   if (S.distForm && t.dataset.ml) { const l = S.distForm.draft.lines[Number(t.dataset.ml)]; l[t.dataset.mk] = t.dataset.mk==="qty" ? t.value : t.value; return; }
