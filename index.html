@@ -934,6 +934,26 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
       .promo { flex: 0 0 auto; height: 44px; order: -1; }
       .promo-track span { font-size: .8rem; }
     }
+
+    /* ---- Savon header: one aligned text column beside the logo ---- */
+    .savon-head { display: grid; grid-template-columns: auto minmax(0, 1fr) minmax(220px, 300px); align-items: center; column-gap: 22px; margin-bottom: 22px; }
+    .savon-head .savon-logo { width: 84px; height: 84px; margin: 0; align-self: center; }
+    .savon-copy .eyebrow { margin: 0 0 6px; }
+    .savon-copy h2 { max-width: 24ch; margin: 0 0 8px; text-wrap: balance; font-size: clamp(1.6rem, 2.6vw, 2.2rem); line-height: 1.15; }
+    .savon-copy .lede { max-width: 46ch; margin: 0; }
+    .savon-head .section-note { align-self: end; margin: 0; padding-left: 18px; border-left: 2px solid var(--gold); color: #bcb5ab; font-size: .9rem; line-height: 1.55; }
+    @media (max-width: 860px) {
+      .savon-head { grid-template-columns: auto minmax(0, 1fr); row-gap: 14px; }
+      .savon-head .section-note { grid-column: 2; align-self: start; }
+    }
+    @media (max-width: 560px) {
+      .savon-head { grid-template-columns: 60px minmax(0, 1fr); column-gap: 14px; align-items: start; }
+      .savon-head .savon-logo { width: 60px; height: 60px; }
+      .savon-copy h2 { font-size: 1.5rem; max-width: none; }
+      .savon-head .section-note { grid-column: 2; }
+    }
+    /* Savon photos now sit below the products */
+    .soap-grid + .savon-gallery { margin: 12px 0 0; }
   </style>
 </head>
 <body>
@@ -1027,17 +1047,17 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 
     <section class="savon-section" id="savon">
       <div class="wrap">
-        <div class="section-head"><div><div class="savon-title"><img class="savon-logo" src="assets/brand/savon-logo.png" width="500" height="500" alt="Pappi Savon logo" loading="lazy" decoding="async"><div><p class="eyebrow">Pappi Savon</p><h2>Turn the everyday shower into a ritual.</h2></div></div><p class="lede">Artisan cleansing bars with creamy lather, a comfortable clean and a beautiful finish.</p></div><p class="section-note">Each bar has its own character. Choose the ritual that suits your mood—or bring home the full trio.</p></div>
+        <div class="savon-head"><img class="savon-logo" src="assets/brand/savon-logo.png" width="500" height="500" alt="Pappi Savon logo" loading="lazy" decoding="async"><div class="savon-copy"><p class="eyebrow">Pappi Savon</p><h2>Turn the everyday shower into a ritual.</h2><p class="lede">Artisan cleansing bars with creamy lather, a comfortable clean and a beautiful finish.</p></div><p class="section-note">Each bar has its own character. Choose the ritual that suits your mood—or bring home the full trio.</p></div>
+        <div class="soap-grid" id="savon-products">
+          <article class="soap-card"><div class="product-image"><img src="assets/savon/coconut-silk.png" width="723" height="760" alt="Pappi Savon Coconut Silk artisan cleansing bar" loading="lazy" decoding="async"></div><div class="product-body"><span class="soap-number">RITUAL 01</span><h3>Coconut Silk</h3><p>A soft, comforting cleanse with creamy lather for normal, dry and combination skin.</p><button class="add" data-add="savon-coconut-silk" aria-label="Add Coconut Silk Savon to cart"><span class="add-label"><b>Add to Cart</b><small>Artisan bar</small></span><span class="add-price" data-price>Coming soon</span></button></div></article>
+          <article class="soap-card"><div class="product-image"><img src="assets/savon/golden-glow.png" width="731" height="760" alt="Pappi Savon Golden Glow artisan cleansing bar" loading="lazy" decoding="async"></div><div class="product-body"><span class="soap-number">RITUAL 02</span><h3>Golden Glow</h3><p>A warm, uplifting cleanse with artisan golden swirls for dull, normal and combination skin.</p><button class="add" data-add="savon-golden-glow" aria-label="Add Golden Glow Savon to cart"><span class="add-label"><b>Add to Cart</b><small>Artisan bar</small></span><span class="add-price" data-price>Coming soon</span></button></div></article>
+          <article class="soap-card"><div class="product-image"><img src="assets/savon/noir-charcoal.png" width="723" height="760" alt="Pappi Savon Noir Charcoal artisan cleansing bar" loading="lazy" decoding="async"></div><div class="product-body"><span class="soap-number">RITUAL 03</span><h3>Noir Charcoal</h3><p>A bold charcoal-inspired bar with a refined black-and-gold finish for a fresh daily cleanse.</p><button class="add" data-add="savon-noir-charcoal" aria-label="Add Noir Charcoal Savon to cart"><span class="add-label"><b>Add to Cart</b><small>Artisan bar</small></span><span class="add-price" data-price>Coming soon</span></button></div></article>
+        </div>
         <div class="savon-gallery">
           <div class="savon-gallery-secondary">
             <figure class="savon-gallery-tile"><img src="assets/savon-gallery/parfum-savon-collection.jpg" width="1500" height="844" alt="Pappi Parfum bottles displayed with Coconut Silk, Golden Glow and Noir Charcoal artisan soaps" loading="lazy" decoding="async"></figure>
             <figure class="savon-gallery-tile"><img src="assets/savon-gallery/artisan-trio.jpg" width="1100" height="1100" alt="Pappi Savon artisan cleansing bar trio with charcoal, coconut, oatmeal and turmeric ingredients" loading="lazy" decoding="async"></figure>
           </div>
-        </div>
-        <div class="soap-grid" id="savon-products">
-          <article class="soap-card"><div class="product-image"><img src="assets/savon/coconut-silk.png" width="723" height="760" alt="Pappi Savon Coconut Silk artisan cleansing bar" loading="lazy" decoding="async"></div><div class="product-body"><span class="soap-number">RITUAL 01</span><h3>Coconut Silk</h3><p>A soft, comforting cleanse with creamy lather for normal, dry and combination skin.</p><button class="add" data-add="savon-coconut-silk" aria-label="Add Coconut Silk Savon to cart"><span class="add-label"><b>Add to Cart</b><small>Artisan bar</small></span><span class="add-price" data-price>Coming soon</span></button></div></article>
-          <article class="soap-card"><div class="product-image"><img src="assets/savon/golden-glow.png" width="731" height="760" alt="Pappi Savon Golden Glow artisan cleansing bar" loading="lazy" decoding="async"></div><div class="product-body"><span class="soap-number">RITUAL 02</span><h3>Golden Glow</h3><p>A warm, uplifting cleanse with artisan golden swirls for dull, normal and combination skin.</p><button class="add" data-add="savon-golden-glow" aria-label="Add Golden Glow Savon to cart"><span class="add-label"><b>Add to Cart</b><small>Artisan bar</small></span><span class="add-price" data-price>Coming soon</span></button></div></article>
-          <article class="soap-card"><div class="product-image"><img src="assets/savon/noir-charcoal.png" width="723" height="760" alt="Pappi Savon Noir Charcoal artisan cleansing bar" loading="lazy" decoding="async"></div><div class="product-body"><span class="soap-number">RITUAL 03</span><h3>Noir Charcoal</h3><p>A bold charcoal-inspired bar with a refined black-and-gold finish for a fresh daily cleanse.</p><button class="add" data-add="savon-noir-charcoal" aria-label="Add Noir Charcoal Savon to cart"><span class="add-label"><b>Add to Cart</b><small>Artisan bar</small></span><span class="add-price" data-price>Coming soon</span></button></div></article>
         </div>
       </div>
     </section>
@@ -1703,7 +1723,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     };
     // ------------------------------------------------------------
     const db = window.supabase.createClient(CHAT.SUPABASE_URL, CHAT.SUPABASE_KEY);
-    const $ = s => document.querySelector(s);
+    const $ = s => document.querySelector("#chat " + s) || document.querySelector(s);   // chat fields are looked up inside the chat box first
     const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;" }[c]));
     const store = { get(k, d) { try { return JSON.parse(localStorage.getItem(k)) ?? d; } catch { return d; } }, set(k, v) { try { v == null ? localStorage.removeItem(k) : localStorage.setItem(k, JSON.stringify(v)); } catch {} } };
     const box = $("#chat"), fab = $("#chat-fab"), body = $("#chat-body"), bottom = $("#chat-bottom");
@@ -1721,11 +1741,11 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     function viewStart() {
       const g = store.get("pappi_guest", {});
       body.innerHTML = `<p class="chat-intro">Hi! 👋 Ask us about scents, orders or delivery. We'll reply right here.</p>
-        <label for="c-name">Your name</label><input id="c-name" autocomplete="name" value="${esc(g.name || "")}">
-        <label for="c-phone">Mobile number</label><input id="c-phone" type="tel" inputmode="tel" autocomplete="tel" placeholder="09XXXXXXXXX" value="${esc(g.phone || "")}">
-        <label for="c-msg">Message</label><textarea id="c-msg" placeholder="Type your question…"></textarea>
+        <label for="chat-name">Your name</label><input id="chat-name" autocomplete="name" value="${esc(g.name || "")}">
+        <label for="chat-phone">Mobile number</label><input id="chat-phone" type="tel" inputmode="tel" autocomplete="tel" placeholder="09XXXXXXXXX" value="${esc(g.phone || "")}">
+        <label for="chat-msg">Message</label><textarea id="chat-msg" placeholder="Type your question…"></textarea>
         ${C.error ? `<p class="chat-err" role="alert">${esc(C.error)}</p>` : ""}
-        <button class="chat-go" id="c-start" ${C.busy ? "disabled" : ""}>${C.busy ? "Sending…" : "Chat now"}</button>`;
+        <button class="chat-go" id="chat-start" ${C.busy ? "disabled" : ""}>${C.busy ? "Sending…" : "Chat now"}</button>`;
       bottom.innerHTML = "";
     }
     function viewThread() {
@@ -1733,7 +1753,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
       const waiting = C.msgs.length && C.msgs[C.msgs.length - 1].sender === "customer";
       body.innerHTML = list + (waiting ? `<div class="msg sys"><p>${online() ? "Sent. Verge will reply here shortly." : "Sent. We're away right now and will reply here as soon as we can."}</p></div>` : "");
       body.scrollTop = body.scrollHeight;
-      if (!bottom.innerHTML) bottom.innerHTML = `<div class="chat-send"><textarea id="c-text" rows="1" placeholder="Type a message…" aria-label="Message"></textarea><button id="c-send" aria-label="Send"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M22 2 11 13M22 2l-7 20-4-9-9-4 20-7z"/></svg></button></div>`;
+      if (!bottom.innerHTML) bottom.innerHTML = `<div class="chat-send"><textarea id="chat-text" rows="1" placeholder="Type a message…" aria-label="Message"></textarea><button id="chat-send-btn" aria-label="Send"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M22 2 11 13M22 2l-7 20-4-9-9-4 20-7z"/></svg></button></div>`;
       if (C.error) body.insertAdjacentHTML("beforeend", `<p class="chat-err" role="alert">${esc(C.error)}</p>`);
     }
     const render = () => (C.token ? viewThread() : viewStart());
@@ -1758,16 +1778,16 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     const forward = (id) => db.functions.invoke("telegram-chat", { body: { action: "customer_message", token: C.token, message_id: id } }).catch(() => {});
 
     async function start() {
-      const name = $("#c-name").value.trim(), phone = $("#c-phone").value.trim(), msg = $("#c-msg").value.trim();
+      const name = $("#chat-name").value.trim(), phone = $("#chat-phone").value.trim(), msg = $("#chat-msg").value.trim();
       C.error = "";
       if (name.length < 2) C.error = "Enter your name.";
       else if (!/^(09\d{9}|639\d{9})$/.test(phone.replace(/\D/g, ""))) C.error = "Enter an 11-digit mobile number, like 09171234567.";
       else if (!msg) C.error = "Type your message.";
-      if (C.error) { const keep = { n: name, p: phone, m: msg }; viewStart(); $("#c-name").value = keep.n; $("#c-phone").value = keep.p; $("#c-msg").value = keep.m; return; }
-      C.busy = true; viewStart(); $("#c-name").value = name; $("#c-phone").value = phone; $("#c-msg").value = msg;
+      if (C.error) { const keep = { n: name, p: phone, m: msg }; viewStart(); $("#chat-name").value = keep.n; $("#chat-phone").value = keep.p; $("#chat-msg").value = keep.m; return; }
+      C.busy = true; viewStart(); $("#chat-name").value = name; $("#chat-phone").value = phone; $("#chat-msg").value = msg;
       const { data, error } = await db.rpc("chat_start", { p_name: name, p_phone: phone, p_message: msg, p_page: location.pathname });
       C.busy = false;
-      if (error) { C.error = error.message; viewStart(); $("#c-name").value = name; $("#c-phone").value = phone; $("#c-msg").value = msg; return; }
+      if (error) { C.error = error.message; viewStart(); $("#chat-name").value = name; $("#chat-phone").value = phone; $("#chat-msg").value = msg; return; }
       C.token = data[0].token; store.set("pappi_chat", C.token);
       try { (window.dataLayer = window.dataLayer || []).push({ event: "generate_lead", lead_source: "website_chat" }); } catch {}
       store.set("pappi_guest", { ...store.get("pappi_guest", {}), name, phone });
@@ -1775,7 +1795,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
       await poll(); render(); schedule();
     }
     async function send() {
-      const ta = $("#c-text"), text = ta.value.trim(); if (!text || C.busy) return;
+      const ta = $("#chat-text"), text = ta.value.trim(); if (!text || C.busy) return;
       C.busy = true; C.error = "";
       const { data, error } = await db.rpc("chat_send", { p_token: C.token, p_body: text });
       C.busy = false;
@@ -1790,7 +1810,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
       const bagClose = document.getElementById("bag-close"); if (document.getElementById("bag")?.classList.contains("open")) bagClose?.click();
       box.classList.add("open"); document.body.classList.add("chat-open"); fab.setAttribute("aria-expanded", "true");
       status(); render(); markSeen(); schedule();
-      setTimeout(() => (C.token ? $("#c-text") : $("#c-name").value ? $("#c-msg") : $("#c-name"))?.focus(), 150);
+      setTimeout(() => (C.token ? $("#chat-text") : $("#chat-name").value ? $("#chat-msg") : $("#chat-name"))?.focus(), 150);
     }
     function close() { box.classList.remove("open"); document.body.classList.remove("chat-open"); fab.setAttribute("aria-expanded", "false"); badge(); schedule(); }
     fab.onclick = () => box.classList.contains("open") ? close() : open();
@@ -1800,9 +1820,9 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     const bagEl = document.getElementById("bag");
     if (bagEl) new MutationObserver(() => { if (bagEl.classList.contains("open") && box.classList.contains("open")) close(); }).observe(bagEl, { attributes: true, attributeFilter: ["class"] });
 
-    box.addEventListener("click", e => { if (e.target.closest("#c-start")) start(); if (e.target.closest("#c-send")) send(); });
-    box.addEventListener("keydown", e => { if (e.target.id === "c-text" && e.key === "Enter" && !e.shiftKey) { e.preventDefault(); send(); } });
-    box.addEventListener("input", e => { if (e.target.id === "c-text") { e.target.style.height = "42px"; e.target.style.height = Math.min(110, e.target.scrollHeight) + "px"; } });
+    box.addEventListener("click", e => { if (e.target.closest("#chat-start")) start(); if (e.target.closest("#chat-send-btn")) send(); });
+    box.addEventListener("keydown", e => { if (e.target.id === "chat-text" && e.key === "Enter" && !e.shiftKey) { e.preventDefault(); send(); } });
+    box.addEventListener("input", e => { if (e.target.id === "chat-text") { e.target.style.height = "42px"; e.target.style.height = Math.min(110, e.target.scrollHeight) + "px"; } });
 
     status(); setInterval(status, 60000);
     if (C.token) { poll().then(() => { badge(); schedule(); }); }
